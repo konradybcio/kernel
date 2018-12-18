@@ -18,7 +18,7 @@
 #define ESOC_WAIT_FOR_CRASH	_IOR(ESOC_CODE, 6, unsigned int)
 #define ESOC_REG_REQ_ENG	_IO(ESOC_CODE, 7)
 #define ESOC_REG_CMD_ENG	_IO(ESOC_CODE, 8)
-#define ESOC_GET_LINK_ID	_IOWR(ESOC_CODE, 9, __u64)
+#define ESOC_GET_LINK_ID	_IOWR(ESOC_CODE, 9, struct esoc_link_data)
 #define ESOC_SET_BOOT_FAIL_ACT	_IOW(ESOC_CODE, 10, unsigned int)
 #define ESOC_SET_N_PON_TRIES	_IOW(ESOC_CODE, 11, unsigned int)
 
@@ -26,7 +26,6 @@
 #define ESOC_REQ_CRASH_SHUTDOWN ESOC_REQ_CRASH_SHUTDOWN
 #define ESOC_PON_RETRY		ESOC_PON_RETRY
 #define ESOC_BOOT_FAIL_ACTION
-#define ESOC_LINK_ID
 
 enum esoc_boot_fail_action {
 	BOOT_FAIL_ACTION_RETRY,
