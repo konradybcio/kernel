@@ -1,6 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-only WITH Linux-syscall-note */
 /*
+<<<<<<< HEAD
  * Copyright (c) 2021, The Linux Foundation. All rights reserved.
+=======
+ * Copyright (c) 2015-2019, The Linux Foundation. All rights reserved.
+>>>>>>> 0caf8494413f (esoc: Use BOOT mode indicating mdm2ap status high)
  */
 
 #ifndef __UAPI_ESOC_CTRL_H__
