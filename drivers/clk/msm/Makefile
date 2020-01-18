@@ -25,3 +25,5 @@ obj-$(CONFIG_ARCH_MSM8974)	+= clock-mmss-8974.o
 obj-$(CONFIG_ARCH_MSM8974)	+= clock-mdss-8974.o
 obj-$(CONFIG_ARCH_MSM8974)	+= clock-lpass-8974.o
 endif
+
+obj-y				+= mdss/
