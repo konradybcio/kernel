@@ -8,20 +8,21 @@
 	pm8941_0: pm8941@0 {
 		compatible = "qcom,pm8941", "qcom,spmi-pmic";
 		reg = <0x0 SPMI_USID>;
-		#address-cells = <1>;
+		#address-cells = <2>;
 		#size-cells = <0>;
 
 		rtc@6000 {
 			compatible = "qcom,pm8941-rtc";
-			reg = <0x6000>,
-			      <0x6100>;
+			reg = <0x6000 0x100>,
+			      <0x6100 0x100>;
 			reg-names = "rtc", "alarm";
 			interrupts = <0x0 0x61 0x1 IRQ_TYPE_EDGE_RISING>;
 		};
 
 		pwrkey@800 {
 			compatible = "qcom,pm8941-pwrkey";
-			reg = <0x800>;
+			//?
+            reg = <0x800 0x100>;
 			interrupts = <0x0 0x8 0 IRQ_TYPE_EDGE_BOTH>;
 			debounce = <15625>;
 			bias-pull-up;
@@ -29,14 +30,16 @@
 
 		usb_id: misc@900 {
 			compatible = "qcom,pm8941-misc";
-			reg = <0x900>;
+			//?
+            reg = <0x900 0x100>;
 			interrupts = <0x0 0x9 0 IRQ_TYPE_EDGE_BOTH>;
 			interrupt-names = "usb_id";
 		};
 
 		smbb: charger@1000 {
 			compatible = "qcom,pm8941-charger";
-			reg = <0x1000>;
+			//?
+            reg = <0x1000 0x800>;
 			interrupts = <0x0 0x10 7 IRQ_TYPE_EDGE_BOTH>,
 				     <0x0 0x10 5 IRQ_TYPE_EDGE_BOTH>,
 				     <0x0 0x10 4 IRQ_TYPE_EDGE_BOTH>,
@@ -61,7 +64,7 @@
 
 		pm8941_gpios: gpios@c000 {
 			compatible = "qcom,pm8941-gpio", "qcom,spmi-gpio";
-			reg = <0xc000>;
+			reg = <0xc000 0x2400>;
 			gpio-controller;
 			#gpio-cells = <2>;
 			interrupts = <0 0xc0 0 IRQ_TYPE_NONE>,
@@ -100,6 +103,24 @@
 				     <0 0xe1 0 IRQ_TYPE_NONE>,
 				     <0 0xe2 0 IRQ_TYPE_NONE>,
 				     <0 0xe3 0 IRQ_TYPE_NONE>;
+//                 interrupt-names = "pm8941_gpio1", "pm8941_gpio2",
+// 					  "pm8941_gpio4", "pm8941_gpio5",
+// 					  "pm8941_gpio6", "pm8941_gpio7",
+// 					  "pm8941_gpio8", "pm8941_gpio9",
+//                       "pm8941_gpio10", "pm8941_gpio11",
+//                       "pm8941_gpio12", "pm8941_gpio13",
+//                       "pm8941_gpio14", "pm8941_gpio15",
+//                       "pm8941_gpio16", "pm8941_gpio17",
+//                       "pm8941_gpio18", "pm8941_gpio19",
+//                       "pm8941_gpio20", "pm8941_gpio21",
+//                       "pm8941_gpio22", "pm8941_gpio23",
+//                       "pm8941_gpio24", "pm8941_gpio25",
+//                       "pm8941_gpio26", "pm8941_gpio27",
+//                       "pm8941_gpio28", "pm8941_gpio29",
+//                       "pm8941_gpio30", "pm8941_gpio31",
+//                       "pm8941_gpio32", "pm8941_gpio33",
+//                       "pm8941_gpio34", "pm8941_gpio35",
+//                       "pm8941_gpio36";
 
 			boost_bypass_n_pin: boost-bypass {
 				pins = "gpio21";
@@ -109,7 +130,7 @@
 
 		pm8941_mpps: mpps@a000 {
 			compatible = "qcom,pm8941-mpp", "qcom,spmi-mpp";
-			reg = <0xa000>;
+			reg = <0xa000 0x800>;
 			gpio-controller;
 			#gpio-cells = <2>;
 			interrupts = <0 0xa0 0 IRQ_TYPE_NONE>,
@@ -124,7 +145,8 @@
 
 		pm8941_temp: temp-alarm@2400 {
 			compatible = "qcom,spmi-temp-alarm";
-			reg = <0x2400>;
+			//?
+            reg = <0x2400 0x100>;
 			interrupts = <0 0x24 0 IRQ_TYPE_EDGE_RISING>;
 			io-channels = <&pm8941_vadc VADC_DIE_TEMP>;
 			io-channel-names = "thermal";
@@ -133,7 +155,7 @@
 
 		pm8941_vadc: vadc@3100 {
 			compatible = "qcom,spmi-vadc";
-			reg = <0x3100>;
+			reg = <0x3100 0x100>;
 			interrupts = <0x0 0x31 0x0 IRQ_TYPE_EDGE_RISING>;
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -158,14 +180,15 @@
 
 		pm8941_iadc: iadc@3600 {
 			compatible = "qcom,pm8941-iadc", "qcom,spmi-iadc";
-			reg = <0x3600>;
+			//?
+            reg = <0x3600 0x100>;
 			interrupts = <0x0 0x36 0x0 IRQ_TYPE_EDGE_RISING>;
 			qcom,external-resistor-micro-ohms = <10000>;
 		};
 
 		coincell@2800 {
 			compatible = "qcom,pm8941-coincell";
-			reg = <0x2800>;
+			reg = <0x2800 0x100>;
 			status = "disabled";
 		};
 	};
