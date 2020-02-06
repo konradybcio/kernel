@@ -4,6 +4,7 @@
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/clock/qcom,gcc-msm8974.h>
 #include <dt-bindings/clock/qcom,rpmcc.h>
+#include <dt-bindings/regulator/qcom,rpm-smd-regulator.h>
 #include <dt-bindings/reset/qcom,gcc-msm8974.h>
 #include <dt-bindings/gpio/gpio.h>
 #include "skeleton.dtsi"
@@ -44,8 +45,10 @@
 		};
 
 		smem_region: smem@fa00000 {
+			compatible = "removed-dma-pool";
 			reg = <0xfa00000 0x200000>;
 			no-map;
+			label = "smem_region";
 		};
 
 		tz@0fc00000 {
@@ -263,10 +266,8 @@
 
 	smem {
 		compatible = "qcom,smem";
-
 		memory-region = <&smem_region>;
 		qcom,rpm-msg-ram = <&rpm_msg_ram>;
-
 		hwlocks = <&tcsr_mutex 3>;
 	};
 
@@ -358,7 +359,6 @@
 
 		apps_smsm: apps@0 {
 			reg = <0>;
-
 			#qcom,smem-state-cells = <1>;
 		};
 
@@ -545,12 +545,18 @@
 			reg = <0xfc4ab000 0x4>;
 		};
 
+		rpmcc: clock-controller {
+			compatible = "qcom,rpmcc-msm8974";
+			#clock-cells = <1>;
+		};
+
 		gcc: clock-controller@fc400000 {
-			compatible = "qcom,gcc-msm8974";
+			compatible = "qcom,gcc-msm8974", "syscon";
+			reg = <0xfc400000 0x4000>;
+			reg-names = "cc_base";
 			#clock-cells = <1>;
 			#reset-cells = <1>;
 			#power-domain-cells = <1>;
-			reg = <0xfc400000 0x4000>;
 		};
 
 		tcsr: syscon@fd4a0000 {
@@ -682,6 +688,7 @@
 
 		msmgpio: pinctrl@fd510000 {
 			compatible = "qcom,msm8974-pinctrl";
+			//reg = <0xfd510000 0x4000>;
 			reg = <0xfd510000 0x4000>;
 			reg-names = "pinctrl";
 			gpio-controller;
@@ -736,10 +743,11 @@
 			interrupts = <GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>;
 			qcom,ee = <0>;
 			qcom,channel = <0>;
-			#address-cells = <2>;
-			#size-cells = <0>;
+			#address-cells = <1>;
+			#size-cells = <1>;
 			interrupt-controller;
 			#interrupt-cells = <4>;
+			cell-index = <0>;
 		};
 
 		blsp2_dma: dma-controller@f9944000 {
@@ -1041,20 +1049,24 @@
 			qcom,ipc = <&apcs 8 12>;
 			qcom,smd-edge = <0>;
 		};
+		
 
 		rpm {
 			interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
 			qcom,ipc = <&apcs 8 0>;
 			qcom,smd-edge = <15>;
+			label = "rpm";
+
+			rpm_bus: qcom,rpm-smd {
+				compatible = "qcom,rpm-smd";
+				rpm-channel-name = "rpm_requests";
+				interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
+				rpm-channel-type = <15>; /* SMD_APPS_RPM */
+			};
 
 			rpm_requests {
 				compatible = "qcom,rpm-msm8974";
 				qcom,smd-channels = "rpm_requests";
-
-				rpmcc: clock-controller {
-					compatible = "qcom,rpmcc-msm8974", "qcom,rpmcc";
-					#clock-cells = <1>;
-				};
 
 				pm8841-regulators {
 					compatible = "qcom,rpm-pm8841-regulators";
