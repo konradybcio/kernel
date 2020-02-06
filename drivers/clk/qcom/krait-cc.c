@@ -1,14 +1,5 @@
-/* Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
+// SPDX-License-Identifier: GPL-2.0
+// Copyright (c) 2018, The Linux Foundation. All rights reserved.
 
 #include <linux/kernel.h>
 #include <linux/init.h>
@@ -36,7 +27,7 @@ static unsigned int pri_mux_map[] = {
 };
 
 static int
-krait_add_div(struct device *dev, int id, const char *s, unsigned offset)
+krait_add_div(struct device *dev, int id, const char *s, unsigned int offset)
 {
 	struct krait_div2_clk *div;
 	struct clk_init_data init = {
@@ -76,8 +67,8 @@ krait_add_div(struct device *dev, int id, const char *s, unsigned offset)
 }
 
 static int
-krait_add_sec_mux(struct device *dev, int id, const char *s, unsigned offset,
-		  bool unique_aux)
+krait_add_sec_mux(struct device *dev, int id, const char *s,
+		  unsigned int offset, bool unique_aux)
 {
 	struct krait_mux_clk *mux;
 	static const char *sec_mux_list[] = {
@@ -98,8 +89,6 @@ krait_add_sec_mux(struct device *dev, int id, const char *s, unsigned offset,
 
 	mux->offset = offset;
 	mux->lpl = id >= 0;
-	mux->has_safe_parent = true;
-	mux->safe_sel = 2;
 	mux->mask = 0x3;
 	mux->shift = 2;
 	mux->parent_map = sec_mux_map;
@@ -127,7 +116,8 @@ err_aux:
 }
 
 static struct clk *
-krait_add_pri_mux(struct device *dev, int id, const char *s, unsigned offset)
+krait_add_pri_mux(struct device *dev, int id, const char *s,
+		  unsigned int offset)
 {
 	struct krait_mux_clk *mux;
 	const char *p_names[3];
@@ -143,8 +133,6 @@ krait_add_pri_mux(struct device *dev, int id, const char *s, unsigned offset)
 	if (!mux)
 		return ERR_PTR(-ENOMEM);
 
-	mux->has_safe_parent = true;
-	mux->safe_sel = 0;
 	mux->mask = 0x3;
 	mux->shift = 0;
 	mux->offset = offset;
@@ -190,7 +178,7 @@ err_p0:
 static struct clk *krait_add_clks(struct device *dev, int id, bool unique_aux)
 {
 	int ret;
-	unsigned offset;
+	unsigned int offset;
 	void *p = NULL;
 	const char *s;
 	struct clk *clk;
@@ -258,7 +246,7 @@ static int krait_cc_probe(struct platform_device *pdev)
 		return -ENODEV;
 
 	/* Rate is 1 because 0 causes problems for __clk_mux_determine_rate */
-	clk = clk_register_fixed_rate(dev, "qsb", NULL, CLK_IS_ROOT, 1);
+	clk = clk_register_fixed_rate(dev, "qsb", NULL, 0, 1);
 	if (IS_ERR(clk))
 		return PTR_ERR(clk);
 
@@ -296,7 +284,7 @@ static int krait_cc_probe(struct platform_device *pdev)
 	for_each_online_cpu(cpu) {
 		clk_prepare_enable(l2_pri_mux_clk);
 		WARN(clk_prepare_enable(clks[cpu]),
-			"Unable to turn on CPU%d clock", cpu);
+		     "Unable to turn on CPU%d clock", cpu);
 	}
 
 	/*
@@ -327,6 +315,7 @@ static int krait_cc_probe(struct platform_device *pdev)
 			pr_info("CPU%d @ QSB rate. Forcing new rate.\n", cpu);
 			cur_rate = aux_rate;
 		}
+
 		clk_set_rate(clk, aux_rate);
 		clk_set_rate(clk, 2);
 		clk_set_rate(clk, cur_rate);

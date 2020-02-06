@@ -1,15 +1,4 @@
-/*
- * Copyright (c) 2013, The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
+/* SPDX-License-Identifier: GPL-2.0 */
 
 #ifndef __QCOM_CLK_KRAIT_H
 #define __QCOM_CLK_KRAIT_H
@@ -18,8 +7,6 @@
 
 struct krait_mux_clk {
 	unsigned int	*parent_map;
-	bool		has_safe_parent;
-	u8		safe_sel;
 	u32		offset;
 	u32		mask;
 	u32		shift;
@@ -27,6 +14,7 @@ struct krait_mux_clk {
 	bool		lpl;
 
 	struct clk_hw	hw;
+	struct notifier_block   clk_nb;
 };
 
 #define to_krait_mux_clk(_hw) container_of(_hw, struct krait_mux_clk, hw)

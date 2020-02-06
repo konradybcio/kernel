@@ -1,15 +1,5 @@
-/*
- * Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
+// SPDX-License-Identifier: GPL-2.0
+// Copyright (c) 2018, The Linux Foundation. All rights reserved.
 
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -54,11 +44,12 @@ static int krait_mux_set_parent(struct clk_hw *hw, u8 index)
 	struct krait_mux_clk *mux = to_krait_mux_clk(hw);
 	u32 sel;
 
-	sel = clk_mux_reindex(index, mux->parent_map, 0);
+	sel = clk_mux_index_to_val(mux->parent_map, 0, index);
 	mux->en_mask = sel;
 	/* Don't touch mux if CPU is off as it won't work */
 	if (__clk_is_enabled(hw->clk))
 		__krait_mux_set_sel(mux, sel);
+
 	return 0;
 }
 
@@ -72,47 +63,13 @@ static u8 krait_mux_get_parent(struct clk_hw *hw)
 	sel &= mux->mask;
 	mux->en_mask = sel;
 
-	return clk_mux_get_parent(hw, sel, mux->parent_map, 0);
-}
-
-static struct clk_hw *krait_mux_get_safe_parent(struct clk_hw *hw,
-						unsigned long *safe_freq)
-{
-	int i;
-	struct krait_mux_clk *mux = to_krait_mux_clk(hw);
-	int num_parents = clk_hw_get_num_parents(hw);
-
-	i = mux->safe_sel;
-	for (i = 0; i < num_parents; i++)
-		if (mux->safe_sel == mux->parent_map[i])
-			break;
-
-	return clk_hw_get_parent_by_index(hw, i);
-}
-
-static int krait_mux_enable(struct clk_hw *hw)
-{
-	struct krait_mux_clk *mux = to_krait_mux_clk(hw);
-
-	__krait_mux_set_sel(mux, mux->en_mask);
-
-	return 0;
-}
-
-static void krait_mux_disable(struct clk_hw *hw)
-{
-	struct krait_mux_clk *mux = to_krait_mux_clk(hw);
-
-	__krait_mux_set_sel(mux, mux->safe_sel);
+	return clk_mux_val_to_index(hw, mux->parent_map, 0, sel);
 }
 
 const struct clk_ops krait_mux_clk_ops = {
-	.enable = krait_mux_enable,
-	.disable = krait_mux_disable,
 	.set_parent = krait_mux_set_parent,
 	.get_parent = krait_mux_get_parent,
 	.determine_rate = __clk_mux_determine_rate_closest,
-	.get_safe_parent = krait_mux_get_safe_parent,
 };
 EXPORT_SYMBOL_GPL(krait_mux_clk_ops);
 
@@ -125,7 +82,7 @@ static long krait_div2_round_rate(struct clk_hw *hw, unsigned long rate,
 }
 
 static int krait_div2_set_rate(struct clk_hw *hw, unsigned long rate,
-			unsigned long parent_rate)
+			       unsigned long parent_rate)
 {
 	struct krait_div2_clk *d = to_krait_div2_clk(hw);
 	unsigned long flags;
