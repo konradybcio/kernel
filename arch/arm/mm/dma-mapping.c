@@ -960,7 +960,7 @@ static void *arm_dma_remap(struct device *dev, void *cpu_addr,
 static void arm_dma_unremap(struct device *dev, void *remapped_addr,
 				size_t size)
 {
-	unsigned int flags = VM_ARM_DMA_CONSISTENT | VM_USERMAP;
+	unsigned int flags = VM_DMA_COHERENT;
 	struct vm_struct *area;
 
 	size = PAGE_ALIGN(size);
@@ -1786,7 +1786,7 @@ void __arm_iommu_free_attrs(struct device *dev, size_t size, void *cpu_addr,
 
 	if ((attrs & DMA_ATTR_NO_KERNEL_MAPPING) == 0) {
 		dma_common_free_remap(cpu_addr, size,
-			VM_ARM_DMA_CONSISTENT | VM_USERMAP, true);
+			VM_DMA_COHERENT, true);
 	}
 
 	__iommu_remove_mapping(dev, handle, size);
