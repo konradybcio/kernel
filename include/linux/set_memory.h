@@ -8,6 +8,17 @@
 #ifndef _LINUX_SET_MEMORY_H_
 #define _LINUX_SET_MEMORY_H_
 
+#ifdef CONFIG_ARM
+static inline int set_direct_map_invalid_noflush(struct page *page)
+{
+        return 0;
+}
+static inline int set_direct_map_default_noflush(struct page *page)
+{
+        return 0;
+}
+#endif
+
 #ifdef CONFIG_ARCH_HAS_SET_MEMORY
 #include <asm/set_memory.h>
 #else
