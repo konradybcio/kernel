@@ -264,11 +264,98 @@
 		qcom,smem-state-names = "stop";
 	};
 
+	tcsr_mutex: tcsr-mutex {
+		compatible = "qcom,tcsr-mutex";
+		syscon = <&tcsr_mutex_block 0 0x80>;
+
+		#hwlock-cells = <1>;
+	};
+
 	smem {
 		compatible = "qcom,smem";
 		memory-region = <&smem_region>;
 		qcom,rpm-msg-ram = <&rpm_msg_ram>;
 		hwlocks = <&tcsr_mutex 3>;
+	};
+
+	smd {
+		compatible = "qcom,smd";
+
+		adsp {
+			interrupts = <GIC_SPI 156 IRQ_TYPE_EDGE_RISING>;
+
+			qcom,ipc = <&apcs 8 8>;
+			qcom,smd-edge = <1>;
+		};
+
+		modem {
+			interrupts = <GIC_SPI 25 IRQ_TYPE_EDGE_RISING>;
+
+			qcom,ipc = <&apcs 8 12>;
+			qcom,smd-edge = <0>;
+		};
+
+		rpm {
+			interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
+			qcom,ipc = <&apcs 8 0>;
+			qcom,smd-edge = <15>;
+			label = "rpm";
+
+			rpm_requests {
+				compatible = "qcom,rpm-msm8974";
+				qcom,smd-channels = "rpm_requests";
+
+				pm8841-regulators {
+					compatible = "qcom,rpm-pm8841-regulators";
+
+					pm8841_s1: s1 {};
+					pm8841_s2: s2 {};
+					pm8841_s3: s3 {};
+					pm8841_s4: s4 {};
+					pm8841_s5: s5 {};
+					pm8841_s6: s6 {};
+					pm8841_s7: s7 {};
+					pm8841_s8: s8 {};
+				};
+
+				pm8941-regulators {
+					compatible = "qcom,rpm-pm8941-regulators";
+
+					pm8941_s1: s1 {};
+					pm8941_s2: s2 {};
+					pm8941_s3: s3 {};
+
+					pm8941_l1: l1 {};
+					pm8941_l2: l2 {};
+					pm8941_l3: l3 {};
+					pm8941_l4: l4 {};
+					pm8941_l5: l5 {};
+					pm8941_l6: l6 {};
+					pm8941_l7: l7 {};
+					pm8941_l8: l8 {};
+					pm8941_l9: l9 {};
+					pm8941_l10: l10 {};
+					pm8941_l11: l11 {};
+					pm8941_l12: l12 {};
+					pm8941_l13: l13 {};
+					pm8941_l14: l14 {};
+					pm8941_l15: l15 {};
+					pm8941_l16: l16 {};
+					pm8941_l17: l17 {};
+					pm8941_l18: l18 {};
+					pm8941_l19: l19 {};
+					pm8941_l20: l20 {};
+					pm8941_l21: l21 {};
+					pm8941_l22: l22 {};
+					pm8941_l23: l23 {};
+					pm8941_l24: l24 {};
+
+					pm8941_lvs1: lvs1 {};
+					pm8941_lvs2: lvs2 {};
+					pm8941_lvs3: lvs3 {};
+				};
+			};
+		};
 	};
 
 	smp2p-adsp {
@@ -408,6 +495,19 @@
 			reg = <0xf9000000 0x1000>,
 			      <0xf9002000 0x1000>;
 		};
+		
+		rpm_bus: qcom,rpm-smd {
+			compatible = "qcom,rpm-smd";
+			rpm-channel-name = "rpm_requests";
+			interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
+			rpm-channel-type = <15>; /* SMD_APPS_RPM */
+		};
+
+		rpmcc: clock-controller {
+			compatible = "qcom,rpmcc-msm8974", "qcom,rpmcc";
+			#clock-cells = <1>;
+			status = "ok";
+		};
 
 		apcs: syscon@f9011000 {
 			compatible = "syscon";
@@ -545,11 +645,6 @@
 			reg = <0xfc4ab000 0x4>;
 		};
 
-		rpmcc: clock-controller {
-			compatible = "qcom,rpmcc-msm8974";
-			#clock-cells = <1>;
-		};
-
 		gcc: clock-controller@fc400000 {
 			compatible = "qcom,gcc-msm8974", "syscon";
 			reg = <0xfc400000 0x4000>;
@@ -575,13 +670,6 @@
 			#reset-cells = <1>;
 			#power-domain-cells = <1>;
 			reg = <0xfd8c0000 0x6000>;
-		};
-
-		tcsr_mutex: tcsr-mutex {
-			compatible = "qcom,tcsr-mutex";
-			syscon = <&tcsr_mutex_block 0 0x80>;
-
-			#hwlock-cells = <1>;
 		};
 
 		rpm_msg_ram: memory@fc428000 {
@@ -1028,94 +1116,6 @@
 			port {
 				etm3_out: endpoint {
 					remote-endpoint = <&kpss_in3>;
-				};
-			};
-		};
-	};
-
-	smd {
-		compatible = "qcom,smd";
-
-		adsp {
-			interrupts = <GIC_SPI 156 IRQ_TYPE_EDGE_RISING>;
-
-			qcom,ipc = <&apcs 8 8>;
-			qcom,smd-edge = <1>;
-		};
-
-		modem {
-			interrupts = <GIC_SPI 25 IRQ_TYPE_EDGE_RISING>;
-
-			qcom,ipc = <&apcs 8 12>;
-			qcom,smd-edge = <0>;
-		};
-		
-
-		rpm {
-			interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
-			qcom,ipc = <&apcs 8 0>;
-			qcom,smd-edge = <15>;
-			label = "rpm";
-
-			rpm_bus: qcom,rpm-smd {
-				compatible = "qcom,rpm-smd";
-				rpm-channel-name = "rpm_requests";
-				interrupts = <GIC_SPI 168 IRQ_TYPE_EDGE_RISING>;
-				rpm-channel-type = <15>; /* SMD_APPS_RPM */
-			};
-
-			rpm_requests {
-				compatible = "qcom,rpm-msm8974";
-				qcom,smd-channels = "rpm_requests";
-
-				pm8841-regulators {
-					compatible = "qcom,rpm-pm8841-regulators";
-
-					pm8841_s1: s1 {};
-					pm8841_s2: s2 {};
-					pm8841_s3: s3 {};
-					pm8841_s4: s4 {};
-					pm8841_s5: s5 {};
-					pm8841_s6: s6 {};
-					pm8841_s7: s7 {};
-					pm8841_s8: s8 {};
-				};
-
-				pm8941-regulators {
-					compatible = "qcom,rpm-pm8941-regulators";
-
-					pm8941_s1: s1 {};
-					pm8941_s2: s2 {};
-					pm8941_s3: s3 {};
-
-					pm8941_l1: l1 {};
-					pm8941_l2: l2 {};
-					pm8941_l3: l3 {};
-					pm8941_l4: l4 {};
-					pm8941_l5: l5 {};
-					pm8941_l6: l6 {};
-					pm8941_l7: l7 {};
-					pm8941_l8: l8 {};
-					pm8941_l9: l9 {};
-					pm8941_l10: l10 {};
-					pm8941_l11: l11 {};
-					pm8941_l12: l12 {};
-					pm8941_l13: l13 {};
-					pm8941_l14: l14 {};
-					pm8941_l15: l15 {};
-					pm8941_l16: l16 {};
-					pm8941_l17: l17 {};
-					pm8941_l18: l18 {};
-					pm8941_l19: l19 {};
-					pm8941_l20: l20 {};
-					pm8941_l21: l21 {};
-					pm8941_l22: l22 {};
-					pm8941_l23: l23 {};
-					pm8941_l24: l24 {};
-
-					pm8941_lvs1: lvs1 {};
-					pm8941_lvs2: lvs2 {};
-					pm8941_lvs3: lvs3 {};
 				};
 			};
 		};
