@@ -3524,6 +3524,10 @@ static int __ext4_block_zero_page_range(handle_t *handle,
 	if (!page)
 		return -ENOMEM;
 
+	/* If we are processing an encrypted inode during orphan list handling */
+	if (ext4_encrypted_inode(inode) && !ext4_has_encryption_key(inode))
+		return 0;
+
 	blocksize = inode->i_sb->s_blocksize;
 
 	iblock = index << (PAGE_CACHE_SHIFT - inode->i_sb->s_blocksize_bits);
