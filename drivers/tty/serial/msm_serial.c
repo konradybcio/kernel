@@ -1575,6 +1575,7 @@ static struct msm_port msm_uart_ports[] = {
 		},
 	},
 };
+MODULE_DEVICE_TABLE(of, msm_match_table);
 
 #define UART_NR	ARRAY_SIZE(msm_uart_ports)
 
