@@ -17,4 +17,11 @@ ifeq ($(CONFIG_COMMON_CLK_MSM), y)
 obj-$(CONFIG_ARCH_MDM9607)	+= clock-gcc-9607.o
 # ACPU clock
 obj-$(CONFIG_ARCH_MDM9607)	+= clock-a7.o
+
+# MSM8974
+obj-$(CONFIG_ARCH_MSM8974)	+= clock-rpm-8974.o
+obj-$(CONFIG_ARCH_MSM8974)	+= clock-gcc-8974.o
+obj-$(CONFIG_ARCH_MSM8974)	+= clock-mmss-8974.o
+obj-$(CONFIG_ARCH_MSM8974)	+= clock-mdss-8974.o
+obj-$(CONFIG_ARCH_MSM8974)	+= clock-lpass-8974.o
 endif
