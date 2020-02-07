@@ -1,0 +1,2280 @@
+./drivers/usb/host/Makefile:CFLAGS_xhci-trace.o := -I$(src)
+./drivers/usb/host/Makefile:xhci-hcd-y := xhci.o xhci-mem.o
+./drivers/usb/host/Makefile:xhci-hcd-y += xhci-ring.o xhci-hub.o xhci-dbg.o
+./drivers/usb/host/Makefile:xhci-hcd-y += xhci-trace.o
+./drivers/usb/host/Makefile:xhci-plat-hcd-y := xhci-plat.o
+./drivers/usb/host/Makefile:	xhci-plat-hcd-y		+= xhci-mvebu.o
+./drivers/usb/host/Makefile:	xhci-plat-hcd-y		+= xhci-rcar.o
+./drivers/usb/host/Makefile:obj-$(CONFIG_USB_XHCI_HCD)	+= xhci-hcd.o
+./drivers/usb/host/Makefile:obj-$(CONFIG_USB_XHCI_PCI)	+= xhci-pci.o
+./drivers/usb/host/Makefile:obj-$(CONFIG_USB_XHCI_PLATFORM) += xhci-plat-hcd.o
+./drivers/usb/host/xhci-hub.c:#include "xhci-trace.h"
+./drivers/usb/host/xhci-hub.c:	if (xhci->usb3_rhub.min_rev >= 0x01 && xhci->usb3_rhub.psi_uid_count) {
+./drivers/usb/host/xhci-hub.c:		ssa_count = xhci->usb3_rhub.psi_uid_count * 2;
+./drivers/usb/host/xhci-hub.c:	temp = readl(&xhci->cap_regs->hcc_params);
+./drivers/usb/host/xhci-hub.c:	if ((xhci->quirks & XHCI_LPM_SUPPORT)) {
+./drivers/usb/host/xhci-hub.c:		temp = readl(&xhci->cap_regs->hcs_params3);
+./drivers/usb/host/xhci-hub.c:		bm_attrib |= (xhci->usb3_rhub.psi_uid_count - 1) << 5;
+./drivers/usb/host/xhci-hub.c:		for (i = 0; i < xhci->usb3_rhub.psi_count; i++) {
+./drivers/usb/host/xhci-hub.c:			psi = xhci->usb3_rhub.psi[i];
+./drivers/usb/host/xhci-hub.c:	if (HCC_PPC(xhci->hcc_params))
+./drivers/usb/host/xhci-hub.c:	ports = xhci->num_usb2_ports;
+./drivers/usb/host/xhci-hub.c:		portsc = readl(xhci->usb2_ports[i]);
+./drivers/usb/host/xhci-hub.c:	ports = xhci->num_usb3_ports;
+./drivers/usb/host/xhci-hub.c:		portsc = readl(xhci->usb3_ports[i]);
+./drivers/usb/host/xhci-hub.c:		if (!xhci->devs[i])
+./drivers/usb/host/xhci-hub.c:		speed = xhci->devs[i]->udev->speed;
+./drivers/usb/host/xhci-hub.c:				&& xhci->devs[i]->fake_port == port) {
+./drivers/usb/host/xhci-hub.c:	virt_dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-hub.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:		ep = &xhci->devs[slot_id]->eps[i];
+./drivers/usb/host/xhci-hub.c:		max_ports = xhci->num_usb3_ports;
+./drivers/usb/host/xhci-hub.c:		*port_array = xhci->usb3_ports;
+./drivers/usb/host/xhci-hub.c:		max_ports = xhci->num_usb2_ports;
+./drivers/usb/host/xhci-hub.c:		*port_array = xhci->usb2_ports;
+./drivers/usb/host/xhci-hub.c:		if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
+./drivers/usb/host/xhci-hub.c:	u32 all_ports_seen_u0 = ((1 << xhci->num_usb3_ports)-1);
+./drivers/usb/host/xhci-hub.c:	if (!(xhci->quirks & XHCI_COMP_MODE_QUIRK))
+./drivers/usb/host/xhci-hub.c:	if ((xhci->port_status_u0 != all_ports_seen_u0) && port_in_u0) {
+./drivers/usb/host/xhci-hub.c:		xhci->port_status_u0 |= 1 << wIndex;
+./drivers/usb/host/xhci-hub.c:		if (xhci->port_status_u0 == all_ports_seen_u0) {
+./drivers/usb/host/xhci-hub.c:			del_timer_sync(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci-hub.c:	__releases(&xhci->lock)
+./drivers/usb/host/xhci-hub.c:	__acquires(&xhci->lock)
+./drivers/usb/host/xhci-hub.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-hub.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:					spin_unlock_irqrestore(&xhci->lock,
+./drivers/usb/host/xhci-hub.c:					spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-hub.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-hub.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-hub.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c:	writel(temp, &xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c:		if ((xhci->quirks & XHCI_MISSING_CAS) &&
+./drivers/usb/host/xhci-hub.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c:	(void) readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c:	writel(temp, &xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.h:#include	"xhci-ext-caps.h"
+./drivers/usb/host/xhci.h:	/* xhci->event_ring keeps track of segment dma addresses */
+./drivers/usb/host/xhci.h: * they see this status (any time they drop and re-acquire xhci->lock).
+./drivers/usb/host/xhci.h:	return xhci->main_hcd;
+./drivers/usb/host/xhci.h:	return xhci->quirks & XHCI_LINK_TRB_QUIRK;
+./drivers/usb/host/xhci-ring.c:#include "xhci-trace.h"
+./drivers/usb/host/xhci-ring.c:	if (ring == xhci->event_ring)
+./drivers/usb/host/xhci-ring.c:			(seg->next == xhci->event_ring->first_seg);
+./drivers/usb/host/xhci-ring.c:	if (ring == xhci->event_ring)
+./drivers/usb/host/xhci-ring.c:					(xhci->quirks & XHCI_AMD_0x96_HOST))
+./drivers/usb/host/xhci-ring.c:	if (!(xhci->cmd_ring_state & CMD_RING_STATE_RUNNING))
+./drivers/usb/host/xhci-ring.c:	writel(DB_VALUE_HOST, &xhci->dba->doorbell[0]);
+./drivers/usb/host/xhci-ring.c:	readl(&xhci->dba->doorbell[0]);
+./drivers/usb/host/xhci-ring.c:	return mod_delayed_work(system_wq, &xhci->cmd_timer, delay);
+./drivers/usb/host/xhci-ring.c:	return list_first_entry_or_null(&xhci->cmd_list, struct xhci_command,
+./drivers/usb/host/xhci-ring.c: * This must be called with command ring stopped and xhci->lock held.
+./drivers/usb/host/xhci-ring.c:	list_for_each_entry(i_cmd, &xhci->cmd_list, cmd_list) {
+./drivers/usb/host/xhci-ring.c:	xhci->cmd_ring_state = CMD_RING_STATE_RUNNING;
+./drivers/usb/host/xhci-ring.c:	if ((xhci->cmd_ring->dequeue != xhci->cmd_ring->enqueue) &&
+./drivers/usb/host/xhci-ring.c:	    !(xhci->xhc_state & XHCI_STATE_DYING)) {
+./drivers/usb/host/xhci-ring.c:		xhci->current_cmd = cur_cmd;
+./drivers/usb/host/xhci-ring.c:/* Must be called with xhci->lock held, releases and aquires lock back */
+./drivers/usb/host/xhci-ring.c:	reinit_completion(&xhci->cmd_ring_stop_completion);
+./drivers/usb/host/xhci-ring.c:	temp_64 = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c:			&xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c:	ret = xhci_handshake(&xhci->op_regs->cmd_ring,
+./drivers/usb/host/xhci-ring.c:			      &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c:		ret = xhci_handshake(&xhci->op_regs->cmd_ring,
+./drivers/usb/host/xhci-ring.c:			xhci->xhc_state |= XHCI_STATE_DYING;
+./drivers/usb/host/xhci-ring.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	ret = wait_for_completion_timeout(&xhci->cmd_ring_stop_completion,
+./drivers/usb/host/xhci-ring.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	__le32 __iomem *db_addr = &xhci->dba->doorbell[slot_id];
+./drivers/usb/host/xhci-ring.c:	struct xhci_virt_ep *ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c:	struct xhci_virt_device *dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c:/* Must be called with xhci->lock held in interrupt context */
+./drivers/usb/host/xhci-ring.c:				if (xhci->quirks & XHCI_AMD_PLL_FIX)
+./drivers/usb/host/xhci-ring.c:		spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:		spin_lock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:		if (!xhci->devs[slot_id])
+./drivers/usb/host/xhci-ring.c:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci-ring.c:	/* Return to the event handler with xhci->lock re-acquired */
+./drivers/usb/host/xhci-ring.c:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c: * through xhci->state.
+./drivers/usb/host/xhci-ring.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	if (xhci->xhc_state & XHCI_STATE_REMOVING) {
+./drivers/usb/host/xhci-ring.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	if (xhci->xhc_state & XHCI_STATE_DYING) {
+./drivers/usb/host/xhci-ring.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	xhci->xhc_state |= XHCI_STATE_DYING;
+./drivers/usb/host/xhci-ring.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:		if (!xhci->devs[i])
+./drivers/usb/host/xhci-ring.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c:	if (xhci->quirks & XHCI_RESET_EP_QUIRK) {
+./drivers/usb/host/xhci-ring.c:				xhci->devs[slot_id]->in_ctx->dma, slot_id,
+./drivers/usb/host/xhci-ring.c:		xhci->devs[slot_id]->eps[ep_index].ep_state &= ~EP_HALTED;
+./drivers/usb/host/xhci-ring.c:		xhci->slot_id = slot_id;
+./drivers/usb/host/xhci-ring.c:		xhci->slot_id = 0;
+./drivers/usb/host/xhci-ring.c:	virt_dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c:	if (xhci->quirks & XHCI_EP_LIMIT_QUIRK)
+./drivers/usb/host/xhci-ring.c:	virt_dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c:	if (xhci->quirks & XHCI_RESET_EP_QUIRK &&
+./drivers/usb/host/xhci-ring.c:	if (!xhci->devs[slot_id])
+./drivers/usb/host/xhci-ring.c:	if (!(xhci->quirks & XHCI_NEC_HOST)) {
+./drivers/usb/host/xhci-ring.c:		xhci->error_bitmask |= 1 << 6;
+./drivers/usb/host/xhci-ring.c:	list_for_each_entry_safe(cur_cmd, tmp_cmd, &xhci->cmd_list, cmd_list)
+./drivers/usb/host/xhci-ring.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	if (!xhci->current_cmd || delayed_work_pending(&xhci->cmd_timer)) {
+./drivers/usb/host/xhci-ring.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	xhci->current_cmd->status = COMP_CMD_ABORT;
+./drivers/usb/host/xhci-ring.c:	hw_ring_state = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c:	if ((xhci->cmd_ring_state & CMD_RING_STATE_RUNNING) &&
+./drivers/usb/host/xhci-ring.c:		xhci->cmd_ring_state = CMD_RING_STATE_ABORTED;
+./drivers/usb/host/xhci-ring.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	if (xhci->xhc_state & XHCI_STATE_REMOVING) {
+./drivers/usb/host/xhci-ring.c:	xhci_handle_stopped_cmd_ring(xhci, xhci->current_cmd);
+./drivers/usb/host/xhci-ring.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c:	cmd_trb = xhci->cmd_ring->dequeue;
+./drivers/usb/host/xhci-ring.c:	cmd_dequeue_dma = xhci_trb_virt_to_dma(xhci->cmd_ring->deq_seg,
+./drivers/usb/host/xhci-ring.c:		xhci->error_bitmask |= 1 << 4;
+./drivers/usb/host/xhci-ring.c:		xhci->error_bitmask |= 1 << 5;
+./drivers/usb/host/xhci-ring.c:	cmd = list_entry(xhci->cmd_list.next, struct xhci_command, cmd_list);
+./drivers/usb/host/xhci-ring.c:	cancel_delayed_work(&xhci->cmd_timer);
+./drivers/usb/host/xhci-ring.c:		complete_all(&xhci->cmd_ring_stop_completion);
+./drivers/usb/host/xhci-ring.c:	if (cmd->command_trb != xhci->cmd_ring->dequeue) {
+./drivers/usb/host/xhci-ring.c:		xhci->cmd_ring_state = CMD_RING_STATE_STOPPED;
+./drivers/usb/host/xhci-ring.c:			if (xhci->current_cmd == cmd)
+./drivers/usb/host/xhci-ring.c:				xhci->current_cmd = NULL;
+./drivers/usb/host/xhci-ring.c:		xhci->error_bitmask |= 1 << 6;
+./drivers/usb/host/xhci-ring.c:	if (cmd->cmd_list.next != &xhci->cmd_list) {
+./drivers/usb/host/xhci-ring.c:		xhci->current_cmd = list_entry(cmd->cmd_list.next,
+./drivers/usb/host/xhci-ring.c:	} else if (xhci->current_cmd == cmd) {
+./drivers/usb/host/xhci-ring.c:		xhci->current_cmd = NULL;
+./drivers/usb/host/xhci-ring.c:	inc_deq(xhci, xhci->cmd_ring);
+./drivers/usb/host/xhci-ring.c:	if (trb_type == TRB_NEC_CMD_COMP && (xhci->quirks & XHCI_NEC_HOST))
+./drivers/usb/host/xhci-ring.c:		u8 port_speed = xhci->port_array[i];
+./drivers/usb/host/xhci-ring.c:	if (!xhci->devs[slot_id]) {
+./drivers/usb/host/xhci-ring.c:	udev = xhci->devs[slot_id]->udev;
+./drivers/usb/host/xhci-ring.c:		xhci->error_bitmask |= 1 << 8;
+./drivers/usb/host/xhci-ring.c:	max_ports = HCS_MAX_PORTS(xhci->hcs_params1);
+./drivers/usb/host/xhci-ring.c:		inc_deq(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-ring.c:	major_revision = xhci->port_array[port_id - 1];
+./drivers/usb/host/xhci-ring.c:		hcd = xhci->shared_hcd;
+./drivers/usb/host/xhci-ring.c:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-ring.c:		port_array = xhci->usb3_ports;
+./drivers/usb/host/xhci-ring.c:		port_array = xhci->usb2_ports;
+./drivers/usb/host/xhci-ring.c:		temp1 = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-ring.c:		if (slot_id && xhci->devs[slot_id])
+./drivers/usb/host/xhci-ring.c:	 * Check to see if xhci-hub.c is waiting on RExit to U0 transition (or
+./drivers/usb/host/xhci-ring.c:	inc_deq(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-ring.c:	spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:	spin_lock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:	struct xhci_virt_ep *ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c:	xdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c:				if (xhci->quirks & XHCI_AMD_PLL_FIX)
+./drivers/usb/host/xhci-ring.c:	xdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c:		if ((xhci->quirks & XHCI_TRUST_TX_LENGTH))
+./drivers/usb/host/xhci-ring.c:			if ((xhci->quirks & XHCI_TRUST_TX_LENGTH))
+./drivers/usb/host/xhci-ring.c:	__releases(&xhci->lock)
+./drivers/usb/host/xhci-ring.c:	__acquires(&xhci->lock)
+./drivers/usb/host/xhci-ring.c:	xdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c:				 xhci->event_ring->deq_seg,
+./drivers/usb/host/xhci-ring.c:				 xhci->event_ring->dequeue),
+./drivers/usb/host/xhci-ring.c:		xhci_debug_segment(xhci, xhci->event_ring->deq_seg);
+./drivers/usb/host/xhci-ring.c:				 xhci->event_ring->deq_seg,
+./drivers/usb/host/xhci-ring.c:				 xhci->event_ring->dequeue),
+./drivers/usb/host/xhci-ring.c:		xhci_debug_segment(xhci, xhci->event_ring->deq_seg);
+./drivers/usb/host/xhci-ring.c:		if (xhci->quirks & XHCI_TRUST_TX_LENGTH)
+./drivers/usb/host/xhci-ring.c:				if ((xhci->quirks & XHCI_SPURIOUS_SUCCESS) &&
+./drivers/usb/host/xhci-ring.c:			inc_deq(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-ring.c:			spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:			spin_lock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c: * xhci->lock between event processing (e.g. to pass up port status changes).
+./drivers/usb/host/xhci-ring.c:	if (!xhci->event_ring || !xhci->event_ring->dequeue) {
+./drivers/usb/host/xhci-ring.c:		xhci->error_bitmask |= 1 << 1;
+./drivers/usb/host/xhci-ring.c:	event = xhci->event_ring->dequeue;
+./drivers/usb/host/xhci-ring.c:	    xhci->event_ring->cycle_state) {
+./drivers/usb/host/xhci-ring.c:		xhci->error_bitmask |= 1 << 2;
+./drivers/usb/host/xhci-ring.c:			xhci->error_bitmask |= 1 << 9;
+./drivers/usb/host/xhci-ring.c:			xhci->error_bitmask |= 1 << 3;
+./drivers/usb/host/xhci-ring.c:	if (xhci->xhc_state & XHCI_STATE_DYING) {
+./drivers/usb/host/xhci-ring.c:		inc_deq(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-ring.c:	spin_lock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:	status = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci-ring.c:		spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:		spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:	writel(status, &xhci->op_regs->status);
+./drivers/usb/host/xhci-ring.c:		irq_pending = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci-ring.c:		writel(irq_pending, &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci-ring.c:	if (xhci->xhc_state & XHCI_STATE_DYING ||
+./drivers/usb/host/xhci-ring.c:	    xhci->xhc_state & XHCI_STATE_HALTED) {
+./drivers/usb/host/xhci-ring.c:		temp_64 = xhci_read_64(xhci, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci-ring.c:				&xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci-ring.c:		spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:	event_ring_deq = xhci->event_ring->dequeue;
+./drivers/usb/host/xhci-ring.c:	temp_64 = xhci_read_64(xhci, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci-ring.c:	if (event_ring_deq != xhci->event_ring->dequeue) {
+./drivers/usb/host/xhci-ring.c:		deq = xhci_trb_virt_to_dma(xhci->event_ring->deq_seg,
+./drivers/usb/host/xhci-ring.c:				xhci->event_ring->dequeue);
+./drivers/usb/host/xhci-ring.c:	xhci_write_64(xhci, temp_64, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci-ring.c:	spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c:		if (ep_ring == xhci->cmd_ring) {
+./drivers/usb/host/xhci-ring.c:					 (xhci->quirks & XHCI_AMD_0x96_HOST)))
+./drivers/usb/host/xhci-ring.c:			xhci->devs[slot_id]->out_ctx, ep_index);
+./drivers/usb/host/xhci-ring.c:	if (xhci->hci_version < 0x100)
+./drivers/usb/host/xhci-ring.c:	ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c:		ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c:	ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c:		ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c:/* Caller must have locked xhci->lock */
+./drivers/usb/host/xhci-ring.c:	ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c:	if (xhci->hci_version >= 0x100) {
+./drivers/usb/host/xhci-ring.c: * Caller must have locked xhci->lock
+./drivers/usb/host/xhci-ring.c:	ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c:		if (xhci->hci_version == 0x100) {
+./drivers/usb/host/xhci-ring.c:	if (xhci->hci_version < 0x100 || udev->speed < USB_SPEED_SUPER)
+./drivers/usb/host/xhci-ring.c:	if (xhci->hci_version < 0x100)
+./drivers/usb/host/xhci-ring.c:	ist = HCS_IST(xhci->hcs_params2) & 0x7;
+./drivers/usb/host/xhci-ring.c:	if (HCS_IST(xhci->hcs_params2) & (1 << 3))
+./drivers/usb/host/xhci-ring.c:	current_frame_id = readl(&xhci->run_regs->microframe_index);
+./drivers/usb/host/xhci-ring.c:		 __func__, index, readl(&xhci->run_regs->microframe_index),
+./drivers/usb/host/xhci-ring.c:	xep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c:	ep_ring = xhci->devs[slot_id]->eps[ep_index].ring;
+./drivers/usb/host/xhci-ring.c:		ret = prepare_transfer(xhci, xhci->devs[slot_id], ep_index,
+./drivers/usb/host/xhci-ring.c:						HCC_CFC(xhci->hcc_params)) {
+./drivers/usb/host/xhci-ring.c:				if (xhci->hci_version == 0x100 &&
+./drivers/usb/host/xhci-ring.c:						!(xhci->quirks &
+./drivers/usb/host/xhci-ring.c:	if (HCC_CFC(xhci->hcc_params))
+./drivers/usb/host/xhci-ring.c:		if (xhci->quirks & XHCI_AMD_PLL_FIX)
+./drivers/usb/host/xhci-ring.c:	xdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c:	xep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c:	if (HCC_CFC(xhci->hcc_params) && !list_empty(&ep_ring->td_list)) {
+./drivers/usb/host/xhci-ring.c:	start_frame = readl(&xhci->run_regs->microframe_index);
+./drivers/usb/host/xhci-ring.c:	ist = HCS_IST(xhci->hcs_params2) & 0x7;
+./drivers/usb/host/xhci-ring.c:	if (HCS_IST(xhci->hcs_params2) & (1 << 3))
+./drivers/usb/host/xhci-ring.c: * Don't decrement xhci->cmd_ring_reserved_trbs after we've queued the TRB
+./drivers/usb/host/xhci-ring.c:	int reserved_trbs = xhci->cmd_ring_reserved_trbs;
+./drivers/usb/host/xhci-ring.c:	if ((xhci->xhc_state & XHCI_STATE_DYING) ||
+./drivers/usb/host/xhci-ring.c:		(xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci-ring.c:	ret = prepare_ring(xhci, xhci->cmd_ring, EP_STATE_RUNNING,
+./drivers/usb/host/xhci-ring.c:	cmd->command_trb = xhci->cmd_ring->enqueue;
+./drivers/usb/host/xhci-ring.c:	list_add_tail(&cmd->cmd_list, &xhci->cmd_list);
+./drivers/usb/host/xhci-ring.c:	if (xhci->cmd_list.next == &cmd->cmd_list &&
+./drivers/usb/host/xhci-ring.c:	    !delayed_work_pending(&xhci->cmd_timer)) {
+./drivers/usb/host/xhci-ring.c:		xhci->current_cmd = cmd;
+./drivers/usb/host/xhci-ring.c:	queue_trb(xhci, xhci->cmd_ring, false, field1, field2, field3,
+./drivers/usb/host/xhci-ring.c:			field4 | xhci->cmd_ring->cycle_state);
+./drivers/usb/host/xhci-ring.c:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-mem.c.rej:--- drivers/usb/host/xhci-mem.c
+./drivers/usb/host/xhci-mem.c.rej:+++ drivers/usb/host/xhci-mem.c
+./drivers/usb/host/xhci-mem.c.rej: 	xhci->erst.entries = dma_alloc_coherent(dev,
+./drivers/usb/host/xhci-mem.c.rej: 	if (!xhci->erst.entries)
+./drivers/usb/host/xhci.c:#include "xhci-trace.h"
+./drivers/usb/host/xhci.c:	halted = readl(&xhci->op_regs->status) & STS_HALT;
+./drivers/usb/host/xhci.c:	cmd = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	writel(cmd, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	ret = xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c:		xhci->xhc_state |= XHCI_STATE_HALTED;
+./drivers/usb/host/xhci.c:		xhci->cmd_ring_state = CMD_RING_STATE_STOPPED;
+./drivers/usb/host/xhci.c:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	writel(temp, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	ret = xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c:		xhci->xhc_state = 0;
+./drivers/usb/host/xhci.c:	state = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c:	command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_INTEL_HOST)
+./drivers/usb/host/xhci.c:	ret = xhci_handshake(&xhci->op_regs->command,
+./drivers/usb/host/xhci.c:	ret = xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c:		xhci->bus_state[i].port_c_suspend = 0;
+./drivers/usb/host/xhci.c:		xhci->bus_state[i].suspended_ports = 0;
+./drivers/usb/host/xhci.c:		xhci->bus_state[i].resuming_ports = 0;
+./drivers/usb/host/xhci.c:	if (!xhci->msix_entries)
+./drivers/usb/host/xhci.c:	for (i = 0; i < xhci->msix_count; i++)
+./drivers/usb/host/xhci.c:		if (xhci->msix_entries[i].vector)
+./drivers/usb/host/xhci.c:			free_irq(xhci->msix_entries[i].vector,
+./drivers/usb/host/xhci.c:	xhci->msix_count = min(num_online_cpus() + 1,
+./drivers/usb/host/xhci.c:				HCS_MAX_INTRS(xhci->hcs_params1));
+./drivers/usb/host/xhci.c:	xhci->msix_entries =
+./drivers/usb/host/xhci.c:		kmalloc((sizeof(struct msix_entry))*xhci->msix_count,
+./drivers/usb/host/xhci.c:	if (!xhci->msix_entries) {
+./drivers/usb/host/xhci.c:	for (i = 0; i < xhci->msix_count; i++) {
+./drivers/usb/host/xhci.c:		xhci->msix_entries[i].entry = i;
+./drivers/usb/host/xhci.c:		xhci->msix_entries[i].vector = 0;
+./drivers/usb/host/xhci.c:	ret = pci_enable_msix_exact(pdev, xhci->msix_entries, xhci->msix_count);
+./drivers/usb/host/xhci.c:	for (i = 0; i < xhci->msix_count; i++) {
+./drivers/usb/host/xhci.c:		ret = request_irq(xhci->msix_entries[i].vector,
+./drivers/usb/host/xhci.c:	kfree(xhci->msix_entries);
+./drivers/usb/host/xhci.c:	xhci->msix_entries = NULL;
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_PLAT)
+./drivers/usb/host/xhci.c:	if (xhci->msix_entries) {
+./drivers/usb/host/xhci.c:		kfree(xhci->msix_entries);
+./drivers/usb/host/xhci.c:		xhci->msix_entries = NULL;
+./drivers/usb/host/xhci.c:	if (xhci->msix_entries) {
+./drivers/usb/host/xhci.c:		for (i = 0; i < xhci->msix_count; i++)
+./drivers/usb/host/xhci.c:			synchronize_irq(xhci->msix_entries[i].vector);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_PLAT)
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_BROKEN_MSI)
+./drivers/usb/host/xhci.c:	for (i = 0; i < xhci->num_usb3_ports; i++) {
+./drivers/usb/host/xhci.c:		temp = readl(xhci->usb3_ports[i]);
+./drivers/usb/host/xhci.c:			hcd = xhci->shared_hcd;
+./drivers/usb/host/xhci.c:	if (xhci->port_status_u0 != ((1 << xhci->num_usb3_ports)-1))
+./drivers/usb/host/xhci.c:		mod_timer(&xhci->comp_mode_recovery_timer,
+./drivers/usb/host/xhci.c:	xhci->port_status_u0 = 0;
+./drivers/usb/host/xhci.c:	setup_timer(&xhci->comp_mode_recovery_timer,
+./drivers/usb/host/xhci.c:	xhci->comp_mode_recovery_timer.expires = jiffies +
+./drivers/usb/host/xhci.c:	set_timer_slack(&xhci->comp_mode_recovery_timer,
+./drivers/usb/host/xhci.c:	add_timer(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci.c:	return (xhci->port_status_u0 == ((1 << xhci->num_usb3_ports)-1));
+./drivers/usb/host/xhci.c:	spin_lock_init(&xhci->lock);
+./drivers/usb/host/xhci.c:	if (xhci->hci_version == 0x95 && link_quirk) {
+./drivers/usb/host/xhci.c:		xhci->quirks |= XHCI_LINK_TRB_QUIRK;
+./drivers/usb/host/xhci.c:		xhci->quirks |= XHCI_COMP_MODE_QUIRK;
+./drivers/usb/host/xhci.c:	xhci->shared_hcd->state = HC_STATE_RUNNING;
+./drivers/usb/host/xhci.c:	xhci->cmd_ring_state = CMD_RING_STATE_RUNNING;
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_NEC_HOST)
+./drivers/usb/host/xhci.c:	xhci_debug_ring(xhci, xhci->cmd_ring);
+./drivers/usb/host/xhci.c:	xhci_dbg_ring_ptrs(xhci, xhci->cmd_ring);
+./drivers/usb/host/xhci.c:	xhci_dbg_erst(xhci, &xhci->erst);
+./drivers/usb/host/xhci.c:	xhci_debug_ring(xhci, xhci->event_ring);
+./drivers/usb/host/xhci.c:	xhci_dbg_ring_ptrs(xhci, xhci->event_ring);
+./drivers/usb/host/xhci.c:	temp_64 = xhci_read_64(xhci, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci.c:	temp = readl(&xhci->ir_set->irq_control);
+./drivers/usb/host/xhci.c:	writel(temp, &xhci->ir_set->irq_control);
+./drivers/usb/host/xhci.c:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	writel(temp, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	temp = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c:			xhci->ir_set, (unsigned int) ER_IRQ_ENABLE(temp));
+./drivers/usb/host/xhci.c:	writel(ER_IRQ_ENABLE(temp), &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_NEC_HOST) {
+./drivers/usb/host/xhci.c:	mutex_lock(&xhci->mutex);
+./drivers/usb/host/xhci.c:	if (!(xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci.c:		spin_lock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:		xhci->xhc_state |= XHCI_STATE_HALTED;
+./drivers/usb/host/xhci.c:		xhci->cmd_ring_state = CMD_RING_STATE_STOPPED;
+./drivers/usb/host/xhci.c:		spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:		mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
+./drivers/usb/host/xhci.c:		del_timer_sync(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_AMD_PLL_FIX)
+./drivers/usb/host/xhci.c:	temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c:	writel(temp & ~STS_EINT, &xhci->op_regs->status);
+./drivers/usb/host/xhci.c:	temp = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c:	writel(ER_IRQ_DISABLE(temp), &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c:			readl(&xhci->op_regs->status));
+./drivers/usb/host/xhci.c:	mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_SPURIOUS_REBOOT)
+./drivers/usb/host/xhci.c:	spin_lock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_SPURIOUS_WAKEUP)
+./drivers/usb/host/xhci.c:	spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:			readl(&xhci->op_regs->status));
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_SPURIOUS_WAKEUP)
+./drivers/usb/host/xhci.c:	xhci->s3.command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	xhci->s3.dev_nt = readl(&xhci->op_regs->dev_notification);
+./drivers/usb/host/xhci.c:	xhci->s3.dcbaa_ptr = xhci_read_64(xhci, &xhci->op_regs->dcbaa_ptr);
+./drivers/usb/host/xhci.c:	xhci->s3.config_reg = readl(&xhci->op_regs->config_reg);
+./drivers/usb/host/xhci.c:	xhci->s3.erst_size = readl(&xhci->ir_set->erst_size);
+./drivers/usb/host/xhci.c:	xhci->s3.erst_base = xhci_read_64(xhci, &xhci->ir_set->erst_base);
+./drivers/usb/host/xhci.c:	xhci->s3.erst_dequeue = xhci_read_64(xhci, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci.c:	xhci->s3.irq_pending = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c:	xhci->s3.irq_control = readl(&xhci->ir_set->irq_control);
+./drivers/usb/host/xhci.c:	writel(xhci->s3.command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	writel(xhci->s3.dev_nt, &xhci->op_regs->dev_notification);
+./drivers/usb/host/xhci.c:	xhci_write_64(xhci, xhci->s3.dcbaa_ptr, &xhci->op_regs->dcbaa_ptr);
+./drivers/usb/host/xhci.c:	writel(xhci->s3.config_reg, &xhci->op_regs->config_reg);
+./drivers/usb/host/xhci.c:	writel(xhci->s3.erst_size, &xhci->ir_set->erst_size);
+./drivers/usb/host/xhci.c:	xhci_write_64(xhci, xhci->s3.erst_base, &xhci->ir_set->erst_base);
+./drivers/usb/host/xhci.c:	xhci_write_64(xhci, xhci->s3.erst_dequeue, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci.c:	writel(xhci->s3.irq_pending, &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c:	writel(xhci->s3.irq_control, &xhci->ir_set->irq_control);
+./drivers/usb/host/xhci.c:	val_64 = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci.c:		(xhci_trb_virt_to_dma(xhci->cmd_ring->deq_seg,
+./drivers/usb/host/xhci.c:				      xhci->cmd_ring->dequeue) &
+./drivers/usb/host/xhci.c:		xhci->cmd_ring->cycle_state;
+./drivers/usb/host/xhci.c:	xhci_write_64(xhci, val_64, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci.c:	ring = xhci->cmd_ring;
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	port_index = xhci->num_usb3_ports;
+./drivers/usb/host/xhci.c:	port_array = xhci->usb3_ports;
+./drivers/usb/host/xhci.c:	port_index = xhci->num_usb2_ports;
+./drivers/usb/host/xhci.c:	port_array = xhci->usb2_ports;
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:			xhci->shared_hcd->state != HC_STATE_SUSPENDED)
+./drivers/usb/host/xhci.c:	clear_bit(HCD_FLAG_POLL_RH, &xhci->shared_hcd->flags);
+./drivers/usb/host/xhci.c:	del_timer_sync(&xhci->shared_hcd->rh_timer);
+./drivers/usb/host/xhci.c:	spin_lock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:	clear_bit(HCD_FLAG_HW_ACCESSIBLE, &xhci->shared_hcd->flags);
+./drivers/usb/host/xhci.c:	command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	delay *= (xhci->quirks & XHCI_SLOW_SUSPEND) ? 10 : 1;
+./drivers/usb/host/xhci.c:	if (xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c:		spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:	command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	if (xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c:		spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:	spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
+./drivers/usb/host/xhci.c:		del_timer_sync(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci.c:	if (time_before(jiffies, xhci->bus_state[0].next_statechange) ||
+./drivers/usb/host/xhci.c:				xhci->bus_state[1].next_statechange))
+./drivers/usb/host/xhci.c:	set_bit(HCD_FLAG_HW_ACCESSIBLE, &xhci->shared_hcd->flags);
+./drivers/usb/host/xhci.c:	spin_lock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_RESET_ON_RESUME)
+./drivers/usb/host/xhci.c:		command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:		writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:		if (xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c:			spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:		temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c:		if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
+./drivers/usb/host/xhci.c:			del_timer_sync(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci.c:		usb_root_hub_lost_power(xhci->main_hcd->self.root_hub);
+./drivers/usb/host/xhci.c:		usb_root_hub_lost_power(xhci->shared_hcd->self.root_hub);
+./drivers/usb/host/xhci.c:		spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:		temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c:		writel(temp & ~STS_EINT, &xhci->op_regs->status);
+./drivers/usb/host/xhci.c:		temp = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c:		writel(ER_IRQ_DISABLE(temp), &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c:			    readl(&xhci->op_regs->status));
+./drivers/usb/host/xhci.c:			secondary_hcd = xhci->shared_hcd;
+./drivers/usb/host/xhci.c:		xhci->shared_hcd->state = HC_STATE_SUSPENDED;
+./drivers/usb/host/xhci.c:	command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c:	xhci_handshake(&xhci->op_regs->status, STS_HALT,
+./drivers/usb/host/xhci.c:	spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c:		status = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c:			usb_hcd_resume_root_hub(xhci->shared_hcd);
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) && !comp_timer_running)
+./drivers/usb/host/xhci.c:	set_bit(HCD_FLAG_POLL_RH, &xhci->shared_hcd->flags);
+./drivers/usb/host/xhci.c:	usb_hcd_poll_rh_status(xhci->shared_hcd);
+./drivers/usb/host/xhci.c:		if (!udev->slot_id || !xhci->devs[udev->slot_id]) {
+./drivers/usb/host/xhci.c:		virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	if (xhci->xhc_state & XHCI_STATE_HALTED)
+./drivers/usb/host/xhci.c:	out_ctx = xhci->devs[slot_id]->out_ctx;
+./drivers/usb/host/xhci.c:		command->in_ctx = xhci->devs[slot_id]->in_ctx;
+./drivers/usb/host/xhci.c:		xhci_endpoint_copy(xhci, xhci->devs[slot_id]->in_ctx,
+./drivers/usb/host/xhci.c:				xhci->devs[slot_id]->out_ctx, ep_index);
+./drivers/usb/host/xhci.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c:		if (xhci->devs[slot_id]->eps[ep_index].ep_state &
+./drivers/usb/host/xhci.c:		} else if (xhci->devs[slot_id]->eps[ep_index].ep_state &
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c:	if (temp == 0xffffffff || (xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci.c:		     i < urb_priv->length && xhci->devs[urb->dev->slot_id];
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	if ((xhci->xhc_state & XHCI_STATE_DYING) ||
+./drivers/usb/host/xhci.c:			(xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci.c:	ep = &xhci->devs[urb->dev->slot_id]->eps[ep_index];
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c: * the xhci->devs[slot_id] structure.
+./drivers/usb/host/xhci.c:	if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c:	in_ctx = xhci->devs[udev->slot_id]->in_ctx;
+./drivers/usb/host/xhci.c:	out_ctx = xhci->devs[udev->slot_id]->out_ctx;
+./drivers/usb/host/xhci.c:		if (xhci->devs[udev->slot_id]->eps[ep_index].ring != NULL)
+./drivers/usb/host/xhci.c:	xhci_endpoint_zero(xhci, xhci->devs[udev->slot_id], ep);
+./drivers/usb/host/xhci.c: * for mutual exclusion to protect the xhci->devs[slot_id] structure.
+./drivers/usb/host/xhci.c:	if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	struct xhci_virt_device *virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c:	if (xhci->num_active_eps + added_eps > xhci->limit_active_eps) {
+./drivers/usb/host/xhci.c:				xhci->num_active_eps, added_eps,
+./drivers/usb/host/xhci.c:				xhci->limit_active_eps);
+./drivers/usb/host/xhci.c:	xhci->num_active_eps += added_eps;
+./drivers/usb/host/xhci.c:			xhci->num_active_eps);
+./drivers/usb/host/xhci.c: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c:	xhci->num_active_eps -= num_failed_eps;
+./drivers/usb/host/xhci.c:			xhci->num_active_eps);
+./drivers/usb/host/xhci.c: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c:	xhci->num_active_eps -= num_dropped_eps;
+./drivers/usb/host/xhci.c:				xhci->num_active_eps);
+./drivers/usb/host/xhci.c:	bw_table = &xhci->rh_bw[virt_dev->real_port - 1].bw_table;
+./drivers/usb/host/xhci.c:			xhci->rh_bw[port_index].num_active_tts;
+./drivers/usb/host/xhci.c:			xhci->devs[udev->slot_id]->bw_table->ss_bw_in -=
+./drivers/usb/host/xhci.c:			xhci->devs[udev->slot_id]->bw_table->ss_bw_out -=
+./drivers/usb/host/xhci.c:			xhci->devs[udev->slot_id]->bw_table->ss_bw_in +=
+./drivers/usb/host/xhci.c:			xhci->devs[udev->slot_id]->bw_table->ss_bw_out +=
+./drivers/usb/host/xhci.c:	rh_bw_info = &xhci->rh_bw[virt_dev->real_port - 1];
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK) &&
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:				xhci->num_active_eps);
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_SW_BW_CHECKING) &&
+./drivers/usb/host/xhci.c:		if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK))
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK))
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK)) {
+./drivers/usb/host/xhci.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c: * else should be touching the xhci->devs[slot_id] structure, so we
+./drivers/usb/host/xhci.c: * don't need to take the xhci->lock for manipulating that.
+./drivers/usb/host/xhci.c:	if ((xhci->xhc_state & XHCI_STATE_DYING) ||
+./drivers/usb/host/xhci.c:		(xhci->xhc_state & XHCI_STATE_REMOVING))
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	in_ctx = xhci->devs[slot_id]->in_ctx;
+./drivers/usb/host/xhci.c:	xhci_endpoint_copy(xhci, xhci->devs[slot_id]->in_ctx,
+./drivers/usb/host/xhci.c:			xhci->devs[slot_id]->out_ctx, ep_index);
+./drivers/usb/host/xhci.c:	xhci_setup_input_ctx_for_config_ep(xhci, xhci->devs[slot_id]->in_ctx,
+./drivers/usb/host/xhci.c:			xhci->devs[slot_id]->out_ctx, ctrl_ctx,
+./drivers/usb/host/xhci.c:	ep = &xhci->devs[udev->slot_id]->eps[ep_index];
+./drivers/usb/host/xhci.c:	if (!(xhci->quirks & XHCI_RESET_EP_QUIRK)) {
+./drivers/usb/host/xhci.c:	ep_state = xhci->devs[slot_id]->eps[ep_index].ep_state;
+./drivers/usb/host/xhci.c:	if (!list_empty(&xhci->devs[slot_id]->eps[ep_index].ring->td_list)) {
+./drivers/usb/host/xhci.c:	max_streams = HCC_MAX_PSA(xhci->hcc_params);
+./drivers/usb/host/xhci.c:	if (!xhci->devs[slot_id])
+./drivers/usb/host/xhci.c:		ep_state = xhci->devs[slot_id]->eps[ep_index].ep_state;
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_BROKEN_STREAMS) ||
+./drivers/usb/host/xhci.c:			HCC_MAX_PSA(xhci->hcc_params) < 4) {
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	vdev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	vdev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		xhci->devs[udev->slot_id]->eps[ep_index].ep_state |=
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c:	xhci->num_active_eps -= num_dropped_eps;
+./drivers/usb/host/xhci.c:				xhci->num_active_eps);
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK)) {
+./drivers/usb/host/xhci.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_RESET_ON_RESUME)
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	state = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c:	if (state == 0xffffffff || (xhci->xhc_state & XHCI_STATE_DYING) ||
+./drivers/usb/host/xhci.c:			(xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c:	if (xhci->num_active_eps + 1 > xhci->limit_active_eps) {
+./drivers/usb/host/xhci.c:				xhci->num_active_eps, xhci->limit_active_eps);
+./drivers/usb/host/xhci.c:	xhci->num_active_eps += 1;
+./drivers/usb/host/xhci.c:			xhci->num_active_eps);
+./drivers/usb/host/xhci.c:	/* xhci->slot_id and xhci->addr_dev are not thread-safe */
+./drivers/usb/host/xhci.c:	mutex_lock(&xhci->mutex);
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	command->completion = &xhci->addr_dev;
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	slot_id = xhci->slot_id;
+./drivers/usb/host/xhci.c:	mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c:					readl(&xhci->cap_regs->hcs_params1)));
+./drivers/usb/host/xhci.c:	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK)) {
+./drivers/usb/host/xhci.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:					xhci->num_active_eps);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_RESET_ON_RESUME)
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	mutex_lock(&xhci->mutex);
+./drivers/usb/host/xhci.c:	if (xhci->xhc_state) {	/* dying, removing or halted */
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	command->completion = &xhci->addr_dev;
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	temp_64 = xhci_read_64(xhci, &xhci->op_regs->dcbaa_ptr);
+./drivers/usb/host/xhci.c:		&xhci->dcbaa->dev_context_ptrs[udev->slot_id],
+./drivers/usb/host/xhci.c:		le64_to_cpu(xhci->dcbaa->dev_context_ptrs[udev->slot_id]));
+./drivers/usb/host/xhci.c:	mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c:	__le32 __iomem *base_addr = &xhci->op_regs->port_status_base;
+./drivers/usb/host/xhci.c:		addr = xhci->usb2_ports[port1 - 1];
+./drivers/usb/host/xhci.c:		addr = xhci->usb3_ports[port1 - 1];
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	 * hub_port_finish_reset() is done and xhci->devs[] are re-allocated
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	command = xhci->lpm_command;
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	u2del = HCS_U2_LATENCY(xhci->hcs_params3);
+./drivers/usb/host/xhci.c:	if (hcd->speed >= HCD_USB3 || !xhci->hw_lpm_support ||
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	port_array = xhci->usb2_ports;
+./drivers/usb/host/xhci.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:			/* USB 3.0 code dedicate one xhci->lpm_command->in_ctx
+./drivers/usb/host/xhci.c:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	for (i = 0; i < xhci->num_ext_caps; i++) {
+./drivers/usb/host/xhci.c:		if (xhci->ext_caps[i] & capability) {
+./drivers/usb/host/xhci.c:			port_offset = XHCI_EXT_PORT_OFF(xhci->ext_caps[i]) - 1;
+./drivers/usb/host/xhci.c:			port_count = XHCI_EXT_PORT_COUNT(xhci->ext_caps[i]);
+./drivers/usb/host/xhci.c:	if (hcd->speed >= HCD_USB3 || !xhci->sw_lpm_support ||
+./drivers/usb/host/xhci.c:	if (xhci->hw_lpm_support == 1 &&
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_INTEL_HOST)
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_INTEL_HOST)
+./drivers/usb/host/xhci.c:	if (xhci->quirks & XHCI_INTEL_HOST)
+./drivers/usb/host/xhci.c:	if (!xhci || !(xhci->quirks & XHCI_LPM_SUPPORT) ||
+./drivers/usb/host/xhci.c:			!xhci->devs[udev->slot_id])
+./drivers/usb/host/xhci.c:	if (!xhci || !(xhci->quirks & XHCI_LPM_SUPPORT) ||
+./drivers/usb/host/xhci.c:			!xhci->devs[udev->slot_id])
+./drivers/usb/host/xhci.c:	vdev = xhci->devs[hdev->slot_id];
+./drivers/usb/host/xhci.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:	if (xhci->hci_version > 0x95) {
+./drivers/usb/host/xhci.c:				(unsigned int) xhci->hci_version);
+./drivers/usb/host/xhci.c:		if (xhci->hci_version < 0x100 || hdev->speed == USB_SPEED_HIGH)
+./drivers/usb/host/xhci.c:				(unsigned int) xhci->hci_version);
+./drivers/usb/host/xhci.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c:			(xhci->hci_version > 0x95) ?
+./drivers/usb/host/xhci.c:	if (xhci->hci_version > 0x95)
+./drivers/usb/host/xhci.c:	return readl(&xhci->run_regs->microframe_index) >> 3;
+./drivers/usb/host/xhci.c:		xhci->main_hcd = hcd;
+./drivers/usb/host/xhci.c:		if (xhci->sbrn == 0x31) {
+./drivers/usb/host/xhci.c:	mutex_init(&xhci->mutex);
+./drivers/usb/host/xhci.c:	xhci->cap_regs = hcd->regs;
+./drivers/usb/host/xhci.c:	xhci->op_regs = hcd->regs +
+./drivers/usb/host/xhci.c:		HC_LENGTH(readl(&xhci->cap_regs->hc_capbase));
+./drivers/usb/host/xhci.c:	xhci->run_regs = hcd->regs +
+./drivers/usb/host/xhci.c:		(readl(&xhci->cap_regs->run_regs_off) & RTSOFF_MASK);
+./drivers/usb/host/xhci.c:	xhci->hcs_params1 = readl(&xhci->cap_regs->hcs_params1);
+./drivers/usb/host/xhci.c:	xhci->hcs_params2 = readl(&xhci->cap_regs->hcs_params2);
+./drivers/usb/host/xhci.c:	xhci->hcs_params3 = readl(&xhci->cap_regs->hcs_params3);
+./drivers/usb/host/xhci.c:	xhci->hcc_params = readl(&xhci->cap_regs->hc_capbase);
+./drivers/usb/host/xhci.c:	xhci->hci_version = HC_VERSION(xhci->hcc_params);
+./drivers/usb/host/xhci.c:	xhci->hcc_params = readl(&xhci->cap_regs->hcc_params);
+./drivers/usb/host/xhci.c:	if (xhci->hci_version > 0x100)
+./drivers/usb/host/xhci.c:		xhci->hcc_params2 = readl(&xhci->cap_regs->hcc_params2);
+./drivers/usb/host/xhci.c:	xhci->quirks = quirks;
+./drivers/usb/host/xhci.c:	if (xhci->hci_version > 0x96)
+./drivers/usb/host/xhci.c:		xhci->quirks |= XHCI_SPURIOUS_SUCCESS;
+./drivers/usb/host/xhci.c:	if (HCC_64BIT_ADDR(xhci->hcc_params) &&
+./drivers/usb/host/xhci.c:		  xhci->hcc_params, xhci->hci_version, xhci->quirks);
+./drivers/usb/host/xhci.c:	if (intr_num >= xhci->max_interrupters) {
+./drivers/usb/host/xhci.c:			xhci->max_interrupters);
+./drivers/usb/host/xhci.c:	if (!(xhci->xhc_state & XHCI_STATE_HALTED) &&
+./drivers/usb/host/xhci.c:		xhci->sec_event_ring && xhci->sec_event_ring[intr_num]
+./drivers/usb/host/xhci.c:		&& xhci->sec_event_ring[intr_num]->first_seg)
+./drivers/usb/host/xhci.c:		return xhci->sec_event_ring[intr_num]->first_seg->dma;
+./drivers/usb/host/xhci.c:	if (!(xhci->xhc_state & XHCI_STATE_HALTED) && xhci->dcbaa)
+./drivers/usb/host/xhci.c:		return xhci->dcbaa->dev_context_ptrs[udev->slot_id];
+./drivers/usb/host/xhci.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c:	.description =		"xhci-hcd",
+./drivers/usb/host/xhci-mvebu.c:#include "xhci-mvebu.h"
+./drivers/usb/host/xhci-hub.c.orig:#include "xhci-trace.h"
+./drivers/usb/host/xhci-hub.c.orig:	if (xhci->usb3_rhub.min_rev >= 0x01 && xhci->usb3_rhub.psi_uid_count) {
+./drivers/usb/host/xhci-hub.c.orig:		ssa_count = xhci->usb3_rhub.psi_uid_count * 2;
+./drivers/usb/host/xhci-hub.c.orig:	temp = readl(&xhci->cap_regs->hcc_params);
+./drivers/usb/host/xhci-hub.c.orig:	if ((xhci->quirks & XHCI_LPM_SUPPORT)) {
+./drivers/usb/host/xhci-hub.c.orig:		temp = readl(&xhci->cap_regs->hcs_params3);
+./drivers/usb/host/xhci-hub.c.orig:		bm_attrib |= (xhci->usb3_rhub.psi_uid_count - 1) << 5;
+./drivers/usb/host/xhci-hub.c.orig:		for (i = 0; i < xhci->usb3_rhub.psi_count; i++) {
+./drivers/usb/host/xhci-hub.c.orig:			psi = xhci->usb3_rhub.psi[i];
+./drivers/usb/host/xhci-hub.c.orig:	if (HCC_PPC(xhci->hcc_params))
+./drivers/usb/host/xhci-hub.c.orig:	ports = xhci->num_usb2_ports;
+./drivers/usb/host/xhci-hub.c.orig:		portsc = readl(xhci->usb2_ports[i]);
+./drivers/usb/host/xhci-hub.c.orig:	ports = xhci->num_usb3_ports;
+./drivers/usb/host/xhci-hub.c.orig:		portsc = readl(xhci->usb3_ports[i]);
+./drivers/usb/host/xhci-hub.c.orig:		if (!xhci->devs[i])
+./drivers/usb/host/xhci-hub.c.orig:		speed = xhci->devs[i]->udev->speed;
+./drivers/usb/host/xhci-hub.c.orig:				&& xhci->devs[i]->fake_port == port) {
+./drivers/usb/host/xhci-hub.c.orig:	virt_dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-hub.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:		ep = &xhci->devs[slot_id]->eps[i];
+./drivers/usb/host/xhci-hub.c.orig:		max_ports = xhci->num_usb3_ports;
+./drivers/usb/host/xhci-hub.c.orig:		*port_array = xhci->usb3_ports;
+./drivers/usb/host/xhci-hub.c.orig:		max_ports = xhci->num_usb2_ports;
+./drivers/usb/host/xhci-hub.c.orig:		*port_array = xhci->usb2_ports;
+./drivers/usb/host/xhci-hub.c.orig:		if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
+./drivers/usb/host/xhci-hub.c.orig:	u32 all_ports_seen_u0 = ((1 << xhci->num_usb3_ports)-1);
+./drivers/usb/host/xhci-hub.c.orig:	if (!(xhci->quirks & XHCI_COMP_MODE_QUIRK))
+./drivers/usb/host/xhci-hub.c.orig:	if ((xhci->port_status_u0 != all_ports_seen_u0) && port_in_u0) {
+./drivers/usb/host/xhci-hub.c.orig:		xhci->port_status_u0 |= 1 << wIndex;
+./drivers/usb/host/xhci-hub.c.orig:		if (xhci->port_status_u0 == all_ports_seen_u0) {
+./drivers/usb/host/xhci-hub.c.orig:			del_timer_sync(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci-hub.c.orig:	__releases(&xhci->lock)
+./drivers/usb/host/xhci-hub.c.orig:	__acquires(&xhci->lock)
+./drivers/usb/host/xhci-hub.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-hub.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:					spin_unlock_irqrestore(&xhci->lock,
+./drivers/usb/host/xhci-hub.c.orig:					spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-hub.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-hub.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:				spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-hub.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c.orig:	writel(temp, &xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-hub.c.orig:	(void) readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c.orig:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c.orig:	writel(temp, &xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c.orig:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-hub.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-mem.c:#include "xhci-trace.h"
+./drivers/usb/host/xhci-mem.c:	seg->trbs = dma_pool_alloc(xhci->segment_pool, flags, &dma);
+./drivers/usb/host/xhci-mem.c:		dma_pool_free(xhci->segment_pool, seg->trbs, seg->dma);
+./drivers/usb/host/xhci-mem.c:				 (xhci->quirks & XHCI_AMD_0x96_HOST)))
+./drivers/usb/host/xhci-mem.c:	ctx->size = HCC_64BYTE_CONTEXT(xhci->hcc_params) ? 2048 : 1024;
+./drivers/usb/host/xhci-mem.c:		ctx->size += CTX_SIZE(xhci->hcc_params);
+./drivers/usb/host/xhci-mem.c:	ctx->bytes = dma_pool_alloc(xhci->device_pool, flags, &ctx->dma);
+./drivers/usb/host/xhci-mem.c:	dma_pool_free(xhci->device_pool, ctx->bytes, ctx->dma);
+./drivers/usb/host/xhci-mem.c:		(ctx->bytes + CTX_SIZE(xhci->hcc_params));
+./drivers/usb/host/xhci-mem.c:		(ctx->bytes + (ep_index * CTX_SIZE(xhci->hcc_params)));
+./drivers/usb/host/xhci-mem.c:		return dma_pool_free(xhci->small_streams_pool,
+./drivers/usb/host/xhci-mem.c:		return dma_pool_free(xhci->medium_streams_pool,
+./drivers/usb/host/xhci-mem.c:		return dma_pool_alloc(xhci->small_streams_pool,
+./drivers/usb/host/xhci-mem.c:		return dma_pool_alloc(xhci->medium_streams_pool,
+./drivers/usb/host/xhci-mem.c:	if (xhci->cmd_ring_reserved_trbs == MAX_RSVD_CMD_TRBS) {
+./drivers/usb/host/xhci-mem.c:	xhci->cmd_ring_reserved_trbs++;
+./drivers/usb/host/xhci-mem.c:	xhci->cmd_ring_reserved_trbs--;
+./drivers/usb/host/xhci-mem.c:	xhci->cmd_ring_reserved_trbs--;
+./drivers/usb/host/xhci-mem.c:			virt_dev->real_port > HCS_MAX_PORTS(xhci->hcs_params1)) {
+./drivers/usb/host/xhci-mem.c:	tt_list_head = &(xhci->rh_bw[virt_dev->real_port - 1].tts);
+./drivers/usb/host/xhci-mem.c:				&xhci->rh_bw[virt_dev->real_port - 1].tts);
+./drivers/usb/host/xhci-mem.c: * Should be called with xhci->lock held if there is any chance the TT lists
+./drivers/usb/host/xhci-mem.c:	if (slot_id == 0 || !xhci->devs[slot_id])
+./drivers/usb/host/xhci-mem.c:	dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-mem.c:	xhci->dcbaa->dev_context_ptrs[slot_id] = 0;
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->devs[slot_id]);
+./drivers/usb/host/xhci-mem.c:	xhci->devs[slot_id] = NULL;
+./drivers/usb/host/xhci-mem.c:	vdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-mem.c:	tt_list_head = &(xhci->rh_bw[vdev->real_port - 1].tts);
+./drivers/usb/host/xhci-mem.c:			for (i = 1; i < HCS_MAX_SLOTS(xhci->hcs_params1); i++) {
+./drivers/usb/host/xhci-mem.c:				vdev = xhci->devs[i];
+./drivers/usb/host/xhci-mem.c:	if (slot_id == 0 || xhci->devs[slot_id]) {
+./drivers/usb/host/xhci-mem.c:	xhci->devs[slot_id] = kzalloc(sizeof(*xhci->devs[slot_id]), flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->devs[slot_id])
+./drivers/usb/host/xhci-mem.c:	dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-mem.c:	xhci->dcbaa->dev_context_ptrs[slot_id] = cpu_to_le64(dev->out_ctx->dma);
+./drivers/usb/host/xhci-mem.c:		 &xhci->dcbaa->dev_context_ptrs[slot_id],
+./drivers/usb/host/xhci-mem.c:		 le64_to_cpu(xhci->dcbaa->dev_context_ptrs[slot_id]));
+./drivers/usb/host/xhci-mem.c:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci-mem.c: * status registers.  xhci->port_array provides an array of the port speed for
+./drivers/usb/host/xhci-mem.c:		hcd = xhci->shared_hcd;
+./drivers/usb/host/xhci-mem.c:		hcd = xhci->main_hcd;
+./drivers/usb/host/xhci-mem.c:	dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci-mem.c:		dev->bw_table = &xhci->rh_bw[port_num - 1].bw_table;
+./drivers/usb/host/xhci-mem.c:		rh_bw = &xhci->rh_bw[port_num - 1];
+./drivers/usb/host/xhci-mem.c:	if (usb_endpoint_xfer_control(&ep->desc) && xhci->hci_version >= 0x100)
+./drivers/usb/host/xhci-mem.c:	int num_sp = HCS_MAX_SCRATCHPAD(xhci->hcs_params2);
+./drivers/usb/host/xhci-mem.c:	xhci->scratchpad = kzalloc(sizeof(*xhci->scratchpad), flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->scratchpad)
+./drivers/usb/host/xhci-mem.c:	xhci->scratchpad->sp_array = dma_alloc_coherent(dev,
+./drivers/usb/host/xhci-mem.c:				     &xhci->scratchpad->sp_dma, flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->scratchpad->sp_array)
+./drivers/usb/host/xhci-mem.c:	xhci->scratchpad->sp_buffers = kzalloc(sizeof(void *) * num_sp, flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->scratchpad->sp_buffers)
+./drivers/usb/host/xhci-mem.c:	xhci->scratchpad->sp_dma_buffers =
+./drivers/usb/host/xhci-mem.c:	if (!xhci->scratchpad->sp_dma_buffers)
+./drivers/usb/host/xhci-mem.c:	xhci->dcbaa->dev_context_ptrs[0] = cpu_to_le64(xhci->scratchpad->sp_dma);
+./drivers/usb/host/xhci-mem.c:		void *buf = dma_alloc_coherent(dev, xhci->page_size, &dma,
+./drivers/usb/host/xhci-mem.c:		xhci->scratchpad->sp_array[i] = dma;
+./drivers/usb/host/xhci-mem.c:		xhci->scratchpad->sp_buffers[i] = buf;
+./drivers/usb/host/xhci-mem.c:		xhci->scratchpad->sp_dma_buffers[i] = dma;
+./drivers/usb/host/xhci-mem.c:		dma_free_coherent(dev, xhci->page_size,
+./drivers/usb/host/xhci-mem.c:				    xhci->scratchpad->sp_buffers[i],
+./drivers/usb/host/xhci-mem.c:				    xhci->scratchpad->sp_dma_buffers[i]);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->scratchpad->sp_dma_buffers);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->scratchpad->sp_buffers);
+./drivers/usb/host/xhci-mem.c:			    xhci->scratchpad->sp_array,
+./drivers/usb/host/xhci-mem.c:			    xhci->scratchpad->sp_dma);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->scratchpad);
+./drivers/usb/host/xhci-mem.c:	xhci->scratchpad = NULL;
+./drivers/usb/host/xhci-mem.c:	if (!xhci->scratchpad)
+./drivers/usb/host/xhci-mem.c:	num_sp = HCS_MAX_SCRATCHPAD(xhci->hcs_params2);
+./drivers/usb/host/xhci-mem.c:		dma_free_coherent(dev, xhci->page_size,
+./drivers/usb/host/xhci-mem.c:				    xhci->scratchpad->sp_buffers[i],
+./drivers/usb/host/xhci-mem.c:				    xhci->scratchpad->sp_dma_buffers[i]);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->scratchpad->sp_dma_buffers);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->scratchpad->sp_buffers);
+./drivers/usb/host/xhci-mem.c:			    xhci->scratchpad->sp_array,
+./drivers/usb/host/xhci-mem.c:			    xhci->scratchpad->sp_dma);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->scratchpad);
+./drivers/usb/host/xhci-mem.c:	xhci->scratchpad = NULL;
+./drivers/usb/host/xhci-mem.c:		readl_relaxed(&xhci->sec_ir_set[intr_num]->irq_pending);
+./drivers/usb/host/xhci-mem.c:			&xhci->sec_ir_set[intr_num]->irq_pending);
+./drivers/usb/host/xhci-mem.c:		readl_relaxed(&xhci->sec_ir_set[intr_num]->irq_pending);
+./drivers/usb/host/xhci-mem.c:			&xhci->sec_ir_set[intr_num]->irq_pending);
+./drivers/usb/host/xhci-mem.c:		xhci_read_64(xhci, &xhci->sec_ir_set[intr_num]->erst_dequeue);
+./drivers/usb/host/xhci-mem.c:	seg = xhci->sec_event_ring[intr_num]->first_seg;
+./drivers/usb/host/xhci-mem.c:	xhci->sec_event_ring[intr_num]->cycle_state =
+./drivers/usb/host/xhci-mem.c:			xhci->sec_event_ring[intr_num]->cycle_state ^= 1;
+./drivers/usb/host/xhci-mem.c:		    xhci->sec_event_ring[intr_num]->cycle_state)
+./drivers/usb/host/xhci-mem.c:		xhci_trb_virt_to_dma(xhci->sec_event_ring[intr_num]->deq_seg,
+./drivers/usb/host/xhci-mem.c:			&xhci->sec_ir_set[intr_num]->erst_dequeue);
+./drivers/usb/host/xhci-mem.c:	if (intr_num >= xhci->max_interrupters) {
+./drivers/usb/host/xhci-mem.c:	sizeof(struct xhci_erst_entry)*(xhci->sec_erst[intr_num].num_entries);
+./drivers/usb/host/xhci-mem.c:	if (xhci->sec_erst[intr_num].entries) {
+./drivers/usb/host/xhci-mem.c:		dma_free_coherent(dev, size, xhci->sec_erst[intr_num].entries,
+./drivers/usb/host/xhci-mem.c:				xhci->sec_erst[intr_num].erst_dma_addr);
+./drivers/usb/host/xhci-mem.c:		xhci->sec_erst[intr_num].entries = NULL;
+./drivers/usb/host/xhci-mem.c:	if (xhci->sec_event_ring[intr_num])
+./drivers/usb/host/xhci-mem.c:		xhci_ring_free(xhci, xhci->sec_event_ring[intr_num]);
+./drivers/usb/host/xhci-mem.c:	xhci->sec_event_ring[intr_num] = NULL;
+./drivers/usb/host/xhci-mem.c:	for (i = 1; i < xhci->max_interrupters; i++)
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->sec_ir_set);
+./drivers/usb/host/xhci-mem.c:	xhci->sec_ir_set = NULL;
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->sec_erst);
+./drivers/usb/host/xhci-mem.c:	xhci->sec_erst = NULL;
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->sec_event_ring);
+./drivers/usb/host/xhci-mem.c:	xhci->sec_event_ring = NULL;
+./drivers/usb/host/xhci-mem.c:	size = sizeof(struct xhci_erst_entry)*(xhci->erst.num_entries);
+./drivers/usb/host/xhci-mem.c:	if (xhci->erst.entries)
+./drivers/usb/host/xhci-mem.c:				xhci->erst.entries, xhci->erst.erst_dma_addr);
+./drivers/usb/host/xhci-mem.c:	xhci->erst.entries = NULL;
+./drivers/usb/host/xhci-mem.c:	if (xhci->event_ring)
+./drivers/usb/host/xhci-mem.c:		xhci_ring_free(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-mem.c:	xhci->event_ring = NULL;
+./drivers/usb/host/xhci-mem.c:	cancel_delayed_work_sync(&xhci->cmd_timer);
+./drivers/usb/host/xhci-mem.c:	if (xhci->lpm_command)
+./drivers/usb/host/xhci-mem.c:		xhci_free_command(xhci, xhci->lpm_command);
+./drivers/usb/host/xhci-mem.c:	xhci->lpm_command = NULL;
+./drivers/usb/host/xhci-mem.c:	if (xhci->cmd_ring)
+./drivers/usb/host/xhci-mem.c:		xhci_ring_free(xhci, xhci->cmd_ring);
+./drivers/usb/host/xhci-mem.c:	xhci->cmd_ring = NULL;
+./drivers/usb/host/xhci-mem.c:	num_ports = HCS_MAX_PORTS(xhci->hcs_params1);
+./drivers/usb/host/xhci-mem.c:	for (i = 0; i < num_ports && xhci->rh_bw; i++) {
+./drivers/usb/host/xhci-mem.c:		struct xhci_interval_bw_table *bwt = &xhci->rh_bw[i].bw_table;
+./drivers/usb/host/xhci-mem.c:	for (i = HCS_MAX_SLOTS(xhci->hcs_params1); i > 0; i--)
+./drivers/usb/host/xhci-mem.c:	dma_pool_destroy(xhci->segment_pool);
+./drivers/usb/host/xhci-mem.c:	xhci->segment_pool = NULL;
+./drivers/usb/host/xhci-mem.c:	dma_pool_destroy(xhci->device_pool);
+./drivers/usb/host/xhci-mem.c:	xhci->device_pool = NULL;
+./drivers/usb/host/xhci-mem.c:	dma_pool_destroy(xhci->small_streams_pool);
+./drivers/usb/host/xhci-mem.c:	xhci->small_streams_pool = NULL;
+./drivers/usb/host/xhci-mem.c:	dma_pool_destroy(xhci->medium_streams_pool);
+./drivers/usb/host/xhci-mem.c:	xhci->medium_streams_pool = NULL;
+./drivers/usb/host/xhci-mem.c:	if (xhci->dcbaa)
+./drivers/usb/host/xhci-mem.c:		dma_free_coherent(dev, sizeof(*xhci->dcbaa),
+./drivers/usb/host/xhci-mem.c:				xhci->dcbaa, xhci->dcbaa->dma);
+./drivers/usb/host/xhci-mem.c:	xhci->dcbaa = NULL;
+./drivers/usb/host/xhci-mem.c:	if (!xhci->rh_bw)
+./drivers/usb/host/xhci-mem.c:		list_for_each_entry_safe(tt, n, &xhci->rh_bw[i].tts, tt_list) {
+./drivers/usb/host/xhci-mem.c:	xhci->cmd_ring_reserved_trbs = 0;
+./drivers/usb/host/xhci-mem.c:	xhci->num_usb2_ports = 0;
+./drivers/usb/host/xhci-mem.c:	xhci->num_usb3_ports = 0;
+./drivers/usb/host/xhci-mem.c:	xhci->num_active_eps = 0;
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->usb2_ports);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->usb3_ports);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->port_array);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->rh_bw);
+./drivers/usb/host/xhci-mem.c:	kfree(xhci->ext_caps);
+./drivers/usb/host/xhci-mem.c:	xhci->usb2_ports = NULL;
+./drivers/usb/host/xhci-mem.c:	xhci->usb3_ports = NULL;
+./drivers/usb/host/xhci-mem.c:	xhci->port_array = NULL;
+./drivers/usb/host/xhci-mem.c:	xhci->rh_bw = NULL;
+./drivers/usb/host/xhci-mem.c:	xhci->ext_caps = NULL;
+./drivers/usb/host/xhci-mem.c:	xhci->page_size = 0;
+./drivers/usb/host/xhci-mem.c:	xhci->page_shift = 0;
+./drivers/usb/host/xhci-mem.c:	xhci->bus_state[0].bus_suspended = 0;
+./drivers/usb/host/xhci-mem.c:	xhci->bus_state[1].bus_suspended = 0;
+./drivers/usb/host/xhci-mem.c:		{ xhci->event_ring->first_seg->dma - 16, NULL },
+./drivers/usb/host/xhci-mem.c:		{ xhci->event_ring->first_seg->dma - 1, NULL },
+./drivers/usb/host/xhci-mem.c:		{ xhci->event_ring->first_seg->dma, xhci->event_ring->first_seg },
+./drivers/usb/host/xhci-mem.c:		{ xhci->event_ring->first_seg->dma + (TRBS_PER_SEGMENT - 1)*16,
+./drivers/usb/host/xhci-mem.c:			xhci->event_ring->first_seg },
+./drivers/usb/host/xhci-mem.c:		{ xhci->event_ring->first_seg->dma + (TRBS_PER_SEGMENT - 1)*16 + 1, NULL },
+./drivers/usb/host/xhci-mem.c:		{ xhci->event_ring->first_seg->dma + (TRBS_PER_SEGMENT)*16, NULL },
+./drivers/usb/host/xhci-mem.c:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:			.start_trb = xhci->event_ring->first_seg->trbs,
+./drivers/usb/host/xhci-mem.c:			.end_trb = &xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 1],
+./drivers/usb/host/xhci-mem.c:			.input_dma = xhci->cmd_ring->first_seg->dma,
+./drivers/usb/host/xhci-mem.c:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:			.start_trb = xhci->event_ring->first_seg->trbs,
+./drivers/usb/host/xhci-mem.c:			.end_trb = &xhci->cmd_ring->first_seg->trbs[TRBS_PER_SEGMENT - 1],
+./drivers/usb/host/xhci-mem.c:			.input_dma = xhci->cmd_ring->first_seg->dma,
+./drivers/usb/host/xhci-mem.c:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:			.start_trb = xhci->cmd_ring->first_seg->trbs,
+./drivers/usb/host/xhci-mem.c:			.end_trb = &xhci->cmd_ring->first_seg->trbs[TRBS_PER_SEGMENT - 1],
+./drivers/usb/host/xhci-mem.c:			.input_dma = xhci->cmd_ring->first_seg->dma,
+./drivers/usb/host/xhci-mem.c:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:			.start_trb = &xhci->event_ring->first_seg->trbs[0],
+./drivers/usb/host/xhci-mem.c:			.end_trb = &xhci->event_ring->first_seg->trbs[3],
+./drivers/usb/host/xhci-mem.c:			.input_dma = xhci->event_ring->first_seg->dma + 4*16,
+./drivers/usb/host/xhci-mem.c:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:			.start_trb = &xhci->event_ring->first_seg->trbs[3],
+./drivers/usb/host/xhci-mem.c:			.end_trb = &xhci->event_ring->first_seg->trbs[6],
+./drivers/usb/host/xhci-mem.c:			.input_dma = xhci->event_ring->first_seg->dma + 2*16,
+./drivers/usb/host/xhci-mem.c:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:			.start_trb = &xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 3],
+./drivers/usb/host/xhci-mem.c:			.end_trb = &xhci->event_ring->first_seg->trbs[1],
+./drivers/usb/host/xhci-mem.c:			.input_dma = xhci->event_ring->first_seg->dma + 2*16,
+./drivers/usb/host/xhci-mem.c:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:			.start_trb = &xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 3],
+./drivers/usb/host/xhci-mem.c:			.end_trb = &xhci->event_ring->first_seg->trbs[1],
+./drivers/usb/host/xhci-mem.c:			.input_dma = xhci->event_ring->first_seg->dma + (TRBS_PER_SEGMENT - 4)*16,
+./drivers/usb/host/xhci-mem.c:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:			.start_trb = &xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 3],
+./drivers/usb/host/xhci-mem.c:			.end_trb = &xhci->event_ring->first_seg->trbs[1],
+./drivers/usb/host/xhci-mem.c:			.input_dma = xhci->cmd_ring->first_seg->dma + 2*16,
+./drivers/usb/host/xhci-mem.c:				xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c:				xhci->event_ring->first_seg->trbs,
+./drivers/usb/host/xhci-mem.c:				&xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 1],
+./drivers/usb/host/xhci-mem.c:		rhub = &xhci->usb3_rhub;
+./drivers/usb/host/xhci-mem.c:		rhub = &xhci->usb2_rhub;
+./drivers/usb/host/xhci-mem.c:	if (major_revision < 0x03 && xhci->num_ext_caps < max_caps)
+./drivers/usb/host/xhci-mem.c:		xhci->ext_caps[xhci->num_ext_caps++] = temp;
+./drivers/usb/host/xhci-mem.c:	if ((xhci->hci_version == 0x96) && (major_revision != 0x03) &&
+./drivers/usb/host/xhci-mem.c:		xhci->sw_lpm_support = 1;
+./drivers/usb/host/xhci-mem.c:	if ((xhci->hci_version >= 0x100) && (major_revision != 0x03)) {
+./drivers/usb/host/xhci-mem.c:		xhci->sw_lpm_support = 1;
+./drivers/usb/host/xhci-mem.c:			xhci->hw_lpm_support = 1;
+./drivers/usb/host/xhci-mem.c:		if (xhci->port_array[i] != 0) {
+./drivers/usb/host/xhci-mem.c:					xhci->port_array[i], major_revision);
+./drivers/usb/host/xhci-mem.c:			if (xhci->port_array[i] != major_revision &&
+./drivers/usb/host/xhci-mem.c:				xhci->port_array[i] != DUPLICATE_ENTRY) {
+./drivers/usb/host/xhci-mem.c:				if (xhci->port_array[i] == 0x03)
+./drivers/usb/host/xhci-mem.c:					xhci->num_usb3_ports--;
+./drivers/usb/host/xhci-mem.c:					xhci->num_usb2_ports--;
+./drivers/usb/host/xhci-mem.c:				xhci->port_array[i] = DUPLICATE_ENTRY;
+./drivers/usb/host/xhci-mem.c:		xhci->port_array[i] = major_revision;
+./drivers/usb/host/xhci-mem.c:			xhci->num_usb3_ports++;
+./drivers/usb/host/xhci-mem.c:			xhci->num_usb2_ports++;
+./drivers/usb/host/xhci-mem.c:	addr = &xhci->cap_regs->hcc_params;
+./drivers/usb/host/xhci-mem.c:	num_ports = HCS_MAX_PORTS(xhci->hcs_params1);
+./drivers/usb/host/xhci-mem.c:	xhci->port_array = kzalloc(sizeof(*xhci->port_array)*num_ports, flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->port_array)
+./drivers/usb/host/xhci-mem.c:	xhci->rh_bw = kzalloc(sizeof(*xhci->rh_bw)*num_ports, flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->rh_bw)
+./drivers/usb/host/xhci-mem.c:		INIT_LIST_HEAD(&xhci->rh_bw[i].tts);
+./drivers/usb/host/xhci-mem.c:		bw_table = &xhci->rh_bw[i].bw_table;
+./drivers/usb/host/xhci-mem.c:	addr = &xhci->cap_regs->hc_capbase + offset;
+./drivers/usb/host/xhci-mem.c:	xhci->ext_caps = kzalloc(sizeof(*xhci->ext_caps) * cap_count, flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->ext_caps)
+./drivers/usb/host/xhci-mem.c:		if (!offset || (xhci->num_usb2_ports + xhci->num_usb3_ports)
+./drivers/usb/host/xhci-mem.c:	if (xhci->num_usb2_ports == 0 && xhci->num_usb3_ports == 0) {
+./drivers/usb/host/xhci-mem.c:			xhci->num_usb2_ports, xhci->num_usb3_ports);
+./drivers/usb/host/xhci-mem.c:	if (xhci->num_usb3_ports > 15) {
+./drivers/usb/host/xhci-mem.c:		xhci->num_usb3_ports = 15;
+./drivers/usb/host/xhci-mem.c:	if (xhci->num_usb2_ports > USB_MAXCHILDREN) {
+./drivers/usb/host/xhci-mem.c:		xhci->num_usb2_ports = USB_MAXCHILDREN;
+./drivers/usb/host/xhci-mem.c:	if (xhci->num_usb2_ports) {
+./drivers/usb/host/xhci-mem.c:		xhci->usb2_ports = kmalloc(sizeof(*xhci->usb2_ports)*
+./drivers/usb/host/xhci-mem.c:				xhci->num_usb2_ports, flags);
+./drivers/usb/host/xhci-mem.c:		if (!xhci->usb2_ports)
+./drivers/usb/host/xhci-mem.c:			if (xhci->port_array[i] == 0x03 ||
+./drivers/usb/host/xhci-mem.c:					xhci->port_array[i] == 0 ||
+./drivers/usb/host/xhci-mem.c:					xhci->port_array[i] == DUPLICATE_ENTRY)
+./drivers/usb/host/xhci-mem.c:			xhci->usb2_ports[port_index] =
+./drivers/usb/host/xhci-mem.c:				&xhci->op_regs->port_status_base +
+./drivers/usb/host/xhci-mem.c:					xhci->usb2_ports[port_index]);
+./drivers/usb/host/xhci-mem.c:			if (port_index == xhci->num_usb2_ports)
+./drivers/usb/host/xhci-mem.c:	if (xhci->num_usb3_ports) {
+./drivers/usb/host/xhci-mem.c:		xhci->usb3_ports = kmalloc(sizeof(*xhci->usb3_ports)*
+./drivers/usb/host/xhci-mem.c:				xhci->num_usb3_ports, flags);
+./drivers/usb/host/xhci-mem.c:		if (!xhci->usb3_ports)
+./drivers/usb/host/xhci-mem.c:			if (xhci->port_array[i] == 0x03) {
+./drivers/usb/host/xhci-mem.c:				xhci->usb3_ports[port_index] =
+./drivers/usb/host/xhci-mem.c:					&xhci->op_regs->port_status_base +
+./drivers/usb/host/xhci-mem.c:						xhci->usb3_ports[port_index]);
+./drivers/usb/host/xhci-mem.c:				if (port_index == xhci->num_usb3_ports)
+./drivers/usb/host/xhci-mem.c:	if ((xhci->xhc_state & XHCI_STATE_HALTED) || !xhci->sec_ir_set
+./drivers/usb/host/xhci-mem.c:		|| !xhci->sec_event_ring || !xhci->sec_erst ||
+./drivers/usb/host/xhci-mem.c:		intr_num >= xhci->max_interrupters) {
+./drivers/usb/host/xhci-mem.c:		__func__, xhci->xhc_state, xhci->sec_ir_set,
+./drivers/usb/host/xhci-mem.c:		xhci->sec_event_ring, xhci->sec_erst, intr_num);
+./drivers/usb/host/xhci-mem.c:	if (xhci->sec_event_ring && xhci->sec_event_ring[intr_num]
+./drivers/usb/host/xhci-mem.c:		&& xhci->sec_event_ring[intr_num]->first_seg)
+./drivers/usb/host/xhci-mem.c:	xhci->sec_ir_set[intr_num] = &xhci->run_regs->ir_set[intr_num];
+./drivers/usb/host/xhci-mem.c:				&xhci->sec_event_ring[intr_num],
+./drivers/usb/host/xhci-mem.c:				xhci->sec_ir_set[intr_num],
+./drivers/usb/host/xhci-mem.c:				&xhci->sec_erst[intr_num],
+./drivers/usb/host/xhci-mem.c:	xhci->max_interrupters = HCS_MAX_INTRS(xhci->hcs_params1);
+./drivers/usb/host/xhci-mem.c:	xhci->ir_set = &xhci->run_regs->ir_set[0];
+./drivers/usb/host/xhci-mem.c:	ret = xhci_event_ring_setup(xhci, &xhci->event_ring, xhci->ir_set,
+./drivers/usb/host/xhci-mem.c:		&xhci->erst, 0, flags);
+./drivers/usb/host/xhci-mem.c:	xhci->sec_ir_set = kcalloc(xhci->max_interrupters,
+./drivers/usb/host/xhci-mem.c:				sizeof(*xhci->sec_ir_set), flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->sec_ir_set) {
+./drivers/usb/host/xhci-mem.c:	xhci->sec_event_ring = kcalloc(xhci->max_interrupters,
+./drivers/usb/host/xhci-mem.c:				sizeof(*xhci->sec_event_ring), flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->sec_event_ring) {
+./drivers/usb/host/xhci-mem.c:	xhci->sec_erst = kcalloc(xhci->max_interrupters,
+./drivers/usb/host/xhci-mem.c:				sizeof(*xhci->sec_erst), flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->sec_erst)
+./drivers/usb/host/xhci-mem.c:	INIT_LIST_HEAD(&xhci->cmd_list);
+./drivers/usb/host/xhci-mem.c:	INIT_DELAYED_WORK(&xhci->cmd_timer, xhci_handle_command_timeout);
+./drivers/usb/host/xhci-mem.c:	init_completion(&xhci->cmd_ring_stop_completion);
+./drivers/usb/host/xhci-mem.c:	page_size = readl(&xhci->op_regs->page_size);
+./drivers/usb/host/xhci-mem.c:	xhci->page_shift = 12;
+./drivers/usb/host/xhci-mem.c:	xhci->page_size = 1 << xhci->page_shift;
+./drivers/usb/host/xhci-mem.c:			"HCD page size set to %iK", xhci->page_size / 1024);
+./drivers/usb/host/xhci-mem.c:	val = HCS_MAX_SLOTS(readl(&xhci->cap_regs->hcs_params1));
+./drivers/usb/host/xhci-mem.c:	val2 = readl(&xhci->op_regs->config_reg);
+./drivers/usb/host/xhci-mem.c:	writel(val, &xhci->op_regs->config_reg);
+./drivers/usb/host/xhci-mem.c:	xhci->dcbaa = dma_alloc_coherent(dev, sizeof(*xhci->dcbaa), &dma,
+./drivers/usb/host/xhci-mem.c:	if (!xhci->dcbaa)
+./drivers/usb/host/xhci-mem.c:	memset(xhci->dcbaa, 0, sizeof *(xhci->dcbaa));
+./drivers/usb/host/xhci-mem.c:	xhci->dcbaa->dma = dma;
+./drivers/usb/host/xhci-mem.c:			(unsigned long long)xhci->dcbaa->dma, xhci->dcbaa);
+./drivers/usb/host/xhci-mem.c:	xhci_write_64(xhci, dma, &xhci->op_regs->dcbaa_ptr);
+./drivers/usb/host/xhci-mem.c:	xhci->segment_pool = dma_pool_create("xHCI ring segments", dev,
+./drivers/usb/host/xhci-mem.c:			TRB_SEGMENT_SIZE, TRB_SEGMENT_SIZE, xhci->page_size);
+./drivers/usb/host/xhci-mem.c:	xhci->device_pool = dma_pool_create("xHCI input/output contexts", dev,
+./drivers/usb/host/xhci-mem.c:			2112, 64, xhci->page_size);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->segment_pool || !xhci->device_pool)
+./drivers/usb/host/xhci-mem.c:	xhci->small_streams_pool =
+./drivers/usb/host/xhci-mem.c:	xhci->medium_streams_pool =
+./drivers/usb/host/xhci-mem.c:	if (!xhci->small_streams_pool || !xhci->medium_streams_pool)
+./drivers/usb/host/xhci-mem.c:	xhci->cmd_ring = xhci_ring_alloc(xhci, 1, 1, TYPE_COMMAND, flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->cmd_ring)
+./drivers/usb/host/xhci-mem.c:			"Allocated command ring at %pK", xhci->cmd_ring);
+./drivers/usb/host/xhci-mem.c:			(unsigned long long)xhci->cmd_ring->first_seg->dma);
+./drivers/usb/host/xhci-mem.c:	val_64 = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-mem.c:		(xhci->cmd_ring->first_seg->dma & (u64) ~CMD_RING_RSVD_BITS) |
+./drivers/usb/host/xhci-mem.c:		xhci->cmd_ring->cycle_state;
+./drivers/usb/host/xhci-mem.c:	xhci_write_64(xhci, val_64, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-mem.c:	xhci->lpm_command = xhci_alloc_command(xhci, true, true, flags);
+./drivers/usb/host/xhci-mem.c:	if (!xhci->lpm_command)
+./drivers/usb/host/xhci-mem.c:	xhci->cmd_ring_reserved_trbs++;
+./drivers/usb/host/xhci-mem.c:	val = readl(&xhci->cap_regs->db_off);
+./drivers/usb/host/xhci-mem.c:	xhci->dba = (void __iomem *) xhci->cap_regs + val;
+./drivers/usb/host/xhci-mem.c:	init_completion(&xhci->addr_dev);
+./drivers/usb/host/xhci-mem.c:		xhci->devs[i] = NULL;
+./drivers/usb/host/xhci-mem.c:		xhci->bus_state[0].resume_done[i] = 0;
+./drivers/usb/host/xhci-mem.c:		xhci->bus_state[1].resume_done[i] = 0;
+./drivers/usb/host/xhci-mem.c:		init_completion(&xhci->bus_state[1].rexit_done[i]);
+./drivers/usb/host/xhci-mem.c:	temp = readl(&xhci->op_regs->dev_notification);
+./drivers/usb/host/xhci-mem.c:	writel(temp, &xhci->op_regs->dev_notification);
+./drivers/usb/host/xhci-rcar.h: * drivers/usb/host/xhci-rcar.h
+./drivers/usb/host/xhci-trace.h:#define TRACE_SYSTEM xhci-hcd
+./drivers/usb/host/xhci-trace.h:			((HCC_64BYTE_CONTEXT(xhci->hcc_params) + 1) * 8) *
+./drivers/usb/host/xhci-trace.h:		__entry->ctx_64 = HCC_64BYTE_CONTEXT(xhci->hcc_params);
+./drivers/usb/host/xhci-trace.h:			((HCC_64BYTE_CONTEXT(xhci->hcc_params) + 1) * 32) *
+./drivers/usb/host/xhci-trace.h:#define TRACE_INCLUDE_FILE xhci-trace
+./drivers/usb/host/xhci-ring.c.rej:--- drivers/usb/host/xhci-ring.c
+./drivers/usb/host/xhci-ring.c.rej:+++ drivers/usb/host/xhci-ring.c
+./drivers/usb/host/xhci-ring.c.rej:- * This must be called with command ring stopped and xhci->lock held.
+./drivers/usb/host/xhci-ring.c.rej:-	list_for_each_entry_safe(i_cmd, tmp_cmd, &xhci->cmd_list,
+./drivers/usb/host/xhci-ring.c.rej:-	xhci->cmd_ring_state = CMD_RING_STATE_RUNNING;
+./drivers/usb/host/xhci-ring.c.rej:-	if ((xhci->cmd_ring->dequeue != xhci->cmd_ring->enqueue) &&
+./drivers/usb/host/xhci-ring.c.rej:-	    !(xhci->xhc_state & XHCI_STATE_DYING)) {
+./drivers/usb/host/xhci-ring.c.rej:-		xhci->current_cmd = cur_cmd;
+./drivers/usb/host/xhci-ring.c.rej:-		mod_timer(&xhci->cmd_timer, jiffies + XHCI_CMD_DEFAULT_TIMEOUT);
+./drivers/usb/host/xhci-ring.c.rej: 	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.rej:-	if (xhci->current_cmd) {
+./drivers/usb/host/xhci-ring.c.rej:-		if (xhci->current_cmd->status == COMP_CMD_ABORT)
+./drivers/usb/host/xhci-ring.c.rej:-		xhci->current_cmd->status = COMP_CMD_ABORT;
+./drivers/usb/host/xhci-ring.c.rej:+	if (!xhci->current_cmd || delayed_work_pending(&xhci->cmd_timer)) {
+./drivers/usb/host/xhci-ring.c.rej:+		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.rej:+	xhci->current_cmd->status = COMP_CMD_ABORT;
+./drivers/usb/host/xhci-ring.c.rej: 	hw_ring_state = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c.rej: 	if ((xhci->cmd_ring_state & CMD_RING_STATE_RUNNING) &&
+./drivers/usb/host/xhci-ring.c.rej:-		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.rej:+		xhci->cmd_ring_state = CMD_RING_STATE_ABORTED;
+./drivers/usb/host/xhci-ring.c.rej:+			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.rej:-	if (second_timeout || xhci->xhc_state & XHCI_STATE_REMOVING) {
+./drivers/usb/host/xhci-ring.c.rej:-		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.rej:+	if (xhci->xhc_state & XHCI_STATE_REMOVING) {
+./drivers/usb/host/xhci-ring.c.rej: 	xhci_handle_stopped_cmd_ring(xhci, xhci->current_cmd);
+./drivers/usb/host/xhci-ring.c.rej: 	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-plat.c: * xhci-plat.c - xHCI host controller driver platform Bus Glue.
+./drivers/usb/host/xhci-plat.c:#include "xhci-mvebu.h"
+./drivers/usb/host/xhci-plat.c:#include "xhci-rcar.h"
+./drivers/usb/host/xhci-plat.c:	xhci->quirks |= XHCI_PLAT;
+./drivers/usb/host/xhci-plat.c:		xhci->quirks |= XHCI_LPM_SUPPORT;
+./drivers/usb/host/xhci-plat.c:	if (of_device_is_compatible(of_node, "renesas,xhci-r8a7790") ||
+./drivers/usb/host/xhci-plat.c:	    of_device_is_compatible(of_node, "renesas,xhci-r8a7791")) {
+./drivers/usb/host/xhci-plat.c:	if (of_device_is_compatible(of_node, "renesas,xhci-r8a7790") ||
+./drivers/usb/host/xhci-plat.c:	    of_device_is_compatible(of_node, "renesas,xhci-r8a7791"))
+./drivers/usb/host/xhci-plat.c:	if (xhci->shared_hcd->state == HC_STATE_SUSPENDED
+./drivers/usb/host/xhci-plat.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-plat.c:	temp = readl_relaxed(&xhci->ir_set->irq_control);
+./drivers/usb/host/xhci-plat.c:	writel_relaxed(temp, &xhci->ir_set->irq_control);
+./drivers/usb/host/xhci-plat.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-plat.c:	if (xhci->shared_hcd->state == HC_STATE_SUSPENDED
+./drivers/usb/host/xhci-plat.c:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-plat.c:	temp = readl_relaxed(&xhci->ir_set->irq_control) &
+./drivers/usb/host/xhci-plat.c:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-plat.c:	xhci->clk = clk;
+./drivers/usb/host/xhci-plat.c:	xhci->main_hcd = hcd;
+./drivers/usb/host/xhci-plat.c:	xhci->shared_hcd = usb_create_shared_hcd(driver, &pdev->dev,
+./drivers/usb/host/xhci-plat.c:	if (!xhci->shared_hcd) {
+./drivers/usb/host/xhci-plat.c:	hcd_to_bus(xhci->shared_hcd)->skip_resume = true;
+./drivers/usb/host/xhci-plat.c:	if (HCC_MAX_PSA(xhci->hcc_params) >= 4)
+./drivers/usb/host/xhci-plat.c:		xhci->shared_hcd->can_do_streams = 1;
+./drivers/usb/host/xhci-plat.c:	ret = usb_add_hcd(xhci->shared_hcd, irq, IRQF_SHARED | IRQF_ONESHOT);
+./drivers/usb/host/xhci-plat.c:	device_wakeup_enable(&xhci->shared_hcd->self.root_hub->dev);
+./drivers/usb/host/xhci-plat.c:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-plat.c:		temp = readl_relaxed(&xhci->ir_set->irq_control);
+./drivers/usb/host/xhci-plat.c:		writel_relaxed(temp, &xhci->ir_set->irq_control);
+./drivers/usb/host/xhci-plat.c:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-plat.c:	usb_put_hcd(xhci->shared_hcd);
+./drivers/usb/host/xhci-plat.c:	struct clk *clk = xhci->clk;
+./drivers/usb/host/xhci-plat.c:	xhci->xhc_state |= XHCI_STATE_REMOVING;
+./drivers/usb/host/xhci-plat.c:	usb_remove_hcd(xhci->shared_hcd);
+./drivers/usb/host/xhci-plat.c:	usb_put_hcd(xhci->shared_hcd);
+./drivers/usb/host/xhci-plat.c:	dev_dbg(dev, "xhci-plat runtime suspend\n");
+./drivers/usb/host/xhci-plat.c:	dev_dbg(dev, "xhci-plat runtime resume\n");
+./drivers/usb/host/xhci-plat.c:	{ .compatible = "xhci-platform" },
+./drivers/usb/host/xhci-plat.c:	{ .compatible = "renesas,xhci-r8a7790"},
+./drivers/usb/host/xhci-plat.c:	{ .compatible = "renesas,xhci-r8a7791"},
+./drivers/usb/host/xhci-plat.c:		.name = "xhci-hcd",
+./drivers/usb/host/xhci-plat.c:MODULE_ALIAS("platform:xhci-hcd");
+./drivers/usb/host/xhci-trace.c:#include "xhci-trace.h"
+./drivers/usb/host/xhci-mem.c.orig:#include "xhci-trace.h"
+./drivers/usb/host/xhci-mem.c.orig:	seg->trbs = dma_pool_alloc(xhci->segment_pool, flags, &dma);
+./drivers/usb/host/xhci-mem.c.orig:		dma_pool_free(xhci->segment_pool, seg->trbs, seg->dma);
+./drivers/usb/host/xhci-mem.c.orig:				 (xhci->quirks & XHCI_AMD_0x96_HOST)))
+./drivers/usb/host/xhci-mem.c.orig:	ctx->size = HCC_64BYTE_CONTEXT(xhci->hcc_params) ? 2048 : 1024;
+./drivers/usb/host/xhci-mem.c.orig:		ctx->size += CTX_SIZE(xhci->hcc_params);
+./drivers/usb/host/xhci-mem.c.orig:	ctx->bytes = dma_pool_alloc(xhci->device_pool, flags, &ctx->dma);
+./drivers/usb/host/xhci-mem.c.orig:	dma_pool_free(xhci->device_pool, ctx->bytes, ctx->dma);
+./drivers/usb/host/xhci-mem.c.orig:		(ctx->bytes + CTX_SIZE(xhci->hcc_params));
+./drivers/usb/host/xhci-mem.c.orig:		(ctx->bytes + (ep_index * CTX_SIZE(xhci->hcc_params)));
+./drivers/usb/host/xhci-mem.c.orig:		return dma_pool_free(xhci->small_streams_pool,
+./drivers/usb/host/xhci-mem.c.orig:		return dma_pool_free(xhci->medium_streams_pool,
+./drivers/usb/host/xhci-mem.c.orig:		return dma_pool_alloc(xhci->small_streams_pool,
+./drivers/usb/host/xhci-mem.c.orig:		return dma_pool_alloc(xhci->medium_streams_pool,
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->cmd_ring_reserved_trbs == MAX_RSVD_CMD_TRBS) {
+./drivers/usb/host/xhci-mem.c.orig:	xhci->cmd_ring_reserved_trbs++;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->cmd_ring_reserved_trbs--;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->cmd_ring_reserved_trbs--;
+./drivers/usb/host/xhci-mem.c.orig:			virt_dev->real_port > HCS_MAX_PORTS(xhci->hcs_params1)) {
+./drivers/usb/host/xhci-mem.c.orig:	tt_list_head = &(xhci->rh_bw[virt_dev->real_port - 1].tts);
+./drivers/usb/host/xhci-mem.c.orig:				&xhci->rh_bw[virt_dev->real_port - 1].tts);
+./drivers/usb/host/xhci-mem.c.orig: * Should be called with xhci->lock held if there is any chance the TT lists
+./drivers/usb/host/xhci-mem.c.orig:	if (slot_id == 0 || !xhci->devs[slot_id])
+./drivers/usb/host/xhci-mem.c.orig:	dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-mem.c.orig:	xhci->dcbaa->dev_context_ptrs[slot_id] = 0;
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->devs[slot_id]);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->devs[slot_id] = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	if (slot_id == 0 || xhci->devs[slot_id]) {
+./drivers/usb/host/xhci-mem.c.orig:	xhci->devs[slot_id] = kzalloc(sizeof(*xhci->devs[slot_id]), flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->devs[slot_id])
+./drivers/usb/host/xhci-mem.c.orig:	dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-mem.c.orig:	xhci->dcbaa->dev_context_ptrs[slot_id] = cpu_to_le64(dev->out_ctx->dma);
+./drivers/usb/host/xhci-mem.c.orig:		 &xhci->dcbaa->dev_context_ptrs[slot_id],
+./drivers/usb/host/xhci-mem.c.orig:		 le64_to_cpu(xhci->dcbaa->dev_context_ptrs[slot_id]));
+./drivers/usb/host/xhci-mem.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci-mem.c.orig: * status registers.  xhci->port_array provides an array of the port speed for
+./drivers/usb/host/xhci-mem.c.orig:		hcd = xhci->shared_hcd;
+./drivers/usb/host/xhci-mem.c.orig:		hcd = xhci->main_hcd;
+./drivers/usb/host/xhci-mem.c.orig:	dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci-mem.c.orig:		dev->bw_table = &xhci->rh_bw[port_num - 1].bw_table;
+./drivers/usb/host/xhci-mem.c.orig:		rh_bw = &xhci->rh_bw[port_num - 1];
+./drivers/usb/host/xhci-mem.c.orig:	if (usb_endpoint_xfer_control(&ep->desc) && xhci->hci_version >= 0x100)
+./drivers/usb/host/xhci-mem.c.orig:	int num_sp = HCS_MAX_SCRATCHPAD(xhci->hcs_params2);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->scratchpad = kzalloc(sizeof(*xhci->scratchpad), flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->scratchpad)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->scratchpad->sp_array = dma_alloc_coherent(dev,
+./drivers/usb/host/xhci-mem.c.orig:				     &xhci->scratchpad->sp_dma, flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->scratchpad->sp_array)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->scratchpad->sp_buffers = kzalloc(sizeof(void *) * num_sp, flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->scratchpad->sp_buffers)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->scratchpad->sp_dma_buffers =
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->scratchpad->sp_dma_buffers)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->dcbaa->dev_context_ptrs[0] = cpu_to_le64(xhci->scratchpad->sp_dma);
+./drivers/usb/host/xhci-mem.c.orig:		void *buf = dma_alloc_coherent(dev, xhci->page_size, &dma,
+./drivers/usb/host/xhci-mem.c.orig:		xhci->scratchpad->sp_array[i] = dma;
+./drivers/usb/host/xhci-mem.c.orig:		xhci->scratchpad->sp_buffers[i] = buf;
+./drivers/usb/host/xhci-mem.c.orig:		xhci->scratchpad->sp_dma_buffers[i] = dma;
+./drivers/usb/host/xhci-mem.c.orig:		dma_free_coherent(dev, xhci->page_size,
+./drivers/usb/host/xhci-mem.c.orig:				    xhci->scratchpad->sp_buffers[i],
+./drivers/usb/host/xhci-mem.c.orig:				    xhci->scratchpad->sp_dma_buffers[i]);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->scratchpad->sp_dma_buffers);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->scratchpad->sp_buffers);
+./drivers/usb/host/xhci-mem.c.orig:			    xhci->scratchpad->sp_array,
+./drivers/usb/host/xhci-mem.c.orig:			    xhci->scratchpad->sp_dma);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->scratchpad);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->scratchpad = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->scratchpad)
+./drivers/usb/host/xhci-mem.c.orig:	num_sp = HCS_MAX_SCRATCHPAD(xhci->hcs_params2);
+./drivers/usb/host/xhci-mem.c.orig:		dma_free_coherent(dev, xhci->page_size,
+./drivers/usb/host/xhci-mem.c.orig:				    xhci->scratchpad->sp_buffers[i],
+./drivers/usb/host/xhci-mem.c.orig:				    xhci->scratchpad->sp_dma_buffers[i]);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->scratchpad->sp_dma_buffers);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->scratchpad->sp_buffers);
+./drivers/usb/host/xhci-mem.c.orig:			    xhci->scratchpad->sp_array,
+./drivers/usb/host/xhci-mem.c.orig:			    xhci->scratchpad->sp_dma);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->scratchpad);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->scratchpad = NULL;
+./drivers/usb/host/xhci-mem.c.orig:		readl_relaxed(&xhci->sec_ir_set[intr_num]->irq_pending);
+./drivers/usb/host/xhci-mem.c.orig:			&xhci->sec_ir_set[intr_num]->irq_pending);
+./drivers/usb/host/xhci-mem.c.orig:		readl_relaxed(&xhci->sec_ir_set[intr_num]->irq_pending);
+./drivers/usb/host/xhci-mem.c.orig:			&xhci->sec_ir_set[intr_num]->irq_pending);
+./drivers/usb/host/xhci-mem.c.orig:		xhci_read_64(xhci, &xhci->sec_ir_set[intr_num]->erst_dequeue);
+./drivers/usb/host/xhci-mem.c.orig:	seg = xhci->sec_event_ring[intr_num]->first_seg;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_event_ring[intr_num]->cycle_state =
+./drivers/usb/host/xhci-mem.c.orig:			xhci->sec_event_ring[intr_num]->cycle_state ^= 1;
+./drivers/usb/host/xhci-mem.c.orig:		    xhci->sec_event_ring[intr_num]->cycle_state)
+./drivers/usb/host/xhci-mem.c.orig:		xhci_trb_virt_to_dma(xhci->sec_event_ring[intr_num]->deq_seg,
+./drivers/usb/host/xhci-mem.c.orig:			&xhci->sec_ir_set[intr_num]->erst_dequeue);
+./drivers/usb/host/xhci-mem.c.orig:	if (intr_num >= xhci->max_interrupters) {
+./drivers/usb/host/xhci-mem.c.orig:	sizeof(struct xhci_erst_entry)*(xhci->sec_erst[intr_num].num_entries);
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->sec_erst[intr_num].entries) {
+./drivers/usb/host/xhci-mem.c.orig:		dma_free_coherent(dev, size, xhci->sec_erst[intr_num].entries,
+./drivers/usb/host/xhci-mem.c.orig:				xhci->sec_erst[intr_num].erst_dma_addr);
+./drivers/usb/host/xhci-mem.c.orig:		xhci->sec_erst[intr_num].entries = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->sec_event_ring[intr_num])
+./drivers/usb/host/xhci-mem.c.orig:		xhci_ring_free(xhci, xhci->sec_event_ring[intr_num]);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_event_ring[intr_num] = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	for (i = 1; i < xhci->max_interrupters; i++)
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->sec_ir_set);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_ir_set = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->sec_erst);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_erst = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->sec_event_ring);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_event_ring = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	size = sizeof(struct xhci_erst_entry)*(xhci->erst.num_entries);
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->erst.entries)
+./drivers/usb/host/xhci-mem.c.orig:				xhci->erst.entries, xhci->erst.erst_dma_addr);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->erst.entries = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->event_ring)
+./drivers/usb/host/xhci-mem.c.orig:		xhci_ring_free(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->event_ring = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	del_timer_sync(&xhci->cmd_timer);
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->lpm_command)
+./drivers/usb/host/xhci-mem.c.orig:		xhci_free_command(xhci, xhci->lpm_command);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->lpm_command = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->cmd_ring)
+./drivers/usb/host/xhci-mem.c.orig:		xhci_ring_free(xhci, xhci->cmd_ring);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->cmd_ring = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	num_ports = HCS_MAX_PORTS(xhci->hcs_params1);
+./drivers/usb/host/xhci-mem.c.orig:	for (i = 0; i < num_ports && xhci->rh_bw; i++) {
+./drivers/usb/host/xhci-mem.c.orig:		struct xhci_interval_bw_table *bwt = &xhci->rh_bw[i].bw_table;
+./drivers/usb/host/xhci-mem.c.orig:	dma_pool_destroy(xhci->segment_pool);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->segment_pool = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	dma_pool_destroy(xhci->device_pool);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->device_pool = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	dma_pool_destroy(xhci->small_streams_pool);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->small_streams_pool = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	dma_pool_destroy(xhci->medium_streams_pool);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->medium_streams_pool = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->dcbaa)
+./drivers/usb/host/xhci-mem.c.orig:		dma_free_coherent(dev, sizeof(*xhci->dcbaa),
+./drivers/usb/host/xhci-mem.c.orig:				xhci->dcbaa, xhci->dcbaa->dma);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->dcbaa = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->rh_bw)
+./drivers/usb/host/xhci-mem.c.orig:		list_for_each_entry_safe(tt, n, &xhci->rh_bw[i].tts, tt_list) {
+./drivers/usb/host/xhci-mem.c.orig:	xhci->cmd_ring_reserved_trbs = 0;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->num_usb2_ports = 0;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->num_usb3_ports = 0;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->num_active_eps = 0;
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->usb2_ports);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->usb3_ports);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->port_array);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->rh_bw);
+./drivers/usb/host/xhci-mem.c.orig:	kfree(xhci->ext_caps);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->usb2_ports = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->usb3_ports = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->port_array = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->rh_bw = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->ext_caps = NULL;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->page_size = 0;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->page_shift = 0;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->bus_state[0].bus_suspended = 0;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->bus_state[1].bus_suspended = 0;
+./drivers/usb/host/xhci-mem.c.orig:		{ xhci->event_ring->first_seg->dma - 16, NULL },
+./drivers/usb/host/xhci-mem.c.orig:		{ xhci->event_ring->first_seg->dma - 1, NULL },
+./drivers/usb/host/xhci-mem.c.orig:		{ xhci->event_ring->first_seg->dma, xhci->event_ring->first_seg },
+./drivers/usb/host/xhci-mem.c.orig:		{ xhci->event_ring->first_seg->dma + (TRBS_PER_SEGMENT - 1)*16,
+./drivers/usb/host/xhci-mem.c.orig:			xhci->event_ring->first_seg },
+./drivers/usb/host/xhci-mem.c.orig:		{ xhci->event_ring->first_seg->dma + (TRBS_PER_SEGMENT - 1)*16 + 1, NULL },
+./drivers/usb/host/xhci-mem.c.orig:		{ xhci->event_ring->first_seg->dma + (TRBS_PER_SEGMENT)*16, NULL },
+./drivers/usb/host/xhci-mem.c.orig:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:			.start_trb = xhci->event_ring->first_seg->trbs,
+./drivers/usb/host/xhci-mem.c.orig:			.end_trb = &xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 1],
+./drivers/usb/host/xhci-mem.c.orig:			.input_dma = xhci->cmd_ring->first_seg->dma,
+./drivers/usb/host/xhci-mem.c.orig:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:			.start_trb = xhci->event_ring->first_seg->trbs,
+./drivers/usb/host/xhci-mem.c.orig:			.end_trb = &xhci->cmd_ring->first_seg->trbs[TRBS_PER_SEGMENT - 1],
+./drivers/usb/host/xhci-mem.c.orig:			.input_dma = xhci->cmd_ring->first_seg->dma,
+./drivers/usb/host/xhci-mem.c.orig:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:			.start_trb = xhci->cmd_ring->first_seg->trbs,
+./drivers/usb/host/xhci-mem.c.orig:			.end_trb = &xhci->cmd_ring->first_seg->trbs[TRBS_PER_SEGMENT - 1],
+./drivers/usb/host/xhci-mem.c.orig:			.input_dma = xhci->cmd_ring->first_seg->dma,
+./drivers/usb/host/xhci-mem.c.orig:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:			.start_trb = &xhci->event_ring->first_seg->trbs[0],
+./drivers/usb/host/xhci-mem.c.orig:			.end_trb = &xhci->event_ring->first_seg->trbs[3],
+./drivers/usb/host/xhci-mem.c.orig:			.input_dma = xhci->event_ring->first_seg->dma + 4*16,
+./drivers/usb/host/xhci-mem.c.orig:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:			.start_trb = &xhci->event_ring->first_seg->trbs[3],
+./drivers/usb/host/xhci-mem.c.orig:			.end_trb = &xhci->event_ring->first_seg->trbs[6],
+./drivers/usb/host/xhci-mem.c.orig:			.input_dma = xhci->event_ring->first_seg->dma + 2*16,
+./drivers/usb/host/xhci-mem.c.orig:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:			.start_trb = &xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 3],
+./drivers/usb/host/xhci-mem.c.orig:			.end_trb = &xhci->event_ring->first_seg->trbs[1],
+./drivers/usb/host/xhci-mem.c.orig:			.input_dma = xhci->event_ring->first_seg->dma + 2*16,
+./drivers/usb/host/xhci-mem.c.orig:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:			.start_trb = &xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 3],
+./drivers/usb/host/xhci-mem.c.orig:			.end_trb = &xhci->event_ring->first_seg->trbs[1],
+./drivers/usb/host/xhci-mem.c.orig:			.input_dma = xhci->event_ring->first_seg->dma + (TRBS_PER_SEGMENT - 4)*16,
+./drivers/usb/host/xhci-mem.c.orig:		{	.input_seg = xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:			.start_trb = &xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 3],
+./drivers/usb/host/xhci-mem.c.orig:			.end_trb = &xhci->event_ring->first_seg->trbs[1],
+./drivers/usb/host/xhci-mem.c.orig:			.input_dma = xhci->cmd_ring->first_seg->dma + 2*16,
+./drivers/usb/host/xhci-mem.c.orig:				xhci->event_ring->first_seg,
+./drivers/usb/host/xhci-mem.c.orig:				xhci->event_ring->first_seg->trbs,
+./drivers/usb/host/xhci-mem.c.orig:				&xhci->event_ring->first_seg->trbs[TRBS_PER_SEGMENT - 1],
+./drivers/usb/host/xhci-mem.c.orig:		rhub = &xhci->usb3_rhub;
+./drivers/usb/host/xhci-mem.c.orig:		rhub = &xhci->usb2_rhub;
+./drivers/usb/host/xhci-mem.c.orig:	if (major_revision < 0x03 && xhci->num_ext_caps < max_caps)
+./drivers/usb/host/xhci-mem.c.orig:		xhci->ext_caps[xhci->num_ext_caps++] = temp;
+./drivers/usb/host/xhci-mem.c.orig:	if ((xhci->hci_version == 0x96) && (major_revision != 0x03) &&
+./drivers/usb/host/xhci-mem.c.orig:		xhci->sw_lpm_support = 1;
+./drivers/usb/host/xhci-mem.c.orig:	if ((xhci->hci_version >= 0x100) && (major_revision != 0x03)) {
+./drivers/usb/host/xhci-mem.c.orig:		xhci->sw_lpm_support = 1;
+./drivers/usb/host/xhci-mem.c.orig:			xhci->hw_lpm_support = 1;
+./drivers/usb/host/xhci-mem.c.orig:		if (xhci->port_array[i] != 0) {
+./drivers/usb/host/xhci-mem.c.orig:					xhci->port_array[i], major_revision);
+./drivers/usb/host/xhci-mem.c.orig:			if (xhci->port_array[i] != major_revision &&
+./drivers/usb/host/xhci-mem.c.orig:				xhci->port_array[i] != DUPLICATE_ENTRY) {
+./drivers/usb/host/xhci-mem.c.orig:				if (xhci->port_array[i] == 0x03)
+./drivers/usb/host/xhci-mem.c.orig:					xhci->num_usb3_ports--;
+./drivers/usb/host/xhci-mem.c.orig:					xhci->num_usb2_ports--;
+./drivers/usb/host/xhci-mem.c.orig:				xhci->port_array[i] = DUPLICATE_ENTRY;
+./drivers/usb/host/xhci-mem.c.orig:		xhci->port_array[i] = major_revision;
+./drivers/usb/host/xhci-mem.c.orig:			xhci->num_usb3_ports++;
+./drivers/usb/host/xhci-mem.c.orig:			xhci->num_usb2_ports++;
+./drivers/usb/host/xhci-mem.c.orig:	addr = &xhci->cap_regs->hcc_params;
+./drivers/usb/host/xhci-mem.c.orig:	num_ports = HCS_MAX_PORTS(xhci->hcs_params1);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->port_array = kzalloc(sizeof(*xhci->port_array)*num_ports, flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->port_array)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->rh_bw = kzalloc(sizeof(*xhci->rh_bw)*num_ports, flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->rh_bw)
+./drivers/usb/host/xhci-mem.c.orig:		INIT_LIST_HEAD(&xhci->rh_bw[i].tts);
+./drivers/usb/host/xhci-mem.c.orig:		bw_table = &xhci->rh_bw[i].bw_table;
+./drivers/usb/host/xhci-mem.c.orig:	addr = &xhci->cap_regs->hc_capbase + offset;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->ext_caps = kzalloc(sizeof(*xhci->ext_caps) * cap_count, flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->ext_caps)
+./drivers/usb/host/xhci-mem.c.orig:		if (!offset || (xhci->num_usb2_ports + xhci->num_usb3_ports)
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->num_usb2_ports == 0 && xhci->num_usb3_ports == 0) {
+./drivers/usb/host/xhci-mem.c.orig:			xhci->num_usb2_ports, xhci->num_usb3_ports);
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->num_usb3_ports > 15) {
+./drivers/usb/host/xhci-mem.c.orig:		xhci->num_usb3_ports = 15;
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->num_usb2_ports > USB_MAXCHILDREN) {
+./drivers/usb/host/xhci-mem.c.orig:		xhci->num_usb2_ports = USB_MAXCHILDREN;
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->num_usb2_ports) {
+./drivers/usb/host/xhci-mem.c.orig:		xhci->usb2_ports = kmalloc(sizeof(*xhci->usb2_ports)*
+./drivers/usb/host/xhci-mem.c.orig:				xhci->num_usb2_ports, flags);
+./drivers/usb/host/xhci-mem.c.orig:		if (!xhci->usb2_ports)
+./drivers/usb/host/xhci-mem.c.orig:			if (xhci->port_array[i] == 0x03 ||
+./drivers/usb/host/xhci-mem.c.orig:					xhci->port_array[i] == 0 ||
+./drivers/usb/host/xhci-mem.c.orig:					xhci->port_array[i] == DUPLICATE_ENTRY)
+./drivers/usb/host/xhci-mem.c.orig:			xhci->usb2_ports[port_index] =
+./drivers/usb/host/xhci-mem.c.orig:				&xhci->op_regs->port_status_base +
+./drivers/usb/host/xhci-mem.c.orig:					xhci->usb2_ports[port_index]);
+./drivers/usb/host/xhci-mem.c.orig:			if (port_index == xhci->num_usb2_ports)
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->num_usb3_ports) {
+./drivers/usb/host/xhci-mem.c.orig:		xhci->usb3_ports = kmalloc(sizeof(*xhci->usb3_ports)*
+./drivers/usb/host/xhci-mem.c.orig:				xhci->num_usb3_ports, flags);
+./drivers/usb/host/xhci-mem.c.orig:		if (!xhci->usb3_ports)
+./drivers/usb/host/xhci-mem.c.orig:			if (xhci->port_array[i] == 0x03) {
+./drivers/usb/host/xhci-mem.c.orig:				xhci->usb3_ports[port_index] =
+./drivers/usb/host/xhci-mem.c.orig:					&xhci->op_regs->port_status_base +
+./drivers/usb/host/xhci-mem.c.orig:						xhci->usb3_ports[port_index]);
+./drivers/usb/host/xhci-mem.c.orig:				if (port_index == xhci->num_usb3_ports)
+./drivers/usb/host/xhci-mem.c.orig:	if ((xhci->xhc_state & XHCI_STATE_HALTED) || !xhci->sec_ir_set
+./drivers/usb/host/xhci-mem.c.orig:		|| !xhci->sec_event_ring || !xhci->sec_erst ||
+./drivers/usb/host/xhci-mem.c.orig:		intr_num >= xhci->max_interrupters) {
+./drivers/usb/host/xhci-mem.c.orig:		__func__, xhci->xhc_state, xhci->sec_ir_set,
+./drivers/usb/host/xhci-mem.c.orig:		xhci->sec_event_ring, xhci->sec_erst, intr_num);
+./drivers/usb/host/xhci-mem.c.orig:	if (xhci->sec_event_ring && xhci->sec_event_ring[intr_num]
+./drivers/usb/host/xhci-mem.c.orig:		&& xhci->sec_event_ring[intr_num]->first_seg)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_ir_set[intr_num] = &xhci->run_regs->ir_set[intr_num];
+./drivers/usb/host/xhci-mem.c.orig:				&xhci->sec_event_ring[intr_num],
+./drivers/usb/host/xhci-mem.c.orig:				xhci->sec_ir_set[intr_num],
+./drivers/usb/host/xhci-mem.c.orig:				&xhci->sec_erst[intr_num],
+./drivers/usb/host/xhci-mem.c.orig:	xhci->max_interrupters = HCS_MAX_INTRS(xhci->hcs_params1);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->ir_set = &xhci->run_regs->ir_set[0];
+./drivers/usb/host/xhci-mem.c.orig:	ret = xhci_event_ring_setup(xhci, &xhci->event_ring, xhci->ir_set,
+./drivers/usb/host/xhci-mem.c.orig:		&xhci->erst, 0, flags);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_ir_set = kcalloc(xhci->max_interrupters,
+./drivers/usb/host/xhci-mem.c.orig:				sizeof(*xhci->sec_ir_set), flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->sec_ir_set) {
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_event_ring = kcalloc(xhci->max_interrupters,
+./drivers/usb/host/xhci-mem.c.orig:				sizeof(*xhci->sec_event_ring), flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->sec_event_ring) {
+./drivers/usb/host/xhci-mem.c.orig:	xhci->sec_erst = kcalloc(xhci->max_interrupters,
+./drivers/usb/host/xhci-mem.c.orig:				sizeof(*xhci->sec_erst), flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->sec_erst)
+./drivers/usb/host/xhci-mem.c.orig:	INIT_LIST_HEAD(&xhci->cmd_list);
+./drivers/usb/host/xhci-mem.c.orig:	setup_timer(&xhci->cmd_timer, xhci_handle_command_timeout,
+./drivers/usb/host/xhci-mem.c.orig:	page_size = readl(&xhci->op_regs->page_size);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->page_shift = 12;
+./drivers/usb/host/xhci-mem.c.orig:	xhci->page_size = 1 << xhci->page_shift;
+./drivers/usb/host/xhci-mem.c.orig:			"HCD page size set to %iK", xhci->page_size / 1024);
+./drivers/usb/host/xhci-mem.c.orig:	val = HCS_MAX_SLOTS(readl(&xhci->cap_regs->hcs_params1));
+./drivers/usb/host/xhci-mem.c.orig:	val2 = readl(&xhci->op_regs->config_reg);
+./drivers/usb/host/xhci-mem.c.orig:	writel(val, &xhci->op_regs->config_reg);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->dcbaa = dma_alloc_coherent(dev, sizeof(*xhci->dcbaa), &dma,
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->dcbaa)
+./drivers/usb/host/xhci-mem.c.orig:	memset(xhci->dcbaa, 0, sizeof *(xhci->dcbaa));
+./drivers/usb/host/xhci-mem.c.orig:	xhci->dcbaa->dma = dma;
+./drivers/usb/host/xhci-mem.c.orig:			(unsigned long long)xhci->dcbaa->dma, xhci->dcbaa);
+./drivers/usb/host/xhci-mem.c.orig:	xhci_write_64(xhci, dma, &xhci->op_regs->dcbaa_ptr);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->segment_pool = dma_pool_create("xHCI ring segments", dev,
+./drivers/usb/host/xhci-mem.c.orig:			TRB_SEGMENT_SIZE, TRB_SEGMENT_SIZE, xhci->page_size);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->device_pool = dma_pool_create("xHCI input/output contexts", dev,
+./drivers/usb/host/xhci-mem.c.orig:			2112, 64, xhci->page_size);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->segment_pool || !xhci->device_pool)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->small_streams_pool =
+./drivers/usb/host/xhci-mem.c.orig:	xhci->medium_streams_pool =
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->small_streams_pool || !xhci->medium_streams_pool)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->cmd_ring = xhci_ring_alloc(xhci, 1, 1, TYPE_COMMAND, flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->cmd_ring)
+./drivers/usb/host/xhci-mem.c.orig:			"Allocated command ring at %pK", xhci->cmd_ring);
+./drivers/usb/host/xhci-mem.c.orig:			(unsigned long long)xhci->cmd_ring->first_seg->dma);
+./drivers/usb/host/xhci-mem.c.orig:	val_64 = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-mem.c.orig:		(xhci->cmd_ring->first_seg->dma & (u64) ~CMD_RING_RSVD_BITS) |
+./drivers/usb/host/xhci-mem.c.orig:		xhci->cmd_ring->cycle_state;
+./drivers/usb/host/xhci-mem.c.orig:	xhci_write_64(xhci, val_64, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->lpm_command = xhci_alloc_command(xhci, true, true, flags);
+./drivers/usb/host/xhci-mem.c.orig:	if (!xhci->lpm_command)
+./drivers/usb/host/xhci-mem.c.orig:	xhci->cmd_ring_reserved_trbs++;
+./drivers/usb/host/xhci-mem.c.orig:	val = readl(&xhci->cap_regs->db_off);
+./drivers/usb/host/xhci-mem.c.orig:	xhci->dba = (void __iomem *) xhci->cap_regs + val;
+./drivers/usb/host/xhci-mem.c.orig:	init_completion(&xhci->addr_dev);
+./drivers/usb/host/xhci-mem.c.orig:		xhci->devs[i] = NULL;
+./drivers/usb/host/xhci-mem.c.orig:		xhci->bus_state[0].resume_done[i] = 0;
+./drivers/usb/host/xhci-mem.c.orig:		xhci->bus_state[1].resume_done[i] = 0;
+./drivers/usb/host/xhci-mem.c.orig:		init_completion(&xhci->bus_state[1].rexit_done[i]);
+./drivers/usb/host/xhci-mem.c.orig:	temp = readl(&xhci->op_regs->dev_notification);
+./drivers/usb/host/xhci-mem.c.orig:	writel(temp, &xhci->op_regs->dev_notification);
+./drivers/usb/host/xhci.c.orig:#include "xhci-trace.h"
+./drivers/usb/host/xhci.c.orig:	halted = readl(&xhci->op_regs->status) & STS_HALT;
+./drivers/usb/host/xhci.c.orig:	cmd = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	writel(cmd, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	ret = xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c.orig:		xhci->xhc_state |= XHCI_STATE_HALTED;
+./drivers/usb/host/xhci.c.orig:	xhci->cmd_ring_state = CMD_RING_STATE_STOPPED;
+./drivers/usb/host/xhci.c.orig:	if (timer_pending(&xhci->cmd_timer)) {
+./drivers/usb/host/xhci.c.orig:		del_timer(&xhci->cmd_timer);
+./drivers/usb/host/xhci.c.orig:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	writel(temp, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	ret = xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c.orig:		xhci->xhc_state = 0;
+./drivers/usb/host/xhci.c.orig:	state = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:	command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_INTEL_HOST)
+./drivers/usb/host/xhci.c.orig:	ret = xhci_handshake(&xhci->op_regs->command,
+./drivers/usb/host/xhci.c.orig:	ret = xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c.orig:		xhci->bus_state[i].port_c_suspend = 0;
+./drivers/usb/host/xhci.c.orig:		xhci->bus_state[i].suspended_ports = 0;
+./drivers/usb/host/xhci.c.orig:		xhci->bus_state[i].resuming_ports = 0;
+./drivers/usb/host/xhci.c.orig:	if (!xhci->msix_entries)
+./drivers/usb/host/xhci.c.orig:	for (i = 0; i < xhci->msix_count; i++)
+./drivers/usb/host/xhci.c.orig:		if (xhci->msix_entries[i].vector)
+./drivers/usb/host/xhci.c.orig:			free_irq(xhci->msix_entries[i].vector,
+./drivers/usb/host/xhci.c.orig:	xhci->msix_count = min(num_online_cpus() + 1,
+./drivers/usb/host/xhci.c.orig:				HCS_MAX_INTRS(xhci->hcs_params1));
+./drivers/usb/host/xhci.c.orig:	xhci->msix_entries =
+./drivers/usb/host/xhci.c.orig:		kmalloc((sizeof(struct msix_entry))*xhci->msix_count,
+./drivers/usb/host/xhci.c.orig:	if (!xhci->msix_entries) {
+./drivers/usb/host/xhci.c.orig:	for (i = 0; i < xhci->msix_count; i++) {
+./drivers/usb/host/xhci.c.orig:		xhci->msix_entries[i].entry = i;
+./drivers/usb/host/xhci.c.orig:		xhci->msix_entries[i].vector = 0;
+./drivers/usb/host/xhci.c.orig:	ret = pci_enable_msix_exact(pdev, xhci->msix_entries, xhci->msix_count);
+./drivers/usb/host/xhci.c.orig:	for (i = 0; i < xhci->msix_count; i++) {
+./drivers/usb/host/xhci.c.orig:		ret = request_irq(xhci->msix_entries[i].vector,
+./drivers/usb/host/xhci.c.orig:	kfree(xhci->msix_entries);
+./drivers/usb/host/xhci.c.orig:	xhci->msix_entries = NULL;
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_PLAT)
+./drivers/usb/host/xhci.c.orig:	if (xhci->msix_entries) {
+./drivers/usb/host/xhci.c.orig:		kfree(xhci->msix_entries);
+./drivers/usb/host/xhci.c.orig:		xhci->msix_entries = NULL;
+./drivers/usb/host/xhci.c.orig:	if (xhci->msix_entries) {
+./drivers/usb/host/xhci.c.orig:		for (i = 0; i < xhci->msix_count; i++)
+./drivers/usb/host/xhci.c.orig:			synchronize_irq(xhci->msix_entries[i].vector);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_PLAT)
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_BROKEN_MSI)
+./drivers/usb/host/xhci.c.orig:	for (i = 0; i < xhci->num_usb3_ports; i++) {
+./drivers/usb/host/xhci.c.orig:		temp = readl(xhci->usb3_ports[i]);
+./drivers/usb/host/xhci.c.orig:			hcd = xhci->shared_hcd;
+./drivers/usb/host/xhci.c.orig:	if (xhci->port_status_u0 != ((1 << xhci->num_usb3_ports)-1))
+./drivers/usb/host/xhci.c.orig:		mod_timer(&xhci->comp_mode_recovery_timer,
+./drivers/usb/host/xhci.c.orig:	xhci->port_status_u0 = 0;
+./drivers/usb/host/xhci.c.orig:	setup_timer(&xhci->comp_mode_recovery_timer,
+./drivers/usb/host/xhci.c.orig:	xhci->comp_mode_recovery_timer.expires = jiffies +
+./drivers/usb/host/xhci.c.orig:	set_timer_slack(&xhci->comp_mode_recovery_timer,
+./drivers/usb/host/xhci.c.orig:	add_timer(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci.c.orig:	return (xhci->port_status_u0 == ((1 << xhci->num_usb3_ports)-1));
+./drivers/usb/host/xhci.c.orig:	spin_lock_init(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:	if (xhci->hci_version == 0x95 && link_quirk) {
+./drivers/usb/host/xhci.c.orig:		xhci->quirks |= XHCI_LINK_TRB_QUIRK;
+./drivers/usb/host/xhci.c.orig:		xhci->quirks |= XHCI_COMP_MODE_QUIRK;
+./drivers/usb/host/xhci.c.orig:	xhci->shared_hcd->state = HC_STATE_RUNNING;
+./drivers/usb/host/xhci.c.orig:	xhci->cmd_ring_state = CMD_RING_STATE_RUNNING;
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_NEC_HOST)
+./drivers/usb/host/xhci.c.orig:	xhci_debug_ring(xhci, xhci->cmd_ring);
+./drivers/usb/host/xhci.c.orig:	xhci_dbg_ring_ptrs(xhci, xhci->cmd_ring);
+./drivers/usb/host/xhci.c.orig:	xhci_dbg_erst(xhci, &xhci->erst);
+./drivers/usb/host/xhci.c.orig:	xhci_debug_ring(xhci, xhci->event_ring);
+./drivers/usb/host/xhci.c.orig:	xhci_dbg_ring_ptrs(xhci, xhci->event_ring);
+./drivers/usb/host/xhci.c.orig:	temp_64 = xhci_read_64(xhci, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci.c.orig:	temp = readl(&xhci->ir_set->irq_control);
+./drivers/usb/host/xhci.c.orig:	writel(temp, &xhci->ir_set->irq_control);
+./drivers/usb/host/xhci.c.orig:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	writel(temp, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	temp = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c.orig:			xhci->ir_set, (unsigned int) ER_IRQ_ENABLE(temp));
+./drivers/usb/host/xhci.c.orig:	writel(ER_IRQ_ENABLE(temp), &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_NEC_HOST) {
+./drivers/usb/host/xhci.c.orig:	mutex_lock(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:	if (!(xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci.c.orig:		spin_lock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:		xhci->xhc_state |= XHCI_STATE_HALTED;
+./drivers/usb/host/xhci.c.orig:		xhci->cmd_ring_state = CMD_RING_STATE_STOPPED;
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:		mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
+./drivers/usb/host/xhci.c.orig:		del_timer_sync(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_AMD_PLL_FIX)
+./drivers/usb/host/xhci.c.orig:	temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:	writel(temp & ~STS_EINT, &xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:	temp = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c.orig:	writel(ER_IRQ_DISABLE(temp), &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c.orig:			readl(&xhci->op_regs->status));
+./drivers/usb/host/xhci.c.orig:	mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_SPURIOUS_REBOOT)
+./drivers/usb/host/xhci.c.orig:	spin_lock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_SPURIOUS_WAKEUP)
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:			readl(&xhci->op_regs->status));
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_SPURIOUS_WAKEUP)
+./drivers/usb/host/xhci.c.orig:	xhci->s3.command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	xhci->s3.dev_nt = readl(&xhci->op_regs->dev_notification);
+./drivers/usb/host/xhci.c.orig:	xhci->s3.dcbaa_ptr = xhci_read_64(xhci, &xhci->op_regs->dcbaa_ptr);
+./drivers/usb/host/xhci.c.orig:	xhci->s3.config_reg = readl(&xhci->op_regs->config_reg);
+./drivers/usb/host/xhci.c.orig:	xhci->s3.erst_size = readl(&xhci->ir_set->erst_size);
+./drivers/usb/host/xhci.c.orig:	xhci->s3.erst_base = xhci_read_64(xhci, &xhci->ir_set->erst_base);
+./drivers/usb/host/xhci.c.orig:	xhci->s3.erst_dequeue = xhci_read_64(xhci, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci.c.orig:	xhci->s3.irq_pending = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c.orig:	xhci->s3.irq_control = readl(&xhci->ir_set->irq_control);
+./drivers/usb/host/xhci.c.orig:	writel(xhci->s3.command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	writel(xhci->s3.dev_nt, &xhci->op_regs->dev_notification);
+./drivers/usb/host/xhci.c.orig:	xhci_write_64(xhci, xhci->s3.dcbaa_ptr, &xhci->op_regs->dcbaa_ptr);
+./drivers/usb/host/xhci.c.orig:	writel(xhci->s3.config_reg, &xhci->op_regs->config_reg);
+./drivers/usb/host/xhci.c.orig:	writel(xhci->s3.erst_size, &xhci->ir_set->erst_size);
+./drivers/usb/host/xhci.c.orig:	xhci_write_64(xhci, xhci->s3.erst_base, &xhci->ir_set->erst_base);
+./drivers/usb/host/xhci.c.orig:	xhci_write_64(xhci, xhci->s3.erst_dequeue, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci.c.orig:	writel(xhci->s3.irq_pending, &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c.orig:	writel(xhci->s3.irq_control, &xhci->ir_set->irq_control);
+./drivers/usb/host/xhci.c.orig:	val_64 = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci.c.orig:		(xhci_trb_virt_to_dma(xhci->cmd_ring->deq_seg,
+./drivers/usb/host/xhci.c.orig:				      xhci->cmd_ring->dequeue) &
+./drivers/usb/host/xhci.c.orig:		xhci->cmd_ring->cycle_state;
+./drivers/usb/host/xhci.c.orig:	xhci_write_64(xhci, val_64, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci.c.orig:	ring = xhci->cmd_ring;
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	port_index = xhci->num_usb3_ports;
+./drivers/usb/host/xhci.c.orig:	port_array = xhci->usb3_ports;
+./drivers/usb/host/xhci.c.orig:	port_index = xhci->num_usb2_ports;
+./drivers/usb/host/xhci.c.orig:	port_array = xhci->usb2_ports;
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:			xhci->shared_hcd->state != HC_STATE_SUSPENDED)
+./drivers/usb/host/xhci.c.orig:	clear_bit(HCD_FLAG_POLL_RH, &xhci->shared_hcd->flags);
+./drivers/usb/host/xhci.c.orig:	del_timer_sync(&xhci->shared_hcd->rh_timer);
+./drivers/usb/host/xhci.c.orig:	spin_lock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:	clear_bit(HCD_FLAG_HW_ACCESSIBLE, &xhci->shared_hcd->flags);
+./drivers/usb/host/xhci.c.orig:	command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	delay *= (xhci->quirks & XHCI_SLOW_SUSPEND) ? 10 : 1;
+./drivers/usb/host/xhci.c.orig:	if (xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:	command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	if (xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
+./drivers/usb/host/xhci.c.orig:		del_timer_sync(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci.c.orig:	if (time_before(jiffies, xhci->bus_state[0].next_statechange) ||
+./drivers/usb/host/xhci.c.orig:				xhci->bus_state[1].next_statechange))
+./drivers/usb/host/xhci.c.orig:	set_bit(HCD_FLAG_HW_ACCESSIBLE, &xhci->shared_hcd->flags);
+./drivers/usb/host/xhci.c.orig:	spin_lock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_RESET_ON_RESUME)
+./drivers/usb/host/xhci.c.orig:		command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:		writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:		if (xhci_handshake(&xhci->op_regs->status,
+./drivers/usb/host/xhci.c.orig:			spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:		temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:		if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) &&
+./drivers/usb/host/xhci.c.orig:			del_timer_sync(&xhci->comp_mode_recovery_timer);
+./drivers/usb/host/xhci.c.orig:		usb_root_hub_lost_power(xhci->main_hcd->self.root_hub);
+./drivers/usb/host/xhci.c.orig:		usb_root_hub_lost_power(xhci->shared_hcd->self.root_hub);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:		temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:		writel(temp & ~STS_EINT, &xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:		temp = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c.orig:		writel(ER_IRQ_DISABLE(temp), &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci.c.orig:			    readl(&xhci->op_regs->status));
+./drivers/usb/host/xhci.c.orig:			secondary_hcd = xhci->shared_hcd;
+./drivers/usb/host/xhci.c.orig:		xhci->shared_hcd->state = HC_STATE_SUSPENDED;
+./drivers/usb/host/xhci.c.orig:	command = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	writel(command, &xhci->op_regs->command);
+./drivers/usb/host/xhci.c.orig:	xhci_handshake(&xhci->op_regs->status, STS_HALT,
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irq(&xhci->lock);
+./drivers/usb/host/xhci.c.orig:		status = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:			usb_hcd_resume_root_hub(xhci->shared_hcd);
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_COMP_MODE_QUIRK) && !comp_timer_running)
+./drivers/usb/host/xhci.c.orig:	set_bit(HCD_FLAG_POLL_RH, &xhci->shared_hcd->flags);
+./drivers/usb/host/xhci.c.orig:	usb_hcd_poll_rh_status(xhci->shared_hcd);
+./drivers/usb/host/xhci.c.orig:		if (!udev->slot_id || !xhci->devs[udev->slot_id]) {
+./drivers/usb/host/xhci.c.orig:		virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	if (xhci->xhc_state & XHCI_STATE_HALTED)
+./drivers/usb/host/xhci.c.orig:	out_ctx = xhci->devs[slot_id]->out_ctx;
+./drivers/usb/host/xhci.c.orig:		command->in_ctx = xhci->devs[slot_id]->in_ctx;
+./drivers/usb/host/xhci.c.orig:		xhci_endpoint_copy(xhci, xhci->devs[slot_id]->in_ctx,
+./drivers/usb/host/xhci.c.orig:				xhci->devs[slot_id]->out_ctx, ep_index);
+./drivers/usb/host/xhci.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c.orig:		if (xhci->devs[slot_id]->eps[ep_index].ep_state &
+./drivers/usb/host/xhci.c.orig:		} else if (xhci->devs[slot_id]->eps[ep_index].ep_state &
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:	if (temp == 0xffffffff || (xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci.c.orig:		     i < urb_priv->length && xhci->devs[urb->dev->slot_id];
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	if ((xhci->xhc_state & XHCI_STATE_DYING) ||
+./drivers/usb/host/xhci.c.orig:			(xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci.c.orig:	ep = &xhci->devs[urb->dev->slot_id]->eps[ep_index];
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig: * the xhci->devs[slot_id] structure.
+./drivers/usb/host/xhci.c.orig:	if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c.orig:	in_ctx = xhci->devs[udev->slot_id]->in_ctx;
+./drivers/usb/host/xhci.c.orig:	out_ctx = xhci->devs[udev->slot_id]->out_ctx;
+./drivers/usb/host/xhci.c.orig:		if (xhci->devs[udev->slot_id]->eps[ep_index].ring != NULL)
+./drivers/usb/host/xhci.c.orig:	xhci_endpoint_zero(xhci, xhci->devs[udev->slot_id], ep);
+./drivers/usb/host/xhci.c.orig: * for mutual exclusion to protect the xhci->devs[slot_id] structure.
+./drivers/usb/host/xhci.c.orig:	if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	struct xhci_virt_device *virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c.orig:	if (xhci->num_active_eps + added_eps > xhci->limit_active_eps) {
+./drivers/usb/host/xhci.c.orig:				xhci->num_active_eps, added_eps,
+./drivers/usb/host/xhci.c.orig:				xhci->limit_active_eps);
+./drivers/usb/host/xhci.c.orig:	xhci->num_active_eps += added_eps;
+./drivers/usb/host/xhci.c.orig:			xhci->num_active_eps);
+./drivers/usb/host/xhci.c.orig: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c.orig:	xhci->num_active_eps -= num_failed_eps;
+./drivers/usb/host/xhci.c.orig:			xhci->num_active_eps);
+./drivers/usb/host/xhci.c.orig: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c.orig:	xhci->num_active_eps -= num_dropped_eps;
+./drivers/usb/host/xhci.c.orig:				xhci->num_active_eps);
+./drivers/usb/host/xhci.c.orig:	bw_table = &xhci->rh_bw[virt_dev->real_port - 1].bw_table;
+./drivers/usb/host/xhci.c.orig:			xhci->rh_bw[port_index].num_active_tts;
+./drivers/usb/host/xhci.c.orig:			xhci->devs[udev->slot_id]->bw_table->ss_bw_in -=
+./drivers/usb/host/xhci.c.orig:			xhci->devs[udev->slot_id]->bw_table->ss_bw_out -=
+./drivers/usb/host/xhci.c.orig:			xhci->devs[udev->slot_id]->bw_table->ss_bw_in +=
+./drivers/usb/host/xhci.c.orig:			xhci->devs[udev->slot_id]->bw_table->ss_bw_out +=
+./drivers/usb/host/xhci.c.orig:	rh_bw_info = &xhci->rh_bw[virt_dev->real_port - 1];
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK) &&
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:				xhci->num_active_eps);
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_SW_BW_CHECKING) &&
+./drivers/usb/host/xhci.c.orig:		if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK))
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK))
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK)) {
+./drivers/usb/host/xhci.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig: * else should be touching the xhci->devs[slot_id] structure, so we
+./drivers/usb/host/xhci.c.orig: * don't need to take the xhci->lock for manipulating that.
+./drivers/usb/host/xhci.c.orig:	if ((xhci->xhc_state & XHCI_STATE_DYING) ||
+./drivers/usb/host/xhci.c.orig:		(xhci->xhc_state & XHCI_STATE_REMOVING))
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	in_ctx = xhci->devs[slot_id]->in_ctx;
+./drivers/usb/host/xhci.c.orig:	xhci_endpoint_copy(xhci, xhci->devs[slot_id]->in_ctx,
+./drivers/usb/host/xhci.c.orig:			xhci->devs[slot_id]->out_ctx, ep_index);
+./drivers/usb/host/xhci.c.orig:	xhci_setup_input_ctx_for_config_ep(xhci, xhci->devs[slot_id]->in_ctx,
+./drivers/usb/host/xhci.c.orig:			xhci->devs[slot_id]->out_ctx, ctrl_ctx,
+./drivers/usb/host/xhci.c.orig:	ep = &xhci->devs[udev->slot_id]->eps[ep_index];
+./drivers/usb/host/xhci.c.orig:	if (!(xhci->quirks & XHCI_RESET_EP_QUIRK)) {
+./drivers/usb/host/xhci.c.orig:	ep_state = xhci->devs[slot_id]->eps[ep_index].ep_state;
+./drivers/usb/host/xhci.c.orig:	if (!list_empty(&xhci->devs[slot_id]->eps[ep_index].ring->td_list)) {
+./drivers/usb/host/xhci.c.orig:	max_streams = HCC_MAX_PSA(xhci->hcc_params);
+./drivers/usb/host/xhci.c.orig:	if (!xhci->devs[slot_id])
+./drivers/usb/host/xhci.c.orig:		ep_state = xhci->devs[slot_id]->eps[ep_index].ep_state;
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_BROKEN_STREAMS) ||
+./drivers/usb/host/xhci.c.orig:			HCC_MAX_PSA(xhci->hcc_params) < 4) {
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	vdev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	vdev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		xhci->devs[udev->slot_id]->eps[ep_index].ep_state |=
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c.orig:	xhci->num_active_eps -= num_dropped_eps;
+./drivers/usb/host/xhci.c.orig:				xhci->num_active_eps);
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK)) {
+./drivers/usb/host/xhci.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_RESET_ON_RESUME)
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	state = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci.c.orig:	if (state == 0xffffffff || (xhci->xhc_state & XHCI_STATE_DYING) ||
+./drivers/usb/host/xhci.c.orig:			(xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig: * Must be called with xhci->lock held.
+./drivers/usb/host/xhci.c.orig:	if (xhci->num_active_eps + 1 > xhci->limit_active_eps) {
+./drivers/usb/host/xhci.c.orig:				xhci->num_active_eps, xhci->limit_active_eps);
+./drivers/usb/host/xhci.c.orig:	xhci->num_active_eps += 1;
+./drivers/usb/host/xhci.c.orig:			xhci->num_active_eps);
+./drivers/usb/host/xhci.c.orig:	/* xhci->slot_id and xhci->addr_dev are not thread-safe */
+./drivers/usb/host/xhci.c.orig:	mutex_lock(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	command->completion = &xhci->addr_dev;
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	slot_id = xhci->slot_id;
+./drivers/usb/host/xhci.c.orig:	mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:					readl(&xhci->cap_regs->hcs_params1)));
+./drivers/usb/host/xhci.c.orig:	if ((xhci->quirks & XHCI_EP_LIMIT_QUIRK)) {
+./drivers/usb/host/xhci.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:					xhci->num_active_eps);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_RESET_ON_RESUME)
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	mutex_lock(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:	if (xhci->xhc_state)	/* dying, removing or halted */
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	command->completion = &xhci->addr_dev;
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	temp_64 = xhci_read_64(xhci, &xhci->op_regs->dcbaa_ptr);
+./drivers/usb/host/xhci.c.orig:		&xhci->dcbaa->dev_context_ptrs[udev->slot_id],
+./drivers/usb/host/xhci.c.orig:		le64_to_cpu(xhci->dcbaa->dev_context_ptrs[udev->slot_id]));
+./drivers/usb/host/xhci.c.orig:	mutex_unlock(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:	__le32 __iomem *base_addr = &xhci->op_regs->port_status_base;
+./drivers/usb/host/xhci.c.orig:		addr = xhci->usb2_ports[port1 - 1];
+./drivers/usb/host/xhci.c.orig:		addr = xhci->usb3_ports[port1 - 1];
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	 * hub_port_finish_reset() is done and xhci->devs[] are re-allocated
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	command = xhci->lpm_command;
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	u2del = HCS_U2_LATENCY(xhci->hcs_params3);
+./drivers/usb/host/xhci.c.orig:	if (hcd->speed >= HCD_USB3 || !xhci->hw_lpm_support ||
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	port_array = xhci->usb2_ports;
+./drivers/usb/host/xhci.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:			/* USB 3.0 code dedicate one xhci->lpm_command->in_ctx
+./drivers/usb/host/xhci.c.orig:			spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:			spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	for (i = 0; i < xhci->num_ext_caps; i++) {
+./drivers/usb/host/xhci.c.orig:		if (xhci->ext_caps[i] & capability) {
+./drivers/usb/host/xhci.c.orig:			port_offset = XHCI_EXT_PORT_OFF(xhci->ext_caps[i]) - 1;
+./drivers/usb/host/xhci.c.orig:			port_count = XHCI_EXT_PORT_COUNT(xhci->ext_caps[i]);
+./drivers/usb/host/xhci.c.orig:	if (hcd->speed >= HCD_USB3 || !xhci->sw_lpm_support ||
+./drivers/usb/host/xhci.c.orig:	if (xhci->hw_lpm_support == 1 &&
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_INTEL_HOST)
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_INTEL_HOST)
+./drivers/usb/host/xhci.c.orig:	if (xhci->quirks & XHCI_INTEL_HOST)
+./drivers/usb/host/xhci.c.orig:	if (!xhci || !(xhci->quirks & XHCI_LPM_SUPPORT) ||
+./drivers/usb/host/xhci.c.orig:			!xhci->devs[udev->slot_id])
+./drivers/usb/host/xhci.c.orig:	if (!xhci || !(xhci->quirks & XHCI_LPM_SUPPORT) ||
+./drivers/usb/host/xhci.c.orig:			!xhci->devs[udev->slot_id])
+./drivers/usb/host/xhci.c.orig:	vdev = xhci->devs[hdev->slot_id];
+./drivers/usb/host/xhci.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:	if (xhci->hci_version > 0x95) {
+./drivers/usb/host/xhci.c.orig:				(unsigned int) xhci->hci_version);
+./drivers/usb/host/xhci.c.orig:		if (xhci->hci_version < 0x100 || hdev->speed == USB_SPEED_HIGH)
+./drivers/usb/host/xhci.c.orig:				(unsigned int) xhci->hci_version);
+./drivers/usb/host/xhci.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci.c.orig:			(xhci->hci_version > 0x95) ?
+./drivers/usb/host/xhci.c.orig:	if (xhci->hci_version > 0x95)
+./drivers/usb/host/xhci.c.orig:	return readl(&xhci->run_regs->microframe_index) >> 3;
+./drivers/usb/host/xhci.c.orig:		xhci->main_hcd = hcd;
+./drivers/usb/host/xhci.c.orig:		if (xhci->sbrn == 0x31) {
+./drivers/usb/host/xhci.c.orig:	mutex_init(&xhci->mutex);
+./drivers/usb/host/xhci.c.orig:	xhci->cap_regs = hcd->regs;
+./drivers/usb/host/xhci.c.orig:	xhci->op_regs = hcd->regs +
+./drivers/usb/host/xhci.c.orig:		HC_LENGTH(readl(&xhci->cap_regs->hc_capbase));
+./drivers/usb/host/xhci.c.orig:	xhci->run_regs = hcd->regs +
+./drivers/usb/host/xhci.c.orig:		(readl(&xhci->cap_regs->run_regs_off) & RTSOFF_MASK);
+./drivers/usb/host/xhci.c.orig:	xhci->hcs_params1 = readl(&xhci->cap_regs->hcs_params1);
+./drivers/usb/host/xhci.c.orig:	xhci->hcs_params2 = readl(&xhci->cap_regs->hcs_params2);
+./drivers/usb/host/xhci.c.orig:	xhci->hcs_params3 = readl(&xhci->cap_regs->hcs_params3);
+./drivers/usb/host/xhci.c.orig:	xhci->hcc_params = readl(&xhci->cap_regs->hc_capbase);
+./drivers/usb/host/xhci.c.orig:	xhci->hci_version = HC_VERSION(xhci->hcc_params);
+./drivers/usb/host/xhci.c.orig:	xhci->hcc_params = readl(&xhci->cap_regs->hcc_params);
+./drivers/usb/host/xhci.c.orig:	if (xhci->hci_version > 0x100)
+./drivers/usb/host/xhci.c.orig:		xhci->hcc_params2 = readl(&xhci->cap_regs->hcc_params2);
+./drivers/usb/host/xhci.c.orig:	xhci->quirks = quirks;
+./drivers/usb/host/xhci.c.orig:	if (xhci->hci_version > 0x96)
+./drivers/usb/host/xhci.c.orig:		xhci->quirks |= XHCI_SPURIOUS_SUCCESS;
+./drivers/usb/host/xhci.c.orig:	if (HCC_64BIT_ADDR(xhci->hcc_params) &&
+./drivers/usb/host/xhci.c.orig:		  xhci->hcc_params, xhci->hci_version, xhci->quirks);
+./drivers/usb/host/xhci.c.orig:	if (intr_num >= xhci->max_interrupters) {
+./drivers/usb/host/xhci.c.orig:			xhci->max_interrupters);
+./drivers/usb/host/xhci.c.orig:	if (!(xhci->xhc_state & XHCI_STATE_HALTED) &&
+./drivers/usb/host/xhci.c.orig:		xhci->sec_event_ring && xhci->sec_event_ring[intr_num]
+./drivers/usb/host/xhci.c.orig:		&& xhci->sec_event_ring[intr_num]->first_seg)
+./drivers/usb/host/xhci.c.orig:		return xhci->sec_event_ring[intr_num]->first_seg->dma;
+./drivers/usb/host/xhci.c.orig:	if (!(xhci->xhc_state & XHCI_STATE_HALTED) && xhci->dcbaa)
+./drivers/usb/host/xhci.c.orig:		return xhci->dcbaa->dev_context_ptrs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	virt_dev = xhci->devs[udev->slot_id];
+./drivers/usb/host/xhci.c.orig:	.description =		"xhci-hcd",
+./drivers/usb/host/xhci.h.orig:#include	"xhci-ext-caps.h"
+./drivers/usb/host/xhci.h.orig:	/* xhci->event_ring keeps track of segment dma addresses */
+./drivers/usb/host/xhci.h.orig: * they see this status (any time they drop and re-acquire xhci->lock).
+./drivers/usb/host/xhci.h.orig:	return xhci->main_hcd;
+./drivers/usb/host/xhci.h.orig:	return xhci->quirks & XHCI_LINK_TRB_QUIRK;
+./drivers/usb/host/xhci-pci.c:#include "xhci-trace.h"
+./drivers/usb/host/xhci-pci.c:			xhci->quirks |= XHCI_RESET_EP_QUIRK;
+./drivers/usb/host/xhci-pci.c:			xhci->quirks |= XHCI_SLOW_SUSPEND;
+./drivers/usb/host/xhci-pci.c:			xhci->quirks |= XHCI_BROKEN_STREAMS;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_BROKEN_MSI;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_TRUST_TX_LENGTH;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_BROKEN_STREAMS;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_NEC_HOST;
+./drivers/usb/host/xhci-pci.c:	if (pdev->vendor == PCI_VENDOR_ID_AMD && xhci->hci_version == 0x96)
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_AMD_0x96_HOST;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_AMD_PLL_FIX;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_TRUST_TX_LENGTH;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_LPM_SUPPORT;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_INTEL_HOST;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_AVOID_BEI;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_EP_LIMIT_QUIRK;
+./drivers/usb/host/xhci-pci.c:		xhci->limit_active_eps = 64;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_SW_BW_CHECKING;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_SPURIOUS_REBOOT;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_SPURIOUS_REBOOT;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_SPURIOUS_WAKEUP;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_PME_STUCK_QUIRK;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_MISSING_CAS;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_RESET_ON_RESUME;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_TRUST_TX_LENGTH;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_BROKEN_STREAMS;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_RESET_ON_RESUME;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_RESET_ON_RESUME;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_BROKEN_STREAMS;
+./drivers/usb/host/xhci-pci.c:		xhci->quirks |= XHCI_BROKEN_STREAMS;
+./drivers/usb/host/xhci-pci.c:	if (xhci->quirks & XHCI_RESET_ON_RESUME)
+./drivers/usb/host/xhci-pci.c:	if (!xhci->sbrn)
+./drivers/usb/host/xhci-pci.c:		pci_read_config_byte(pdev, XHCI_SBRN_OFFSET, &xhci->sbrn);
+./drivers/usb/host/xhci-pci.c:	xhci_dbg(xhci, "Got SBRN %u\n", (unsigned int) xhci->sbrn);
+./drivers/usb/host/xhci-pci.c:	xhci->shared_hcd = usb_create_shared_hcd(driver, &dev->dev,
+./drivers/usb/host/xhci-pci.c:	if (!xhci->shared_hcd) {
+./drivers/usb/host/xhci-pci.c:	retval = usb_add_hcd(xhci->shared_hcd, dev->irq,
+./drivers/usb/host/xhci-pci.c:	if (!(xhci->quirks & XHCI_BROKEN_STREAMS) &&
+./drivers/usb/host/xhci-pci.c:			HCC_MAX_PSA(xhci->hcc_params) >= 4)
+./drivers/usb/host/xhci-pci.c:		xhci->shared_hcd->can_do_streams = 1;
+./drivers/usb/host/xhci-pci.c:	if (xhci->quirks & XHCI_PME_STUCK_QUIRK)
+./drivers/usb/host/xhci-pci.c:	usb_put_hcd(xhci->shared_hcd);
+./drivers/usb/host/xhci-pci.c:	xhci->xhc_state |= XHCI_STATE_REMOVING;
+./drivers/usb/host/xhci-pci.c:	if (xhci->shared_hcd) {
+./drivers/usb/host/xhci-pci.c:		usb_remove_hcd(xhci->shared_hcd);
+./drivers/usb/host/xhci-pci.c:		usb_put_hcd(xhci->shared_hcd);
+./drivers/usb/host/xhci-pci.c:	if (xhci->quirks & XHCI_SPURIOUS_WAKEUP)
+./drivers/usb/host/xhci-pci.c:			reg = (void __iomem *) xhci->cap_regs +
+./drivers/usb/host/xhci-pci.c:	reg = (void __iomem *) xhci->cap_regs + 0x80a4;
+./drivers/usb/host/xhci-pci.c:	if (xhci->quirks & XHCI_COMP_MODE_QUIRK)
+./drivers/usb/host/xhci-pci.c:	if (xhci->quirks & XHCI_PME_STUCK_QUIRK)
+./drivers/usb/host/xhci-pci.c:	if (xhci->quirks & XHCI_PME_STUCK_QUIRK)
+./drivers/usb/host/xhci-ring.c.orig:#include "xhci-trace.h"
+./drivers/usb/host/xhci-ring.c.orig:	if (ring == xhci->event_ring)
+./drivers/usb/host/xhci-ring.c.orig:			(seg->next == xhci->event_ring->first_seg);
+./drivers/usb/host/xhci-ring.c.orig:	if (ring == xhci->event_ring)
+./drivers/usb/host/xhci-ring.c.orig:					(xhci->quirks & XHCI_AMD_0x96_HOST))
+./drivers/usb/host/xhci-ring.c.orig:	if (!(xhci->cmd_ring_state & CMD_RING_STATE_RUNNING))
+./drivers/usb/host/xhci-ring.c.orig:	writel(DB_VALUE_HOST, &xhci->dba->doorbell[0]);
+./drivers/usb/host/xhci-ring.c.orig:	readl(&xhci->dba->doorbell[0]);
+./drivers/usb/host/xhci-ring.c.orig:	temp_64 = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c.orig:	xhci->cmd_ring_state = CMD_RING_STATE_ABORTED;
+./drivers/usb/host/xhci-ring.c.orig:	mod_timer(&xhci->cmd_timer, jiffies + (2 * XHCI_CMD_DEFAULT_TIMEOUT));
+./drivers/usb/host/xhci-ring.c.orig:			&xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c.orig:	ret = xhci_handshake(&xhci->op_regs->cmd_ring,
+./drivers/usb/host/xhci-ring.c.orig:			      &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c.orig:		ret = xhci_handshake(&xhci->op_regs->cmd_ring,
+./drivers/usb/host/xhci-ring.c.orig:		del_timer(&xhci->cmd_timer);
+./drivers/usb/host/xhci-ring.c.orig:		xhci->xhc_state |= XHCI_STATE_DYING;
+./drivers/usb/host/xhci-ring.c.orig:	__le32 __iomem *db_addr = &xhci->dba->doorbell[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:	struct xhci_virt_ep *ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c.orig:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c.orig:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c.orig:	struct xhci_virt_device *dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:/* Must be called with xhci->lock held in interrupt context */
+./drivers/usb/host/xhci-ring.c.orig:				if (xhci->quirks & XHCI_AMD_PLL_FIX)
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:		spin_lock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:		if (!xhci->devs[slot_id])
+./drivers/usb/host/xhci-ring.c.orig:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c.orig:		if (xhci->xhc_state & XHCI_STATE_DYING)
+./drivers/usb/host/xhci-ring.c.orig:	/* Return to the event handler with xhci->lock re-acquired */
+./drivers/usb/host/xhci-ring.c.orig:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c.orig: * through xhci->state.
+./drivers/usb/host/xhci-ring.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->xhc_state & XHCI_STATE_REMOVING) {
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->xhc_state & XHCI_STATE_DYING) {
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	xhci->xhc_state |= XHCI_STATE_DYING;
+./drivers/usb/host/xhci-ring.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:		if (!xhci->devs[i])
+./drivers/usb/host/xhci-ring.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->quirks & XHCI_RESET_EP_QUIRK) {
+./drivers/usb/host/xhci-ring.c.orig:				xhci->devs[slot_id]->in_ctx->dma, slot_id,
+./drivers/usb/host/xhci-ring.c.orig:		xhci->devs[slot_id]->eps[ep_index].ep_state &= ~EP_HALTED;
+./drivers/usb/host/xhci-ring.c.orig:		xhci->slot_id = slot_id;
+./drivers/usb/host/xhci-ring.c.orig:		xhci->slot_id = 0;
+./drivers/usb/host/xhci-ring.c.orig:	virt_dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->quirks & XHCI_EP_LIMIT_QUIRK)
+./drivers/usb/host/xhci-ring.c.orig:	virt_dev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->quirks & XHCI_RESET_EP_QUIRK &&
+./drivers/usb/host/xhci-ring.c.orig:	if (!xhci->devs[slot_id])
+./drivers/usb/host/xhci-ring.c.orig:	if (!(xhci->quirks & XHCI_NEC_HOST)) {
+./drivers/usb/host/xhci-ring.c.orig:		xhci->error_bitmask |= 1 << 6;
+./drivers/usb/host/xhci-ring.c.orig:	list_for_each_entry_safe(cur_cmd, tmp_cmd, &xhci->cmd_list, cmd_list)
+./drivers/usb/host/xhci-ring.c.orig: * This must be called with command ring stopped and xhci->lock held.
+./drivers/usb/host/xhci-ring.c.orig:	list_for_each_entry_safe(i_cmd, tmp_cmd, &xhci->cmd_list,
+./drivers/usb/host/xhci-ring.c.orig:	xhci->cmd_ring_state = CMD_RING_STATE_RUNNING;
+./drivers/usb/host/xhci-ring.c.orig:	if ((xhci->cmd_ring->dequeue != xhci->cmd_ring->enqueue) &&
+./drivers/usb/host/xhci-ring.c.orig:	    !(xhci->xhc_state & XHCI_STATE_DYING)) {
+./drivers/usb/host/xhci-ring.c.orig:		xhci->current_cmd = cur_cmd;
+./drivers/usb/host/xhci-ring.c.orig:		mod_timer(&xhci->cmd_timer, jiffies + XHCI_CMD_DEFAULT_TIMEOUT);
+./drivers/usb/host/xhci-ring.c.orig:	spin_lock_irqsave(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->current_cmd) {
+./drivers/usb/host/xhci-ring.c.orig:		if (xhci->current_cmd->status == COMP_CMD_ABORT)
+./drivers/usb/host/xhci-ring.c.orig:		xhci->current_cmd->status = COMP_CMD_ABORT;
+./drivers/usb/host/xhci-ring.c.orig:	hw_ring_state = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-ring.c.orig:	if ((xhci->cmd_ring_state & CMD_RING_STATE_RUNNING) &&
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	if (second_timeout || xhci->xhc_state & XHCI_STATE_REMOVING) {
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	xhci_handle_stopped_cmd_ring(xhci, xhci->current_cmd);
+./drivers/usb/host/xhci-ring.c.orig:	spin_unlock_irqrestore(&xhci->lock, flags);
+./drivers/usb/host/xhci-ring.c.orig:	cmd_trb = xhci->cmd_ring->dequeue;
+./drivers/usb/host/xhci-ring.c.orig:	cmd_dequeue_dma = xhci_trb_virt_to_dma(xhci->cmd_ring->deq_seg,
+./drivers/usb/host/xhci-ring.c.orig:		xhci->error_bitmask |= 1 << 4;
+./drivers/usb/host/xhci-ring.c.orig:		xhci->error_bitmask |= 1 << 5;
+./drivers/usb/host/xhci-ring.c.orig:	cmd = list_entry(xhci->cmd_list.next, struct xhci_command, cmd_list);
+./drivers/usb/host/xhci-ring.c.orig:	del_timer(&xhci->cmd_timer);
+./drivers/usb/host/xhci-ring.c.orig:	if (cmd->command_trb != xhci->cmd_ring->dequeue) {
+./drivers/usb/host/xhci-ring.c.orig:		xhci->cmd_ring_state = CMD_RING_STATE_STOPPED;
+./drivers/usb/host/xhci-ring.c.orig:		xhci->error_bitmask |= 1 << 6;
+./drivers/usb/host/xhci-ring.c.orig:	if (cmd->cmd_list.next != &xhci->cmd_list) {
+./drivers/usb/host/xhci-ring.c.orig:		xhci->current_cmd = list_entry(cmd->cmd_list.next,
+./drivers/usb/host/xhci-ring.c.orig:		mod_timer(&xhci->cmd_timer, jiffies + XHCI_CMD_DEFAULT_TIMEOUT);
+./drivers/usb/host/xhci-ring.c.orig:	inc_deq(xhci, xhci->cmd_ring);
+./drivers/usb/host/xhci-ring.c.orig:	if (trb_type == TRB_NEC_CMD_COMP && (xhci->quirks & XHCI_NEC_HOST))
+./drivers/usb/host/xhci-ring.c.orig:		u8 port_speed = xhci->port_array[i];
+./drivers/usb/host/xhci-ring.c.orig:	if (!xhci->devs[slot_id]) {
+./drivers/usb/host/xhci-ring.c.orig:	udev = xhci->devs[slot_id]->udev;
+./drivers/usb/host/xhci-ring.c.orig:		xhci->error_bitmask |= 1 << 8;
+./drivers/usb/host/xhci-ring.c.orig:	max_ports = HCS_MAX_PORTS(xhci->hcs_params1);
+./drivers/usb/host/xhci-ring.c.orig:		inc_deq(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-ring.c.orig:	major_revision = xhci->port_array[port_id - 1];
+./drivers/usb/host/xhci-ring.c.orig:		hcd = xhci->shared_hcd;
+./drivers/usb/host/xhci-ring.c.orig:	bus_state = &xhci->bus_state[hcd_index(hcd)];
+./drivers/usb/host/xhci-ring.c.orig:		port_array = xhci->usb3_ports;
+./drivers/usb/host/xhci-ring.c.orig:		port_array = xhci->usb2_ports;
+./drivers/usb/host/xhci-ring.c.orig:		temp1 = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-ring.c.orig:		if (slot_id && xhci->devs[slot_id])
+./drivers/usb/host/xhci-ring.c.orig:	 * Check to see if xhci-hub.c is waiting on RExit to U0 transition (or
+./drivers/usb/host/xhci-ring.c.orig:	inc_deq(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-ring.c.orig:	spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:	spin_lock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:	struct xhci_virt_ep *ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c.orig:	xdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:				if (xhci->quirks & XHCI_AMD_PLL_FIX)
+./drivers/usb/host/xhci-ring.c.orig:	xdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:		if ((xhci->quirks & XHCI_TRUST_TX_LENGTH))
+./drivers/usb/host/xhci-ring.c.orig:			if ((xhci->quirks & XHCI_TRUST_TX_LENGTH))
+./drivers/usb/host/xhci-ring.c.orig:	__releases(&xhci->lock)
+./drivers/usb/host/xhci-ring.c.orig:	__acquires(&xhci->lock)
+./drivers/usb/host/xhci-ring.c.orig:	xdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:				 xhci->event_ring->deq_seg,
+./drivers/usb/host/xhci-ring.c.orig:				 xhci->event_ring->dequeue),
+./drivers/usb/host/xhci-ring.c.orig:		xhci_debug_segment(xhci, xhci->event_ring->deq_seg);
+./drivers/usb/host/xhci-ring.c.orig:				 xhci->event_ring->deq_seg,
+./drivers/usb/host/xhci-ring.c.orig:				 xhci->event_ring->dequeue),
+./drivers/usb/host/xhci-ring.c.orig:		xhci_debug_segment(xhci, xhci->event_ring->deq_seg);
+./drivers/usb/host/xhci-ring.c.orig:		if (xhci->quirks & XHCI_TRUST_TX_LENGTH)
+./drivers/usb/host/xhci-ring.c.orig:				if ((xhci->quirks & XHCI_SPURIOUS_SUCCESS) &&
+./drivers/usb/host/xhci-ring.c.orig:			inc_deq(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-ring.c.orig:			spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:			spin_lock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig: * xhci->lock between event processing (e.g. to pass up port status changes).
+./drivers/usb/host/xhci-ring.c.orig:	if (!xhci->event_ring || !xhci->event_ring->dequeue) {
+./drivers/usb/host/xhci-ring.c.orig:		xhci->error_bitmask |= 1 << 1;
+./drivers/usb/host/xhci-ring.c.orig:	event = xhci->event_ring->dequeue;
+./drivers/usb/host/xhci-ring.c.orig:	    xhci->event_ring->cycle_state) {
+./drivers/usb/host/xhci-ring.c.orig:		xhci->error_bitmask |= 1 << 2;
+./drivers/usb/host/xhci-ring.c.orig:			xhci->error_bitmask |= 1 << 9;
+./drivers/usb/host/xhci-ring.c.orig:			xhci->error_bitmask |= 1 << 3;
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->xhc_state & XHCI_STATE_DYING) {
+./drivers/usb/host/xhci-ring.c.orig:		inc_deq(xhci, xhci->event_ring);
+./drivers/usb/host/xhci-ring.c.orig:	spin_lock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:	status = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:	writel(status, &xhci->op_regs->status);
+./drivers/usb/host/xhci-ring.c.orig:		irq_pending = readl(&xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci-ring.c.orig:		writel(irq_pending, &xhci->ir_set->irq_pending);
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->xhc_state & XHCI_STATE_DYING ||
+./drivers/usb/host/xhci-ring.c.orig:	    xhci->xhc_state & XHCI_STATE_HALTED) {
+./drivers/usb/host/xhci-ring.c.orig:		temp_64 = xhci_read_64(xhci, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci-ring.c.orig:				&xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci-ring.c.orig:		spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:	event_ring_deq = xhci->event_ring->dequeue;
+./drivers/usb/host/xhci-ring.c.orig:	temp_64 = xhci_read_64(xhci, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci-ring.c.orig:	if (event_ring_deq != xhci->event_ring->dequeue) {
+./drivers/usb/host/xhci-ring.c.orig:		deq = xhci_trb_virt_to_dma(xhci->event_ring->deq_seg,
+./drivers/usb/host/xhci-ring.c.orig:				xhci->event_ring->dequeue);
+./drivers/usb/host/xhci-ring.c.orig:	xhci_write_64(xhci, temp_64, &xhci->ir_set->erst_dequeue);
+./drivers/usb/host/xhci-ring.c.orig:	spin_unlock(&xhci->lock);
+./drivers/usb/host/xhci-ring.c.orig:		if (ep_ring == xhci->cmd_ring) {
+./drivers/usb/host/xhci-ring.c.orig:					 (xhci->quirks & XHCI_AMD_0x96_HOST)))
+./drivers/usb/host/xhci-ring.c.orig:			xhci->devs[slot_id]->out_ctx, ep_index);
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->hci_version < 0x100)
+./drivers/usb/host/xhci-ring.c.orig:	ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c.orig:		ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c.orig:	ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c.orig:		ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c.orig:/* Caller must have locked xhci->lock */
+./drivers/usb/host/xhci-ring.c.orig:	ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->hci_version >= 0x100) {
+./drivers/usb/host/xhci-ring.c.orig: * Caller must have locked xhci->lock
+./drivers/usb/host/xhci-ring.c.orig:	ret = prepare_transfer(xhci, xhci->devs[slot_id],
+./drivers/usb/host/xhci-ring.c.orig:		if (xhci->hci_version == 0x100) {
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->hci_version < 0x100 || udev->speed < USB_SPEED_SUPER)
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->hci_version < 0x100)
+./drivers/usb/host/xhci-ring.c.orig:	ist = HCS_IST(xhci->hcs_params2) & 0x7;
+./drivers/usb/host/xhci-ring.c.orig:	if (HCS_IST(xhci->hcs_params2) & (1 << 3))
+./drivers/usb/host/xhci-ring.c.orig:	current_frame_id = readl(&xhci->run_regs->microframe_index);
+./drivers/usb/host/xhci-ring.c.orig:		 __func__, index, readl(&xhci->run_regs->microframe_index),
+./drivers/usb/host/xhci-ring.c.orig:	xep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c.orig:	ep_ring = xhci->devs[slot_id]->eps[ep_index].ring;
+./drivers/usb/host/xhci-ring.c.orig:		ret = prepare_transfer(xhci, xhci->devs[slot_id], ep_index,
+./drivers/usb/host/xhci-ring.c.orig:						HCC_CFC(xhci->hcc_params)) {
+./drivers/usb/host/xhci-ring.c.orig:				if (xhci->hci_version == 0x100 &&
+./drivers/usb/host/xhci-ring.c.orig:						!(xhci->quirks &
+./drivers/usb/host/xhci-ring.c.orig:	if (HCC_CFC(xhci->hcc_params))
+./drivers/usb/host/xhci-ring.c.orig:		if (xhci->quirks & XHCI_AMD_PLL_FIX)
+./drivers/usb/host/xhci-ring.c.orig:	xdev = xhci->devs[slot_id];
+./drivers/usb/host/xhci-ring.c.orig:	xep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/xhci-ring.c.orig:	if (HCC_CFC(xhci->hcc_params) && !list_empty(&ep_ring->td_list)) {
+./drivers/usb/host/xhci-ring.c.orig:	start_frame = readl(&xhci->run_regs->microframe_index);
+./drivers/usb/host/xhci-ring.c.orig:	ist = HCS_IST(xhci->hcs_params2) & 0x7;
+./drivers/usb/host/xhci-ring.c.orig:	if (HCS_IST(xhci->hcs_params2) & (1 << 3))
+./drivers/usb/host/xhci-ring.c.orig: * Don't decrement xhci->cmd_ring_reserved_trbs after we've queued the TRB
+./drivers/usb/host/xhci-ring.c.orig:	int reserved_trbs = xhci->cmd_ring_reserved_trbs;
+./drivers/usb/host/xhci-ring.c.orig:	if ((xhci->xhc_state & XHCI_STATE_DYING) ||
+./drivers/usb/host/xhci-ring.c.orig:		(xhci->xhc_state & XHCI_STATE_HALTED)) {
+./drivers/usb/host/xhci-ring.c.orig:	ret = prepare_ring(xhci, xhci->cmd_ring, EP_STATE_RUNNING,
+./drivers/usb/host/xhci-ring.c.orig:	cmd->command_trb = xhci->cmd_ring->enqueue;
+./drivers/usb/host/xhci-ring.c.orig:	list_add_tail(&cmd->cmd_list, &xhci->cmd_list);
+./drivers/usb/host/xhci-ring.c.orig:	if (xhci->cmd_list.next == &cmd->cmd_list &&
+./drivers/usb/host/xhci-ring.c.orig:	    !timer_pending(&xhci->cmd_timer)) {
+./drivers/usb/host/xhci-ring.c.orig:		xhci->current_cmd = cmd;
+./drivers/usb/host/xhci-ring.c.orig:		mod_timer(&xhci->cmd_timer, jiffies + XHCI_CMD_DEFAULT_TIMEOUT);
+./drivers/usb/host/xhci-ring.c.orig:	queue_trb(xhci, xhci->cmd_ring, false, field1, field2, field3,
+./drivers/usb/host/xhci-ring.c.orig:			field4 | xhci->cmd_ring->cycle_state);
+./drivers/usb/host/xhci-ring.c.orig:	ep = &xhci->devs[slot_id]->eps[ep_index];
+./drivers/usb/host/Kconfig:	  module will be called xhci-hcd.
+./drivers/usb/host/xhci-dbg.c:			xhci->cap_regs);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->hc_capbase);
+./drivers/usb/host/xhci-dbg.c:			&xhci->cap_regs->hc_capbase, temp);
+./drivers/usb/host/xhci-dbg.c:	xhci_dbg(xhci, "// xHCI operational registers at %pK:\n", xhci->op_regs);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->run_regs_off);
+./drivers/usb/host/xhci-dbg.c:			&xhci->cap_regs->run_regs_off,
+./drivers/usb/host/xhci-dbg.c:	xhci_dbg(xhci, "// xHCI runtime registers at %pK:\n", xhci->run_regs);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->db_off);
+./drivers/usb/host/xhci-dbg.c:	xhci_dbg(xhci, "// @%pK = 0x%x DBOFF\n", &xhci->cap_regs->db_off, temp);
+./drivers/usb/host/xhci-dbg.c:	xhci_dbg(xhci, "// Doorbell array at %pK:\n", xhci->dba);
+./drivers/usb/host/xhci-dbg.c:	xhci_dbg(xhci, "xHCI capability registers at %pK:\n", xhci->cap_regs);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->hc_capbase);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->hcs_params1);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->hcs_params2);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->hcs_params3);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->hcc_params);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->cap_regs->run_regs_off);
+./drivers/usb/host/xhci-dbg.c:		temp = readl(&xhci->cap_regs->hcc_params2);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->op_regs->command);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->op_regs->status);
+./drivers/usb/host/xhci-dbg.c:	xhci_dbg(xhci, "xHCI operational registers at %pK:\n", xhci->op_regs);
+./drivers/usb/host/xhci-dbg.c:	ports = HCS_MAX_PORTS(xhci->hcs_params1);
+./drivers/usb/host/xhci-dbg.c:	addr = &xhci->op_regs->port_status_base;
+./drivers/usb/host/xhci-dbg.c:	struct xhci_intr_reg __iomem *ir_set = &xhci->run_regs->ir_set[set_num];
+./drivers/usb/host/xhci-dbg.c:	xhci_dbg(xhci, "xHCI runtime registers at %pK:\n", xhci->run_regs);
+./drivers/usb/host/xhci-dbg.c:	temp = readl(&xhci->run_regs->microframe_index);
+./drivers/usb/host/xhci-dbg.c:			&xhci->run_regs->microframe_index,
+./drivers/usb/host/xhci-dbg.c:		temp = readl(&xhci->run_regs->rsvd[i]);
+./drivers/usb/host/xhci-dbg.c:					&xhci->run_regs->rsvd[i],
+./drivers/usb/host/xhci-dbg.c:	val = xhci_read_64(xhci, &xhci->op_regs->cmd_ring);
+./drivers/usb/host/xhci-dbg.c:	int csz = HCC_64BYTE_CONTEXT(xhci->hcc_params);
+./drivers/usb/host/xhci-dbg.c:	int csz = HCC_64BYTE_CONTEXT(xhci->hcc_params);
+./drivers/usb/host/xhci-dbg.c:	int csz = HCC_64BYTE_CONTEXT(xhci->hcc_params);
+./drivers/usb/host/pci-quirks.c:#include "xhci-ext-caps.h"
+./drivers/usb/host/xhci-rcar.c:#include "xhci-rcar.h"
+./drivers/usb/dwc3/host.c:	xhci = platform_device_alloc("xhci-hcd", PLATFORM_DEVID_AUTO);
+./drivers/usb/dwc3/host.c:	arch_setup_dma_ops(&xhci->dev, 0, 0, NULL, 0);
+./drivers/usb/dwc3/host.c:	dma_set_coherent_mask(&xhci->dev, dwc->dev->coherent_dma_mask);
+./drivers/usb/dwc3/host.c:	xhci->dev.parent	= dwc->dev;
+./drivers/usb/dwc3/host.c:	xhci->dev.dma_mask	= dwc->dev->dma_mask;
+./drivers/usb/dwc3/host.c:	xhci->dev.dma_parms	= dwc->dev->dma_parms;
+./drivers/usb/dwc3/host.c:	ret = of_property_read_u32(node, "xhci-imod-value",
+./drivers/usb/dwc3/host.c:			  dev_name(&xhci->dev));
+./drivers/usb/dwc3/host.c:			  dev_name(&xhci->dev));
+./drivers/usb/dwc3/host.c:			  dev_name(&dwc->xhci->dev));
+./drivers/usb/dwc3/host.c:			  dev_name(&dwc->xhci->dev));
+./drivers/usb/dwc3/dwc3-msm.c:	if (bus->controller != &dwc->xhci->dev) {
+./drivers/usb/dwc3/dwc3-msm.c:			udev->dev.parent->parent == &dwc->xhci->dev) {
+./drivers/usb/dwc3/dwc3-msm.c:		pm_runtime_init(&dwc->xhci->dev);
+./drivers/usb/dwc3/dwc3-msm.c:			pm_runtime_disable(&dwc->xhci->dev);
+./drivers/usb/dwc3/dwc3-msm.c:				pm_runtime_resume(&dwc->xhci->dev);
+./drivers/usb/dwc3/core.c:	 * since it will be requested by the xhci-plat driver.
+./drivers/usb/dwc3/core.c.orig:	 * since it will be requested by the xhci-plat driver.
