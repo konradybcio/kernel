@@ -1673,6 +1673,9 @@ struct ieee80211_sta_rates {
  * @supp_rates: Bitmap of supported rates (per band)
  * @ht_cap: HT capabilities of this STA; restricted to our own capabilities
  * @vht_cap: VHT capabilities of this STA; restricted to our own capabilities
+ * @max_rx_aggregation_subframes: maximal amount of frames in a single AMPDU
+ *	that this station is allowed to transmit to us.
+ *	Can be modified by driver.
  * @wme: indicates whether the STA supports QoS/WME (if local devices does,
  *	otherwise always false)
  * @drv_priv: data area for driver use, will always be aligned to
@@ -1699,6 +1702,7 @@ struct ieee80211_sta {
 	u16 aid;
 	struct ieee80211_sta_ht_cap ht_cap;
 	struct ieee80211_sta_vht_cap vht_cap;
+	u8 max_rx_aggregation_subframes;
 	bool wme;
 	u8 uapsd_queues;
 	u8 max_sp;
@@ -2682,6 +2686,33 @@ enum ieee80211_ampdu_mlme_action {
 	IEEE80211_AMPDU_TX_STOP_FLUSH,
 	IEEE80211_AMPDU_TX_STOP_FLUSH_CONT,
 	IEEE80211_AMPDU_TX_OPERATIONAL,
+};
+
+/**
+ * struct ieee80211_ampdu_params - AMPDU action parameters
+ *
+ * @action: the ampdu action, value from %ieee80211_ampdu_mlme_action.
+ * @sta: peer of this AMPDU session
+ * @tid: tid of the BA session
+ * @ssn: start sequence number of the session. TX/RX_STOP can pass 0. When
+ *	action is set to %IEEE80211_AMPDU_RX_START the driver passes back the
+ *	actual ssn value used to start the session and writes the value here.
+ * @buf_size: reorder buffer size  (number of subframes). Valid only when the
+ *	action is set to %IEEE80211_AMPDU_RX_START or
+ *	%IEEE80211_AMPDU_TX_OPERATIONAL
+ * @amsdu: indicates the peer's ability to receive A-MSDU within A-MPDU.
+ *	valid when the action is set to %IEEE80211_AMPDU_TX_OPERATIONAL
+ * @timeout: BA session timeout. Valid only when the action is set to
+ *	%IEEE80211_AMPDU_RX_START
+ */
+struct ieee80211_ampdu_params {
+	enum ieee80211_ampdu_mlme_action action;
+	struct ieee80211_sta *sta;
+	u16 tid;
+	u16 ssn;
+	u8 buf_size;
+	bool amsdu;
+	u16 timeout;
 };
 
 /**
