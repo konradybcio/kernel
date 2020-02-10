@@ -179,7 +179,10 @@ config ARCH_MSM8974
 	select ARM_AMBA
 	select QCOM_SCM if SMP
 	select CLKSRC_OF
-	select COMMON_CLK
+	select CLKDEV_LOOKUP
+	select HAVE_CLK
+	select HAVE_CLK_PREPARE
+	select PM_OPP
 
 config ARCH_MDM9615
 	bool "Enable support for MDM9615"
