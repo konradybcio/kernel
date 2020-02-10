@@ -9,31 +9,23 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-
+#include <dt-bindings/interrupt-controller/arm-gic.h>
 &soc {
-	tlmm_pinmux: pinctrl@fd510000 {
-		compatible = "qcom,msm-tlmm-8974";
-		reg = <0xfd510000 0x4000>;
-
-		/*General purpose pins*/
-		gp: gp {
-			qcom,num-pins = <146>;
-			#qcom,pin-cells = <1>;
-
-			/* Add GPIO controller node */
-			msm_gpio: msm_gpio {
-				compatible = "qcom,msm-tlmm-gp";
-				gpio-controller;
-				#gpio-cells = <2>;
-				interrupt-controller;
-				interrupt-cells = <2>;
-				num_irqs = <146>;
-			};
-		};
+	msmgpio: pinctrl@fd510000 {
+		compatible = "qcom,msm8974-pinctrl";
+		reg = <0xfd510000 0x2400>;
+		reg-names = "pinctrl";
+		interrupts-extended = <&wakegic GIC_SPI 208 IRQ_TYPE_NONE>;
+		//interrupts = <GIC_SPI 208 IRQ_TYPE_LEVEL_HIGH>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		interrupt-controller;
+		interrupt-parent = <&wakegpio>;
+		#interrupt-cells = <2>;
 
 		sdhc2_cd_pin {
 			/* check that this is indeed gpio 38 */
-			qcom,pins = <&gp 62>;
+			//qcom,pins = <&gp 62>;
 			qcom,num-grp-pins = <1>;
 			label = "cd-gpio";
 			sdhc2_cd_on: cd_on {
@@ -56,7 +48,7 @@
 		};
 
 		pmx_sdc1_clk {
-			qcom,pins = <&sdc 0>;
+			//qcom,pins = <&sdc 0>;
 			qcom,num-grp-pins = <1>;
 			label = "sdc1-clk";
 			sdc1_clk_on: clk_on {
@@ -74,7 +66,7 @@
 		};
 
 		pmx_sdc1_cmd {
-			qcom,pins = <&sdc 1>;
+			//qcom,pins = <&sdc 1>;
 			qcom,num-grp-pins = <1>;
 			label = "sdc1-cmd";
 			sdc1_cmd_on: cmd_on {
@@ -88,7 +80,7 @@
 		};
 
 		pmx_sdc1_data {
-			qcom,pins = <&sdc 2>;
+			//qcom,pins = <&sdc 2>;
 			qcom,num-grp-pins = <1>;
 			label = "sdc1-data";
 			sdc1_data_on: data_on {
@@ -102,7 +94,7 @@
 		};
 
 		pmx_sdc2_clk {
-			qcom,pins = <&sdc 4>;
+			//qcom,pins = <&sdc 4>;
 			qcom,num-grp-pins = <1>;
 			label = "sdc2-clk";
 			sdc2_clk_on: clk_on {
@@ -120,7 +112,7 @@
 		};
 
 		pmx_sdc2_cmd {
-			qcom,pins = <&sdc 5>;
+			//qcom,pins = <&sdc 5>;
 			qcom,num-grp-pins = <1>;
 			label = "sdc2-cmd";
 			sdc2_cmd_on: cmd_on {
@@ -134,7 +126,7 @@
 		};
 
 		pmx_sdc2_data {
-			qcom,pins = <&sdc 6>;
+			//qcom,pins = <&sdc 6>;
 			qcom,num-grp-pins = <1>;
 			label = "sdc2-data";
 			sdc2_data_on: data_on {
@@ -149,7 +141,7 @@
 
 		/* CoreSight */
 		tpiu_seta_1 {
-			qcom,pins = <&gp 31>;
+			//qcom,pins = <&gp 31>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-1";
@@ -160,7 +152,7 @@
 		};
 
 		tpiu_seta_2 {
-			qcom,pins = <&gp 32>;
+			//qcom,pins = <&gp 32>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-2";
@@ -171,7 +163,7 @@
 		};
 
 		tpiu_seta_3 {
-			qcom,pins = <&gp 33>;
+			//qcom,pins = <&gp 33>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-3";
@@ -182,7 +174,7 @@
 		};
 
 		tpiu_seta_4 {
-			qcom,pins = <&gp 34>;
+			//qcom,pins = <&gp 34>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <3>;
 			label = "tpiu-seta-4";
@@ -193,7 +185,7 @@
 		};
 
 		tpiu_seta_5 {
-			qcom,pins = <&gp 35>;
+			//qcom,pins = <&gp 35>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-5";
@@ -204,7 +196,7 @@
 		};
 
 		tpiu_seta_6 {
-			qcom,pins = <&gp 36>;
+			//qcom,pins = <&gp 36>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-6";
@@ -215,7 +207,7 @@
 		};
 
 		tpiu_seta_7 {
-			qcom,pins = <&gp 37>;
+			//qcom,pins = <&gp 37>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-7";
@@ -226,7 +218,7 @@
 		};
 
 		tpiu_seta_8 {
-			qcom,pins = <&gp 38>;
+			//qcom,pins = <&gp 38>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <3>;
 			label = "tpiu-seta-8";
@@ -237,7 +229,7 @@
 		};
 
 		tpiu_seta_9 {
-			qcom,pins = <&gp 39>;
+			//qcom,pins = <&gp 39>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-9";
@@ -248,7 +240,7 @@
 		};
 
 		tpiu_seta_10 {
-			qcom,pins = <&gp 40>;
+			//qcom,pins = <&gp 40>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <3>;
 			label = "tpiu-seta-10";
@@ -259,7 +251,7 @@
 		};
 
 		tpiu_seta_11 {
-			qcom,pins = <&gp 41>;
+			//qcom,pins = <&gp 41>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-seta-11";
@@ -270,7 +262,7 @@
 		};
 
 		tpiu_seta_12 {
-			qcom,pins = <&gp 42>;
+			//qcom,pins = <&gp 42>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-seta-12";
@@ -281,7 +273,7 @@
 		};
 
 		tpiu_seta_13 {
-			qcom,pins = <&gp 43>;
+			//qcom,pins = <&gp 43>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-seta-13";
@@ -292,7 +284,7 @@
 		};
 
 		tpiu_seta_14 {
-			qcom,pins = <&gp 44>;
+			//qcom,pins = <&gp 44>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-seta-14";
@@ -303,7 +295,7 @@
 		};
 
 		tpiu_seta_15 {
-			qcom,pins = <&gp 45>;
+			//qcom,pins = <&gp 45>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-15";
@@ -314,7 +306,7 @@
 		};
 
 		tpiu_seta_16 {
-			qcom,pins = <&gp 46>;
+			//qcom,pins = <&gp 46>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <4>;
 			label = "tpiu-seta-16";
@@ -325,7 +317,7 @@
 		};
 
 		tpiu_seta_17 {
-			qcom,pins = <&gp 47>;
+			//qcom,pins = <&gp 47>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-seta-17";
@@ -336,7 +328,7 @@
 		};
 
 		tpiu_seta_18 {
-			qcom,pins = <&gp 48>;
+			//qcom,pins = <&gp 48>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-seta-18";
@@ -347,7 +339,7 @@
 		};
 
 		tpiu_setb_1 {
-			qcom,pins = <&gp 15>;
+			//qcom,pins = <&gp 15>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <2>;
 			label = "tpiu-setb-1";
@@ -358,7 +350,7 @@
 		};
 
 		tpiu_setb_2 {
-			qcom,pins = <&gp 16>;
+			//qcom,pins = <&gp 16>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <2>;
 			label = "tpiu-setb-2";
@@ -369,7 +361,7 @@
 		};
 
 		tpiu_setb_3 {
-			qcom,pins = <&gp 17>;
+			//qcom,pins = <&gp 17>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <2>;
 			label = "tpiu-setb-3";
@@ -380,7 +372,7 @@
 		};
 
 		tpiu_setb_4 {
-			qcom,pins = <&gp 18>;
+			//qcom,pins = <&gp 18>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <2>;
 			label = "tpiu-setb-4";
@@ -391,7 +383,7 @@
 		};
 
 		tpiu_setb_5 {
-			qcom,pins = <&gp 19>;
+			//qcom,pins = <&gp 19>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-setb-5";
@@ -402,7 +394,7 @@
 		};
 
 		tpiu_setb_6 {
-			qcom,pins = <&gp 20>;
+			//qcom,pins = <&gp 20>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-setb-6";
@@ -413,7 +405,7 @@
 		};
 
 		tpiu_setb_7 {
-			qcom,pins = <&gp 21>;
+			//qcom,pins = <&gp 21>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-setb-7";
@@ -424,7 +416,7 @@
 		};
 
 		tpiu_setb_8 {
-			qcom,pins = <&gp 22>;
+			//qcom,pins = <&gp 22>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-setb-8";
@@ -435,7 +427,7 @@
 		};
 
 		tpiu_setb_9 {
-			qcom,pins = <&gp 23>;
+			//qcom,pins = <&gp 23>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <6>;
 			label = "tpiu-setb-9";
@@ -446,7 +438,7 @@
 		};
 
 		tpiu_setb_10 {
-			qcom,pins = <&gp 24>;
+			//qcom,pins = <&gp 24>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <6>;
 			label = "tpiu-setb-10";
@@ -457,7 +449,7 @@
 		};
 
 		tpiu_setb_11 {
-			qcom,pins = <&gp 25>;
+			//qcom,pins = <&gp 25>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <6>;
 			label = "tpiu-setb-11";
@@ -468,7 +460,7 @@
 		};
 
 		tpiu_setb_12 {
-			qcom,pins = <&gp 26>;
+			//qcom,pins = <&gp 26>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <7>;
 			label = "tpiu-setb-12";
@@ -479,7 +471,7 @@
 		};
 
 		tpiu_setb_13 {
-			qcom,pins = <&gp 27>;
+			//qcom,pins = <&gp 27>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <7>;
 			label = "tpiu-setb-13";
@@ -490,7 +482,7 @@
 		};
 
 		tpiu_setb_14 {
-			qcom,pins = <&gp 28>;
+			//qcom,pins = <&gp 28>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <5>;
 			label = "tpiu-setb-14";
@@ -501,7 +493,7 @@
 		};
 
 		tpiu_setb_15 {
-			qcom,pins = <&gp 89>;
+			//qcom,pins = <&gp 89>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <2>;
 			label = "tpiu-setb-15";
@@ -512,7 +504,7 @@
 		};
 
 		tpiu_setb_16 {
-			qcom,pins = <&gp 90>;
+			//qcom,pins = <&gp 90>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <3>;
 			label = "tpiu-setb-16";
@@ -523,7 +515,7 @@
 		};
 
 		tpiu_setb_17 {
-			qcom,pins = <&gp 91>;
+			//qcom,pins = <&gp 91>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <3>;
 			label = "tpiu-setb-17";
@@ -534,7 +526,7 @@
 		};
 
 		tpiu_setb_18 {
-			qcom,pins = <&gp 92>;
+			//qcom,pins = <&gp 92>;
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <3>;
 			label = "tpiu-setb-18";
@@ -545,9 +537,9 @@
 		};
 
 		tsif0_signals {
-			qcom,pins = <&gp 89>,	/* TSIF0 CLK */
-				<&gp 90>,	/* TSIF0 Enable */
-				<&gp 91>;	/* TSIF0 DATA */
+			//qcom,pins = <&gp 89>,	/* TSIF0 CLK */
+			//	<&gp 90>,	/* TSIF0 Enable */
+			//	<&gp 91>;	/* TSIF0 DATA */
 			qcom,num-grp-pins = <3>;
 			qcom,pin-func = <1>;
 			label = "tsif0-signals";
@@ -559,7 +551,7 @@
 
 		/* sync signal is only used if configured to mode-2 */
 		tsif0_sync {
-			qcom,pins = <&gp 92>;	/* TSIF0 SYNC */
+			//qcom,pins = <&gp 92>;	/* TSIF0 SYNC */
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <1>;
 			label = "tsif0-sync";
@@ -570,9 +562,9 @@
 		};
 
 		tsif1_signals {
-			qcom,pins = <&gp 93>,	/* TSIF1 CLK */
-				<&gp 94>,	/* TSIF1 Enable */
-				<&gp 95>;	/* TSIF1 DATA */
+			//qcom,pins = <&gp 93>,	/* TSIF1 CLK */
+			//	<&gp 94>,	/* TSIF1 Enable */
+			//	<&gp 95>;	/* TSIF1 DATA */
 			qcom,num-grp-pins = <3>;
 			qcom,pin-func = <1>;
 			label = "tsif1-signals";
@@ -584,7 +576,7 @@
 
 		/* sync signal is only used if configured to mode-2 */
 		tsif1_sync {
-			qcom,pins = <&gp 96>;	/* TSIF1 SYNC */
+			//qcom,pins = <&gp 96>;	/* TSIF1 SYNC */
 			qcom,num-grp-pins = <1>;
 			qcom,pin-func = <1>;
 			label = "tsif1-sync";

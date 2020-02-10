@@ -133,7 +133,21 @@
 		};
 	};
 
-	memory {
+    reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		ramoops@57f00000 {
+				compatible = "ramoops";
+				reg = <0x3e8e0000 0x200000>;
+
+				console-size = <0x100000>;
+				record-size = <0x10000>;
+				ftrace-size = <0x10000>;
+				pmsg-size = <0x80000>;
+		};
+
 		secure_mem: secure_region@0 {
 			linux,reserve-contiguous-region;
 			reg = <0 0xFC00000>;
@@ -188,9 +202,10 @@
 #include "msm8974-bus.dtsi"
 #include "msm8974-ipcrouter.dtsi"
 #include "msm8974-pinctrl.dtsi"
-#include "msm-rdbg.dtsi"
+//#include "msm-rdbg.dtsi"
 
 &soc {
+	compatible = "simple-bus";
 	#address-cells = <1>;
 	#size-cells = <1>;
 	ranges;
@@ -201,19 +216,39 @@
 		#interrupt-cells = <3>;
 		reg = <0xF9000000 0x1000>,
 		      <0xF9002000 0x1000>;
+		interrupt-parent = <&intc>;
 	};
 
-	msmgpio: gpio@fd510000 {
-		compatible = "qcom,msm-gpio";
-		gpio-controller;
-		#gpio-cells = <2>;
-		interrupt-controller;
-		#interrupt-cells = <2>;
-		reg = <0xfd510000 0x4000>;
-		ngpio = <146>;
-		interrupts = <0 208 0>;
-		qcom,direct-connect-irqs = <8>;
+	wakegic: qcom,mpm@fc4281d0 {
+			compatible = "qcom,mpm-gic-msm8974", "qcom,mpm-gic";
+			reg = <0xfc4281d0 0x1000>, /* MSM_RPM_MPM_BASE 4K */
+					<0xfa006000 0x1000>;   /* MSM_APCS_GCC_BASE 4K */
+			reg-names = "vmpm", "ipc";
+			interrupts = <GIC_SPI 171 IRQ_TYPE_EDGE_RISING>;
+			qcom,num-mpm-irqs = <64>;
+			interrupt-controller;
+			interrupt-parent = <&intc>;
+			#interrupt-cells = <3>;
 	};
+
+	wakegpio: wake-gpio {
+			compatible = "qcom,mpm-gpio-msm8974", "qcom,mpm-gpio";
+			interrupt-controller;
+			interrupt-parent = <&intc>;
+			#interrupt-cells = <3>;
+	};
+
+	// msmgpio: gpio@fd510000 {
+	// 	compatible = "qcom,msm-gpio";
+	// 	gpio-controller;
+	// 	#gpio-cells = <2>;
+	// 	interrupt-controller;
+	// 	#interrupt-cells = <2>;
+	// 	reg = <0xfd510000 2400>;
+	// 	ngpio = <146>;
+	// 	interrupts = <0 208 0>;
+	// 	qcom,direct-connect-irqs = <8>;
+	// };
 
 	clock_rpm: qcom,rpmcc@fc4000000 {
 		compatible = "qcom,rpmcc-8974";
