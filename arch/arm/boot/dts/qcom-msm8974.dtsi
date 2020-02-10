@@ -494,8 +494,28 @@
 			#interrupt-cells = <3>;
 			reg = <0xf9000000 0x1000>,
 			      <0xf9002000 0x1000>;
+			interrupt-parent = <&intc>;
 		};
-		
+
+		wakegic: qcom,mpm@fc4281d0 {
+			compatible = "qcom,mpm-gic-msm8974", "qcom,mpm-gic";
+			reg = <0xfc4281d0 0x1000>, /* MSM_RPM_MPM_BASE 4K */
+				<0xfa006000 0x1000>;   /* MSM_APCS_GCC_BASE 4K */
+			reg-names = "vmpm", "ipc";
+			interrupts = <GIC_SPI 171 IRQ_TYPE_EDGE_RISING>;
+			qcom,num-mpm-irqs = <64>;
+			interrupt-controller;
+			interrupt-parent = <&intc>;
+			#interrupt-cells = <3>;
+		};
+
+		wakegpio: wake-gpio {
+			compatible = "qcom,mpm-gpio-msm8974", "qcom,mpm-gpio";
+			interrupt-controller;
+			interrupt-parent = <&intc>;
+			#interrupt-cells = <3>;
+		};
+
 		rpm_bus: qcom,rpm-smd {
 			compatible = "qcom,rpm-smd";
 			rpm-channel-name = "rpm_requests";
@@ -503,10 +523,11 @@
 			rpm-channel-type = <15>; /* SMD_APPS_RPM */
 		};
 
-		rpmcc: clock-controller {
+		rpmcc: qcom,rpmcc@fc4000000 {
 			compatible = "qcom,rpmcc-msm8974", "qcom,rpmcc";
 			#clock-cells = <1>;
-			status = "ok";
+			reg = <0xfc400000 0x4000>;
+			reg-names = "cc_base";
 		};
 
 		apcs: syscon@f9011000 {
@@ -1147,3 +1168,7 @@
 		regulator-always-on;
 	};
 };
+
+#include "msm-pm8x41-rpm-regulator.dtsi"
+#include "qcom-pm8841.dtsi"
+#include "qcom-pm8941.dtsi"
