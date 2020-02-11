@@ -943,9 +943,15 @@
 		      <0Xfc4ca000 0x1000>;
 		/* 190,ee0_krait_hlos_spmi_periph_irq */
 		/* 187,channel_0_krait_hlos_trans_done_irq */
-		interrupts = <0 190 0 0 187 0>;
-		qcom,pmic-arb-ee = <0>;
-		qcom,pmic-arb-channel = <0>;
+		//interrupts = <0 190 0 0 187 0>;
+		interrupt-names = "periph_irq";
+		interrupts = <GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,ee = <0>;
+		qcom,channel = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		interrupt-controller;
+		#interrupt-cells = <3>;
 	};
 
 	i2c_0: i2c@f9967000 { /* BLSP#11 */
