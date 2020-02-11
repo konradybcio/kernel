@@ -196,6 +196,16 @@
 		// 	linux,remove-completely;
 		// 	reg = <0xfa00000 0x500000>;
 		// };
+		
+		/* global autoconfigured region for contiguous allocations */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0 0x00000000 0 0xffffffff>;
+			reusable;
+			alignment = <0 0x400000>;
+			size = <0 0x4000000>; /* 64MB */
+			linux,cma-default;
+		};
 	};
 
 	  clocks {
@@ -832,7 +842,7 @@
 		reg = <0xfe12f000 0x35000>,
 		      <0xfe104000 0x20000>;
 		reg-names = "slimbus_physical", "slimbus_bam_physical";
-		interrupts = <0 163 0 0 164 0>;
+		interrupts = <0 163 0>, <0 164 0>;
 		interrupt-names = "slimbus_irq", "slimbus_bam_irq";
 		qcom,apps-ch-pipes = <0x60000000>;
 		qcom,ea-pc = <0x30>;
