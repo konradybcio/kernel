@@ -12,6 +12,8 @@
 
 #include "skeleton.dtsi"
 #include <dt-bindings/clock/msm-clocks-8974.h>
+#include <dt-bindings/regulator/qcom,rpm-smd-regulator.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. MSM 8974";
@@ -139,13 +141,13 @@
 		ranges;
 
 		ramoops@57f00000 {
-				compatible = "ramoops";
-				reg = <0x3e8e0000 0x200000>;
+			compatible = "ramoops";
+			reg = <0x3e8e0000 0x200000>;
 
-				console-size = <0x100000>;
-				record-size = <0x10000>;
-				ftrace-size = <0x10000>;
-				pmsg-size = <0x80000>;
+			console-size = <0x100000>;
+			record-size = <0x10000>;
+			ftrace-size = <0x10000>;
+			pmsg-size = <0x80000>;
 		};
 
 		smem_region: smem@86300000 {
@@ -196,7 +198,49 @@
 		// };
 	};
 
+	  clocks {
+               xo_board {
+                       compatible = "fixed-clock";
+                       #clock-cells = <0>;
+                       clock-frequency = <19200000>;
+                       clock-output-names = "xo_board";
+		};
+               sleep_clk {
+                       compatible = "fixed-clock";
+                       #clock-cells = <0>;
+                       clock-frequency = <32764>;
+                       clock-output-names = "sleep_clk";
+		};
+	};
+
+	vendor: vendor {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0 0xffffffff>;
+		compatible = "simple-bus";
+	};
+
 	soc: soc { };
+
+	spmi_bus: qcom,spmi@fc4c0000 {
+		cell-index = <0>;
+		compatible = "qcom,spmi-pmic-arb";
+		reg-names = "core", "intr", "cnfg";
+		reg = <0xfc4cf000 0x1000>,
+				<0Xfc4cb000 0x1000>,
+				<0Xfc4ca000 0x1000>;
+		/* 190,ee0_krait_hlos_spmi_periph_irq */
+		/* 187,channel_0_krait_hlos_trans_done_irq */
+		//interrupts = <0 190 0 0 187 0>;
+		interrupt-names = "periph_irq";
+		interrupts = <GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>;
+		qcom,ee = <0>;
+		qcom,channel = <0>;
+		#address-cells = <2>;
+		#size-cells = <0>;
+		interrupt-controller;
+		#interrupt-cells = <4>;
+	};
 };
 
 #include "msm8974-camera.dtsi"
@@ -939,26 +983,6 @@
 				"msm-dai-q6-dev.32770";
 		asoc-codec = <&stub_codec>, <&hdmi_audio>;
 		asoc-codec-names = "msm-stub-codec.1", "msm-hdmi-audio-codec-rx";
-	};
-
-	spmi_bus: qcom,spmi@fc4c0000 {
-		cell-index = <0>;
-		compatible = "qcom,spmi-pmic-arb";
-		reg-names = "core", "intr", "cnfg";
-		reg = <0xfc4cf000 0x1000>,
-		      <0Xfc4cb000 0x1000>,
-		      <0Xfc4ca000 0x1000>;
-		/* 190,ee0_krait_hlos_spmi_periph_irq */
-		/* 187,channel_0_krait_hlos_trans_done_irq */
-		//interrupts = <0 190 0 0 187 0>;
-		interrupt-names = "periph_irq";
-		interrupts = <GIC_SPI 190 IRQ_TYPE_LEVEL_HIGH>;
-		qcom,ee = <0>;
-		qcom,channel = <0>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		interrupt-controller;
-		#interrupt-cells = <3>;
 	};
 
 	i2c_0: i2c@f9967000 { /* BLSP#11 */
@@ -2246,7 +2270,9 @@
 		/* GPIO output to mss */
 		qcom,smem-states = <&modem_smp2p_out 0>;
 		qcom,smem-state-names = "qcom,force-stop";
-		linux,contiguous-region = <&peripheral_mem>;
+		memory-region = <&peripheral_mem>;
+
+		qcom,mem-protect-id = <0xF>;
 	};
 
 	qcom,pronto@fb21b000 {
@@ -2501,7 +2527,7 @@
 		qcom,pas-id = <9>;
 		qcom,proxy-timeout-ms = <5000>;
 		qcom,firmware-name = "venus";
-		linux,contiguous-region = <&peripheral_mem>;
+		memory-region = <&peripheral_mem>;
 	};
 
 	qcom,cache_erp@f9012000 {
