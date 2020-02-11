@@ -12,6 +12,7 @@
 
 /*#include "msm8974-camera-sensor-mtp.dtsi"*/
 #include "msm8974-leds.dtsi"
+#include <dt-bindings/gpio/gpio.h>
 
 / {
 	aliases {
@@ -298,9 +299,8 @@
 	qcom,vdd-io-voltage-level = <1800000 1800000>;
 	qcom,vdd-io-current-level = <250 154000>;
 
-	pinctrl-names = "active", "sleep";
-	pinctrl-0 = <&sdc1_clk_on &sdc1_cmd_on &sdc1_data_on>;
-	pinctrl-1 = <&sdc1_clk_off &sdc1_cmd_off &sdc1_data_off>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdhc1_pin_a>;
 
 	qcom,nonremovable;
 	status = "ok";
@@ -327,9 +327,8 @@
 	qcom,vdd-io-voltage-level = <1800000 2950000>;
 	qcom,vdd-io-current-level = <6 22000>;
 
-	pinctrl-names = "active", "sleep";
-	pinctrl-0 = <&sdc2_clk_on &sdc2_cmd_on &sdc2_data_on>;
-	pinctrl-1 = <&sdc2_clk_off &sdc2_cmd_off &sdc2_data_off>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&sdhc2_pin_a>, <&sdhc2_cd_pin_a>;
 
 	status = "ok";
 };

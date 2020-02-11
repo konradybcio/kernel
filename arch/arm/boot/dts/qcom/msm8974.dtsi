@@ -209,7 +209,7 @@
 	};
 
 	  clocks {
-               xo_board {
+               xo_board: xo_board {
                        compatible = "fixed-clock";
                        #clock-cells = <0>;
                        clock-frequency = <19200000>;
@@ -583,14 +583,15 @@
 
 	sdhc_1: sdhci@f9824900 {
 		qcom,bus-width = <8>;
-		compatible = "qcom,sdhci-msm";
+		compatible = "qcom,sdhci-msm-v4";
 		reg = <0xf9824900 0x11c>, <0xf9824000 0x800>;
 		reg-names = "hc_mem", "core_mem";
 		interrupts = <0 123 0>, <0 138 0>;
 		interrupt-names = "hc_irq", "pwr_irq";
-		clock-names = "iface_clk", "core_clk";
+		clock-names = "iface", "core", "xo";
 		clocks = <&clock_gcc clk_gcc_sdcc1_ahb_clk>,
-			 <&clock_gcc clk_gcc_sdcc1_apps_clk>;
+			 <&clock_gcc clk_gcc_sdcc1_apps_clk>,
+			 <&xo_board>;
 
 		qcom,clk-rates = <400000 20000000 25000000 50000000 100000000 200000000>;
 		qcom,bus-speed-mode = "HS200_1p8v", "DDR_1p8v";
@@ -616,15 +617,16 @@
 	};
 
 	sdhc_2: sdhci@f98a4900 {
-		compatible = "qcom,sdhci-msm";
+		compatible = "qcom,sdhci-msm-v4";
 		reg = <0xf98a4900 0x11c>, <0xf98a4000 0x800>;
 		reg-names = "hc_mem", "core_mem";
 		interrupts = <0 125 0>, <0 221 0>;
 		interrupt-names = "hc_irq", "pwr_irq";
 
-		clock-names = "iface_clk", "core_clk";
+		clock-names = "iface", "core", "xo";
 		clocks = <&clock_gcc clk_gcc_sdcc2_ahb_clk>,
-			 <&clock_gcc clk_gcc_sdcc2_apps_clk>;
+			 <&clock_gcc clk_gcc_sdcc2_apps_clk>,
+			 <&xo_board>;
 
 		qcom,clk-rates = <400000 20000000 25000000 50000000 100000000 200000000>;
 		qcom,bus-width = <4>;
@@ -647,7 +649,7 @@
 	};
 
 	sdhc_3: sdhci@f9864900 {
-		compatible = "qcom,sdhci-msm";
+		compatible = "qcom,sdhci-msm-v4";
 		reg = <0xf9864900 0x11c>, <0xf9864000 0x800>;
 		reg-names = "hc_mem", "core_mem";
 
@@ -669,9 +671,10 @@
 			<&msmgpio 35 0>; /* DATA3 */
 		qcom,gpio-names = "CLK", "CMD", "DAT0", "DAT1", "DAT2", "DAT3";
 
-		clock-names = "iface_clk", "core_clk";
+		clock-names = "iface", "core", "xo";
 		clocks = <&clock_gcc clk_gcc_sdcc3_ahb_clk>,
-			 <&clock_gcc clk_gcc_sdcc3_apps_clk>;
+			 <&clock_gcc clk_gcc_sdcc3_apps_clk>,
+			 <&xo_board>;
 
 		qcom,clk-rates = <400000 20000000 25000000 50000000 100000000>;
 		qcom,bus-width = <4>;

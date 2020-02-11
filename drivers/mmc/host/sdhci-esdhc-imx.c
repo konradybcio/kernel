@@ -305,15 +305,6 @@ static u32 esdhc_readl_le(struct sdhci_host *host, int reg)
 
 			if (imx_data->socdata->flags & ESDHC_FLAG_HS400)
 				val |= SDHCI_SUPPORT_HS400;
-
-			/*
-			 * Do not advertise faster UHS modes if there are no
-			 * pinctrl states for 100MHz/200MHz.
-			 */
-			if (IS_ERR_OR_NULL(imx_data->pins_100mhz) ||
-			    IS_ERR_OR_NULL(imx_data->pins_200mhz))
-				val &= ~(SDHCI_SUPPORT_SDR50 | SDHCI_SUPPORT_DDR50
-					 | SDHCI_SUPPORT_SDR104 | SDHCI_SUPPORT_HS400);
 		}
 	}
 
@@ -425,7 +416,7 @@ static u16 esdhc_readw_le(struct sdhci_host *host, int reg)
 				val = readl(host->ioaddr + ESDHC_MIX_CTRL);
 			else if (imx_data->socdata->flags & ESDHC_FLAG_STD_TUNING)
 				/* the std tuning bits is in ACMD12_ERR for imx6sl */
-				val = readl(host->ioaddr + SDHCI_AUTO_CMD_STATUS);
+				val = readl(host->ioaddr + SDHCI_ACMD12_ERR);
 		}
 
 		if (val & ESDHC_MIX_CTRL_EXE_TUNE)
@@ -490,7 +481,7 @@ static void esdhc_writew_le(struct sdhci_host *host, u16 val, int reg)
 			}
 			writel(new_val , host->ioaddr + ESDHC_MIX_CTRL);
 		} else if (imx_data->socdata->flags & ESDHC_FLAG_STD_TUNING) {
-			u32 v = readl(host->ioaddr + SDHCI_AUTO_CMD_STATUS);
+			u32 v = readl(host->ioaddr + SDHCI_ACMD12_ERR);
 			u32 m = readl(host->ioaddr + ESDHC_MIX_CTRL);
 			if (val & SDHCI_CTRL_TUNED_CLK) {
 				v |= ESDHC_MIX_CTRL_SMPCLK_SEL;
@@ -508,7 +499,7 @@ static void esdhc_writew_le(struct sdhci_host *host, u16 val, int reg)
 				v &= ~ESDHC_MIX_CTRL_EXE_TUNE;
 			}
 
-			writel(v, host->ioaddr + SDHCI_AUTO_CMD_STATUS);
+			writel(v, host->ioaddr + SDHCI_ACMD12_ERR);
 			writel(m, host->ioaddr + ESDHC_MIX_CTRL);
 		}
 		return;
@@ -694,20 +685,6 @@ static inline void esdhc_pltfm_set_clock(struct sdhci_host *host,
 					host->ioaddr + ESDHC_VENDOR_SPEC);
 		}
 		return;
-	}
-
-	/* For i.MX53 eSDHCv3, SYSCTL.SDCLKFS may not be set to 0. */
-	if (is_imx53_esdhc(imx_data)) {
-		/*
-		 * According to the i.MX53 reference manual, if DLLCTRL[10] can
-		 * be set, then the controller is eSDHCv3, else it is eSDHCv2.
-		 */
-		val = readl(host->ioaddr + ESDHC_DLL_CTRL);
-		writel(val | BIT(10), host->ioaddr + ESDHC_DLL_CTRL);
-		temp = readl(host->ioaddr + ESDHC_DLL_CTRL);
-		writel(val, host->ioaddr + ESDHC_DLL_CTRL);
-		if (temp & BIT(10))
-			pre_div = 2;
 	}
 
 	temp = sdhci_readl(host, ESDHC_SYSTEM_CONTROL);
@@ -937,9 +914,9 @@ static void esdhc_reset_tuning(struct sdhci_host *host)
 			writel(ctrl, host->ioaddr + ESDHC_MIX_CTRL);
 			writel(0, host->ioaddr + ESDHC_TUNE_CTRL_STATUS);
 		} else if (imx_data->socdata->flags & ESDHC_FLAG_STD_TUNING) {
-			ctrl = readl(host->ioaddr + SDHCI_AUTO_CMD_STATUS);
+			ctrl = readl(host->ioaddr + SDHCI_ACMD12_ERR);
 			ctrl &= ~ESDHC_MIX_CTRL_SMPCLK_SEL;
-			writel(ctrl, host->ioaddr + SDHCI_AUTO_CMD_STATUS);
+			writel(ctrl, host->ioaddr + SDHCI_ACMD12_ERR);
 		}
 	}
 }
@@ -961,7 +938,6 @@ static void esdhc_set_uhs_signaling(struct sdhci_host *host, unsigned timing)
 	case MMC_TIMING_UHS_SDR25:
 	case MMC_TIMING_UHS_SDR50:
 	case MMC_TIMING_UHS_SDR104:
-	case MMC_TIMING_MMC_HS:
 	case MMC_TIMING_MMC_HS200:
 		writel(m, host->ioaddr + ESDHC_MIX_CTRL);
 		break;
@@ -1078,12 +1054,11 @@ static void sdhci_esdhc_imx_hwinit(struct sdhci_host *host)
 		writel(readl(host->ioaddr + SDHCI_HOST_CONTROL)
 			| ESDHC_BURST_LEN_EN_INCR,
 			host->ioaddr + SDHCI_HOST_CONTROL);
-
 		/*
-		 * erratum ESDHC_FLAG_ERR004536 fix for MX6Q TO1.2 and MX6DL
-		 * TO1.1, it's harmless for MX6SL
-		 */
-		writel(readl(host->ioaddr + 0x6c) & ~BIT(7),
+		* erratum ESDHC_FLAG_ERR004536 fix for MX6Q TO1.2 and MX6DL
+		* TO1.1, it's harmless for MX6SL
+		*/
+		writel(readl(host->ioaddr + 0x6c) | BIT(7),
 			host->ioaddr + 0x6c);
 
 		/* disable DLL_CTRL delay line settings */
@@ -1146,6 +1121,18 @@ sdhci_esdhc_imx_probe_dt(struct platform_device *pdev,
 						ESDHC_PINCTRL_STATE_100MHZ);
 		imx_data->pins_200mhz = pinctrl_lookup_state(imx_data->pinctrl,
 						ESDHC_PINCTRL_STATE_200MHZ);
+		if (IS_ERR(imx_data->pins_100mhz) ||
+				IS_ERR(imx_data->pins_200mhz)) {
+			dev_warn(mmc_dev(host->mmc),
+				"could not get ultra high speed state, work on normal mode\n");
+			/*
+			 * fall back to not supporting uhs by specifying no
+			 * 1.8v quirk
+			 */
+			host->quirks2 |= SDHCI_QUIRK2_NO_1_8_V;
+		}
+	} else {
+		host->quirks2 |= SDHCI_QUIRK2_NO_1_8_V;
 	}
 
 	/* call to generic mmc_of_parse to support additional capabilities */
@@ -1303,7 +1290,7 @@ static int sdhci_esdhc_imx_probe(struct platform_device *pdev)
 
 		/* clear tuning bits in case ROM has set it already */
 		writel(0x0, host->ioaddr + ESDHC_MIX_CTRL);
-		writel(0x0, host->ioaddr + SDHCI_AUTO_CMD_STATUS);
+		writel(0x0, host->ioaddr + SDHCI_ACMD12_ERR);
 		writel(0x0, host->ioaddr + ESDHC_TUNE_CTRL_STATUS);
 	}
 
