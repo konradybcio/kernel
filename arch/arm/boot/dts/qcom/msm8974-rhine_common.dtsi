@@ -47,15 +47,18 @@
 	/* BLSP2 */
 	i2c_2: i2c@f9924000 {
 		cell-index = <0>;
-		compatible = "qcom,i2c-qup";
+		compatible = "qcom,i2c-msm-v2";
 		reg = <0xf9924000 0x1000>;
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg-names = "qup_phys_addr";
 		interrupts = <0 96 0>;
 		interrupt-names = "qup_err_intr";
-		qcom,i2c-bus-freq = <355000>;
-		qcom,i2c-src-freq = <50000000>;
+		// qcom,i2c-bus-freq = <355000>;
+		// qcom,i2c-src-freq = <50000000>;
+
+		qcom,clk-freq-out = <355000>;
+        qcom,clk-freq-in  = <50000000>;
 		qcom,scl-gpio = <&msmgpio 7 0x00>;
 		qcom,sda-gpio = <&msmgpio 6 0x00>;
 		qcom,master-id = <86>;
@@ -81,15 +84,18 @@
 	/* BLSP4 */
 	i2c@f9926000 {
 		cell-index = <1>;
-		compatible = "qcom,i2c-qup";
+		compatible = "qcom,i2c-msm-v2";
 		reg = <0xf9926000 0x1000>;
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg-names = "qup_phys_addr";
 		interrupts = <0 98 0>;
 		interrupt-names = "qup_err_intr";
-		qcom,i2c-bus-freq = <355000>;
-		qcom,i2c-src-freq = <50000000>;
+		// qcom,i2c-bus-freq = <355000>;
+		// qcom,i2c-src-freq = <50000000>;
+
+		qcom,clk-freq-out = <355000>;
+        qcom,clk-freq-in  = <50000000>;
 		qcom,master-id = <86>;
 		status = "ok";
 	};
@@ -97,15 +103,18 @@
 	/* BLSP6 */
 	i2c@f9928000 {
 		cell-index = <2>;
-		compatible = "qcom,i2c-qup";
+		compatible = "qcom,i2c-msm-v2";
 		reg = <0xf9928000 0x1000>;
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg-names = "qup_phys_addr";
 		interrupts = <0 100 0>;
 		interrupt-names = "qup_err_intr";
-		qcom,i2c-bus-freq = <355000>;
-		qcom,i2c-src-freq = <50000000>;
+		// qcom,i2c-bus-freq = <355000>;
+		// qcom,i2c-src-freq = <50000000>;
+
+		qcom,clk-freq-out = <355000>;
+        qcom,clk-freq-in  = <50000000>;
 		qcom,master-id = <86>;
 		status = "ok";
 		nfc@28 {
