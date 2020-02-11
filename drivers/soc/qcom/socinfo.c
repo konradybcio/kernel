@@ -1326,6 +1326,10 @@ static void * __init setup_dummy_socinfo(void)
 		dummy_socinfo.id = 206;
 		strlcpy(dummy_socinfo.build_id, "msm8916 - ",
 			sizeof(dummy_socinfo.build_id));
+	} else if (early_machine_is_msm8974()) {
+		dummy_socinfo.id = 126;
+		strlcpy(dummy_socinfo.build_id, "msm8974 - ",
+			sizeof(dummy_socinfo.build_id));
 	} else if (early_machine_is_msm8996()) {
 		dummy_socinfo.id = 246;
 		strlcpy(dummy_socinfo.build_id, "msm8996 - ",
