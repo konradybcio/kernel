@@ -148,6 +148,13 @@
 				pmsg-size = <0x80000>;
 		};
 
+		smem_region: smem@86300000 {
+			compatible = "removed-dma-pool";
+			no-map;
+			reg = <0xfa00000 0x200000>;
+			label = "smem_region";
+		};
+
 		secure_mem: secure_region@0 {
 			linux,reserve-contiguous-region;
 			reg = <0 0xFC00000>;
@@ -181,12 +188,12 @@
 			label = "peripheral_mem";
 		};
 
-		external_image_mem: external_image_region@fa00000 {
-			linux,reserve-contiguous-region;
-			linux,reserve-region;
-			linux,remove-completely;
-			reg = <0xfa00000 0x500000>;
-		};
+		// external_image_mem: external_image_region@fa00000 {
+		// 	linux,reserve-contiguous-region;
+		// 	linux,reserve-region;
+		// 	linux,remove-completely;
+		// 	reg = <0xfa00000 0x500000>;
+		// };
 	};
 
 	soc: soc { };
@@ -1918,14 +1925,23 @@
 		qcom,firmware-name = "adsp";
 
 		/* GPIO inputs from lpass */
-		qcom,gpio-err-fatal = <&smp2pgpio_ssr_smp2p_2_in 0 0>;
-		qcom,gpio-proxy-unvote = <&smp2pgpio_ssr_smp2p_2_in 2 0>;
-		qcom,gpio-err-ready = <&smp2pgpio_ssr_smp2p_2_in 1 0>;
-		qcom,gpio-stop-ack = <&smp2pgpio_ssr_smp2p_2_in 3 0>;
+		interrupts-extended = <&wakegic 0 293 1>,
+						<&adsp_smp2p_in 0 0>,
+						<&adsp_smp2p_in 2 0>,
+						<&adsp_smp2p_in 1 0>,
+						<&adsp_smp2p_in 3 0>;
+
+		interrupt-names = "qcom,wdog",
+		"qcom,err-fatal",
+		"qcom,proxy-unvote",
+		"qcom,err-ready",
+		"qcom,stop-ack";
 
 		/* GPIO output to lpass */
-		qcom,gpio-force-stop = <&smp2pgpio_ssr_smp2p_2_out 0 0>;
-		linux,contiguous-region = <&peripheral_mem>;
+		qcom,smem-states = <&adsp_smp2p_out 0>;
+		qcom,smem-state-names = "qcom,force-stop";
+
+		memory-region = <&peripheral_mem>;
 	};
 
 	qcom,msm-adsp-loader {
@@ -2216,13 +2232,20 @@
 		qcom,mba-image-is-not-elf;
 
 		/* GPIO inputs from mss */
-		qcom,gpio-err-fatal = <&smp2pgpio_ssr_smp2p_1_in 0 0>;
-		qcom,gpio-err-ready = <&smp2pgpio_ssr_smp2p_1_in 1 0>;
-		qcom,gpio-proxy-unvote = <&smp2pgpio_ssr_smp2p_1_in 2 0>;
-		qcom,gpio-stop-ack = <&smp2pgpio_ssr_smp2p_1_in 3 0>;
+		interrupts-extended = <&wakegic 0 24 1>,
+						<&modem_smp2p_in 0 0>,
+						<&modem_smp2p_in 2 0>,
+						<&modem_smp2p_in 1 0>,
+						<&modem_smp2p_in 3 0>;
+		interrupt-names = "qcom,wdog",
+				"qcom,err-fatal",
+				"qcom,proxy-unvote",
+				"qcom,err-ready",
+				"qcom,stop-ack";
 
 		/* GPIO output to mss */
-		qcom,gpio-force-stop = <&smp2pgpio_ssr_smp2p_1_out 0 0>;
+		qcom,smem-states = <&modem_smp2p_out 0>;
+		qcom,smem-state-names = "qcom,force-stop";
 		linux,contiguous-region = <&peripheral_mem>;
 	};
 
@@ -2254,14 +2277,22 @@
 		qcom,firmware-name = "wcnss";
 
 		/* GPIO inputs from wcnss */
-		qcom,gpio-err-fatal = <&smp2pgpio_ssr_smp2p_4_in 0 0>;
-		qcom,gpio-err-ready = <&smp2pgpio_ssr_smp2p_4_in 1 0>;
-		qcom,gpio-proxy-unvote = <&smp2pgpio_ssr_smp2p_4_in 2 0>;
-		qcom,gpio-stop-ack = <&smp2pgpio_ssr_smp2p_4_in 3 0>;
+		interrupts-extended = <&wakegic 0 153 1>,
+						<&wcnss_smp2p_in 0 0>,
+						<&wcnss_smp2p_in 2 0>,
+						<&wcnss_smp2p_in 1 0>,
+						<&wcnss_smp2p_in 3 0>;
 
+		interrupt-names = "qcom,wdog",
+				"qcom,err-fatal",
+				"qcom,proxy-unvote",
+				"qcom,err-ready",
+				"qcom,stop-ack";
+		
 		/* GPIO output to wcnss */
-		qcom,gpio-force-stop = <&smp2pgpio_ssr_smp2p_4_out 0 0>;
-		linux,contiguous-region = <&peripheral_mem>;
+		qcom,smem-states = <&wcnss_smp2p_out 0>;
+		qcom,smem-state-names = "qcom,force-stop";
+		memory-region = <&peripheral_mem>;
 	};
 
 	qcom,iris-fm {
@@ -2373,12 +2404,6 @@
 			qcom,ocmem-part-min = <0x55000>;
 		};
 
-	};
-
-	rpm_bus: qcom,rpm-smd {
-		compatible = "qcom,rpm-smd";
-		rpm-channel-name = "rpm_requests";
-		rpm-channel-type = <15>; /* SMD_APPS_RPM */
 	};
 
         qcom,msm-rng@f9bff000 {
@@ -2728,75 +2753,102 @@
 				<84 512 500 800>;
 	};
 
+	tcsr_mutex_block: syscon@1905000 {
+		compatible = "syscon";
+		reg = <0x1905000 0x20000>;
+	};
+
+	tcsr_mutex: hwlock {
+		compatible = "qcom,tcsr-mutex";
+		syscon = <&tcsr_mutex_block 0 0x1000>;
+		#hwlock-cells = <1>;
+	};
+	
+	rpm_msg_ram: memory@60000 {
+		compatible = "qcom,rpm-msg-ram";
+		reg = <0xfc428000 0x4000>;
+	};
+
 	qcom,smem@fa00000 {
 		compatible = "qcom,smem";
-		reg = <0xfa00000 0x200000>,
-			<0xf9011000 0x1000>,
-			<0xfc428000 0x4000>;
-		reg-names = "smem", "irq-reg-base", "aux-mem1";
+		memory-region = <&smem_region>;
+		qcom,rpm-msg-ram = <&rpm_msg_ram>;
+		hwlocks = <&tcsr_mutex 3>;
 		qcom,mpu-enabled;
+	};
+	qcom,smd {
+		compatible = "qcom,smd";
 
-		qcom,smd-modem {
-			compatible = "qcom,smd";
+		modem {
 			qcom,smd-edge = <0>;
-			qcom,smd-irq-offset = <0x8>;
-			qcom,smd-irq-bitmask = <0x1000>;
-			interrupts = <0 25 1>;
+			qcom,ipc = <&apcs 0 12>;
+			interrupts = <GIC_SPI 25 1>;
 			label = "modem";
 		};
 
-		qcom,smsm-modem {
-			compatible = "qcom,smsm";
-			qcom,smsm-edge = <0>;
-			qcom,smsm-irq-offset = <0x8>;
-			qcom,smsm-irq-bitmask = <0x2000>;
-			interrupts = <0 26 1>;
-		};
-
-		qcom,smd-adsp {
-			compatible = "qcom,smd";
+		adsp {
 			qcom,smd-edge = <1>;
-			qcom,smd-irq-offset = <0x8>;
-			qcom,smd-irq-bitmask = <0x100>;
-			interrupts = <0 156 1>;
+			qcom,ipc = <&apcs 0 8>;
+			interrupts = <GIC_SPI 156 1>;
 			label = "adsp";
 		};
 
-		qcom,smsm-adsp {
-			compatible = "qcom,smsm";
-			qcom,smsm-edge = <1>;
-			qcom,smsm-irq-offset = <0x8>;
-			qcom,smsm-irq-bitmask = <0x200>;
-			interrupts = <0 157 1>;
-		};
-
-		qcom,smd-wcnss {
-			compatible = "qcom,smd";
+		wcnss {
 			qcom,smd-edge = <6>;
-			qcom,smd-irq-offset = <0x8>;
-			qcom,smd-irq-bitmask = <0x20000>;
-			interrupts = <0 142 1>;
+			qcom,ipc = <&apcs 0 16>;
+			interrupts = <GIC_SPI 142 1>;
 			label = "wcnss";
 		};
 
-		qcom,smsm-wcnss {
-			compatible = "qcom,smsm";
-			qcom,smsm-edge = <6>;
-			qcom,smsm-irq-offset = <0x8>;
-			qcom,smsm-irq-bitmask = <0x80000>;
-			interrupts = <0 144 1>;
+		rpm {
+			qcom,smd-edge = <15>;
+			qcom,ipc = <&apcs 0 0>;
+			interrupts = <GIC_SPI 168 1>;
+			label = "rpm";
+
+				rpm_bus: qcom,rpm-smd {
+					compatible = "qcom,rpm-smd";
+					rpm-channel-name = "rpm_requests";
+					rpm-channel-type = <15>; /* SMD_APPS_RPM */
+				};
+		};
+	};
+		qcom,smsm {
+		compatible = "qcom,smsm";
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		qcom,ipc-1 = <&apcs 0 12>;
+		qcom,ipc-2 = <&apcs 0 9>;
+		qcom,ipc-3 = <&apcs 0 18>;
+
+		apps_smsm: apps@0 {
+			reg = <0>;
+			#qcom,smem-state-cells = <1>;
 		};
 
-		qcom,smd-rpm {
-			compatible = "qcom,smd";
-			qcom,smd-edge = <15>;
-			qcom,smd-irq-offset = <0x8>;
-			qcom,smd-irq-bitmask = <0x1>;
-			interrupts = <0 168 1>;
-			label = "rpm";
-			qcom,irq-no-suspend;
-			qcom,not-loadable;
+		modem_smsm: modem@1 {
+			reg = <1>;
+			interrupts = <GIC_SPI 26 IRQ_TYPE_EDGE_RISING>; 
+			interrupt-controller;
+			#interrupt-cells = <2>;
 		};
+
+		wcnss_smsm: wcnss@6 {
+			reg = <6>;
+			interrupts = <GIC_SPI 144 IRQ_TYPE_EDGE_RISING>;
+
+			interrupt-controller;
+			#interrupt-cells = <2>;
+		};
+
+		adsp_smsm: adsp@1 {
+			interrupts = <GIC_SPI 157 IRQ_TYPE_EDGE_RISING>;
+
+			interrupt-controller;
+			#interrupt-cells = <2>;
+	};
 	};
 
 	qcom,bcl {
@@ -2838,6 +2890,11 @@
 		compatible = "qcom,ipc-spinlock-ldrex";
 		reg = <0xfa00000 0x200000>;
 		status = "disable";
+	};
+
+	apcs: syscon@0b011008 {
+		compatible = "syscon";
+		reg = <0x0b011008 0x04>;
 	};
 
 	cpu-pmu {
