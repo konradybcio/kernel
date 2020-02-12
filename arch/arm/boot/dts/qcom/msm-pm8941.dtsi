@@ -9,6 +9,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+#include <dt-bindings/pinctrl/qcom,pmic-mpp.h>
+#include <dt-bindings/pinctrl/qcom,pmic-gpio.h>
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/input/qcom,qpnp-power-on.h>
 #include <dt-bindings/spmi/spmi.h>
@@ -554,6 +556,7 @@
 		};
 
 		qcom,pm8941_rtc {
+			spmi-dev-container;
 			compatible = "qcom,qpnp-rtc";
 			#address-cells = <1>;
 			#size-cells = <1>;
@@ -968,6 +971,7 @@ qcom,pm8941@1 {
 
 		regulator@1400 {
 			regulator-name = "8941_s1";
+			spmi-dev-container;
 			#address-cells = <1>;
 			#size-cells = <1>;
 			compatible = "qcom,qpnp-regulator";

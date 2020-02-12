@@ -12,6 +12,8 @@
 
 
 /* QPNP controlled regulators: */
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
 &spmi_bus {
 	qcom,pm8941@1 {
 		pm8941_boost: regulator@a000 {
@@ -74,7 +76,8 @@
 			regulator-name = "8841_s1_ao";
 			qcom,set = <1>;
 			regulator-min-microvolt = <675000>;
-			qcom,init-voltage-level = <675000>;
+			//apparently 4.14 driver only allows 65535
+			//qcom,init-voltage-level = <675000>;
 			regulator-max-microvolt = <1050000>;
 			status = "okay";
 			compatible = "qcom,rpm-smd-regulator";
