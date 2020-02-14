@@ -157,45 +157,36 @@
 			label = "smem_region";
 		};
 
-		secure_mem: secure_region {
-			compatible = "shared-dma-pool";
-			reusable;
-			//reg = <0 0xFC00000>;
-			alignment = <0xFC00000>;
-			size = <0x200000>;
+		secure_mem: secure_region@0 {
+			linux,reserve-contiguous-region;
+			reg = <0 0xFC00000>;
 			label = "secure_mem";
 		};
 
-		adsp_mem: adsp_region {
-			compatible = "shared-dma-pool";
-			reusable;
-			//reg = <0 0x4100000>;
-			alignment = <0x0dc00000>;
-			size = <0x4100000>;
+		adsp_mem: adsp_region@0 {
+			linux,reserve-contiguous-region;
+			reg = <0 0x4100000>;
 			label = "adsp_mem";
 		};
 
-		qsecom_mem: qsecom_region {
-			compatible = "shared-dma-pool";
-			reusable;
+		qsecom_mem: qsecom_region@0 {
+			linux,reserve-contiguous-region;
+			reg = <0 0x1100000>;
 			label = "qseecom_mem";
-			size = <0x1100000>;
 		};
 
-		audio_mem: audio_region {
-			compatible = "shared-dma-pool";
-			reusable;
+		audio_mem: audio_region@0 {
+			linux,reserve-contiguous-region;
+			linux,reserve-region;
 			reg = <0 0x614000>;
 			label = "audio_mem";
 		};
 
-		//also move it here lol
-		peripheral_mem: peripheral_region@0xfd00000 {
-			compatible = "removed-dma-pool";
-			no-map;
-			//reg = <0x5d00000 0x7d00000>;
-			//move it temporarily
-			reg = <0xfd00000 0x7d00000>;
+		peripheral_mem: peripheral_region@5d00000 {
+			linux,reserve-contiguous-region;
+			linux,reserve-region;
+			linux,remove-completely;
+			reg = <0x5d00000 0x7d00000>;
 			label = "peripheral_mem";
 		};
 
@@ -206,15 +197,15 @@
 		// 	reg = <0xfa00000 0x500000>;
 		// };
 		
-		// /* global autoconfigured region for contiguous allocations */
-		// linux,cma {
-		// 	compatible = "shared-dma-pool";
-		// 	alloc-ranges = <0x00000000 0xffffffff>;
-		// 	reusable;
-		// 	alignment = <0x400000>;
-		// 	size = <0x4000000>; /* 64MB */
-		// 	linux,cma-default;
-		// };
+		/* global autoconfigured region for contiguous allocations */
+		linux,cma {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0 0x00000000 0 0xffffffff>;
+			reusable;
+			alignment = <0 0x400000>;
+			size = <0 0x4000000>; /* 64MB */
+			linux,cma-default;
+		};
 	};
 
 	  clocks {
@@ -2815,7 +2806,7 @@
 	
 	rpm_msg_ram: memory@0xfc428000 {
 		compatible = "qcom,rpm-msg-ram";
-		reg = <0xfc428000 0x8000>; //0x4000?
+		reg = <0xfc428000 0x4000>;
 	};
 
 	qcom,smem@fa00000 {
