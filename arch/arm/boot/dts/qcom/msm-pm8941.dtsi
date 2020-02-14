@@ -21,6 +21,7 @@
 		reg = <0x0 SPMI_USID>;
 		#address-cells = <2>;
 		#size-cells = <0>;
+		spmi-slave-container;
 
 		pm8941_misc: qcom,misc@900 {
 			compatible = "qcom,qpnp-misc";

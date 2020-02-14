@@ -18,7 +18,7 @@
 / {
 	model = "Qualcomm Technologies, Inc. MSM 8974";
 	compatible = "qcom,msm8974";
-	interrupt-parent = <&intc>;
+	interrupt-parent = <&wakegic>;
 
 	aliases {
 		spi0 = &spi_0;
@@ -273,10 +273,10 @@
 		interrupt-parent = <&intc>;
 	};
 
-	wakegic: qcom,mpm@fc4281d0 {
+	wakegic: qcom,mpm {
 			compatible = "qcom,mpm-gic-msm8974", "qcom,mpm-gic";
 			reg = <0xfc4281d0 0x1000>, /* MSM_RPM_MPM_BASE 4K */
-					<0xfa006000 0x1000>;   /* MSM_APCS_GCC_BASE 4K */
+					<0xfa006000 0x4>;   /* MSM_APCS_GCC_BASE 4K */ //0x1000
 			reg-names = "vmpm", "ipc";
 			interrupts = <GIC_SPI 171 IRQ_TYPE_EDGE_RISING>;
 			qcom,num-mpm-irqs = <64>;
@@ -527,16 +527,38 @@
 
 	usb_otg: usb@f9a55000 {
 		compatible = "qcom,hsusb-otg";
-		status = "disabled";
-
 		reg = <0xf9a55000 0x400>;
 		reg-names = "core";
-		interrupts = <0 134 0 0 140 0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		interrupts = <0 134 0>, <0 140 0>;
 		interrupt-names = "core_irq", "async_irq";
-		HSUSB_VDDCX-supply = <&pm8841_s2_corner>;
+
+		hsusb_vdd_dig-supply = <&pm8841_s2_corner>;
 		HSUSB_1p8-supply = <&pm8941_l6>;
 		HSUSB_3p3-supply = <&pm8941_l24>;
+		vbus_otg-supply = <&pm8941_chg_otg>;
 		qcom,vdd-voltage-level = <1 5 7>;
+		qcom,hsusb-otg-mode = <1>;
+		qcom,hsusb-otg-otg-control = <1>;
+		qcom,hsusb-otg-mpm-dpsehv-int = <49>;
+		qcom,hsusb-otg-mpm-dmsehv-int = <58>;
+		qcom,hsusb-otg-disable-reset;
+		
+		resets = <&clock_gcc GCC_USB_30_BCR>;
+		reset-names = "core_reset";
+
+		qcom,hsusb-otg-phy-init-seq = <0x63 0x81 0xffffffff>;
+		qcom,hsusb-otg-phy-type = <2>; /* CHIPIDEA PHY*/
+		
+		qcom,msm-bus,name = "usb2";
+		qcom,msm-bus,num-cases = <2>;
+		qcom,msm-bus,num-paths = <1>;
+		qcom,msm-bus,vectors-KBps =
+				<87 512 0 0>,
+				<87 512 60000 960000>;
 
 		clocks = <&clock_gcc clk_gcc_usb_hs_system_clk>,
 			<&clock_gcc  clk_gcc_usb_hs_ahb_clk>,
@@ -544,20 +566,66 @@
 			<&clock_rpm  clk_cxo_otg_clk>;
 		clock-names = "core_clk", "iface_clk", "sleep_clk", "xo";
 
-		qcom,hsusb-otg-phy-type = <2>;
-		qcom,hsusb-otg-phy-init-seq = <0x63 0x81 0xffffffff>;
-		qcom,hsusb-otg-mode = <1>;
-		qcom,hsusb-otg-otg-control = <1>;
-		qcom,hsusb-otg-disable-reset;
-		qcom,hsusb-otg-mpm-dpsehv-int = <49>;
-		qcom,hsusb-otg-mpm-dmsehv-int = <58>;
+		
+		qcom,usbbam@f9304000 {
+			compatible = "qcom,usb-bam-msm";
+			//are multiple regs allowed on 4.14?
+			reg = <0xf9304000 0x5000>,
+				<0xf9a44000 0x11000>,
+				<0xf92f880c 0x4>;
+			reg-names = "ssusb", "hsusb", "qscratch_ram1_reg";
+			interrupts = <0 132 0>, <0 135 0>;
+			interrupt-names = "ssusb", "hsusb";
+			qcom,usb-bam-num-pipes = <16>;
+			qcom,usb-bam-fifo-baseaddr = <0xf9200000>;
+			qcom,ignore-core-reset-ack;
+			qcom,disable-clk-gating;
+			//I don't think 4.14 driver even wants clocks here
+			clocks = <&clock_gcc clk_gcc_usb30_master_clk>,
+				<&clock_gcc clk_gcc_sys_noc_usb3_axi_clk>;
+			clock-names = "mem_clk", "mem_iface_clk";
 
-		qcom,msm-bus,name = "usb2";
-		qcom,msm-bus,num-cases = <2>;
-		qcom,msm-bus,num-paths = <1>;
-		qcom,msm-bus,vectors-KBps =
-				<87 512 0 0>,
-				<87 512 60000 960000>;
+			qcom,pipe0 {
+				label = "ssusb-qdss-in-0";
+				qcom,usb-bam-mem-type = <1>;
+				qcom,bam-type = <0>;
+				qcom,dir = <1>;
+				qcom,pipe-num = <0>;
+				qcom,peer-bam = <1>;
+				qcom,src-bam-physical-address = <0xfc37C000>;
+				qcom,src-bam-pipe-index = <0>;
+				qcom,dst-bam-physical-address = <0xf9304000>;
+				qcom,dst-bam-pipe-index = <2>;
+				qcom,data-fifo-offset = <0xf0000>;
+				qcom,data-fifo-size = <0x1800>;
+				qcom,descriptor-fifo-offset = <0xf4000>;
+				qcom,descriptor-fifo-size = <0x1400>;
+				qcom,reset-bam-on-connect;
+		};
+
+		qcom,pipe1 {
+			label = "hsusb-qdss-in-0";
+			qcom,usb-bam-mem-type = <1>;
+			qcom,bam-type = <1>;
+			qcom,dir = <1>;
+			qcom,pipe-num = <0>;
+			qcom,peer-bam = <1>;
+			qcom,src-bam-physical-address = <0xfc37c000>;
+			qcom,src-bam-pipe-index = <0>;
+			qcom,dst-bam-physical-address = <0xf9a44000>;
+			qcom,dst-bam-pipe-index = <2>;
+			qcom,data-fifo-offset = <0xf4000>;
+			qcom,data-fifo-size = <0x1000>;
+			qcom,descriptor-fifo-offset = <0xf5000>;
+			qcom,descriptor-fifo-size = <0x400>;
+		};
+	};
+		
+		
+		
+		
+
+		
 	};
 
 	qcom,rmtfs_sharedmem@0fd80000 {
@@ -994,7 +1062,7 @@
 
 	i2c_0: i2c@f9967000 { /* BLSP#11 */
 		cell-index = <0>;
-		compatible = "qcom,i2c-msm-v2";
+		compatible = "qcom,i2c-qup-v2.1.1";
 		reg = <0Xf9967000 0x1000>;
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -1003,7 +1071,7 @@
 		interrupt-names = "qup_err_intr";
 		qcom,clk-freq-out = <100000>;
         qcom,clk-freq-in  = <19200000>;
-		clock-names = "iface_clk", "core_clk";
+		clock-names = "iface", "core";
 		clocks = <&clock_gcc clk_gcc_blsp2_ahb_clk>,
 			 <&clock_gcc clk_gcc_blsp2_qup5_i2c_apps_clk>;
 
@@ -1016,14 +1084,14 @@
 
 	i2c_1: i2c@f9923000 {
 		cell-index = <1>;
-		compatible = "qcom,i2c-msm-v2";
+		compatible = "qcom,i2c-qup-v2.1.1";
 		reg = <0xf9923000 0x1000>;
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg-names = "qup_phys_addr";
 		interrupts = <0 95 0>;
 		interrupt-names = "qup_err_intr";
-		clock-names = "iface_clk", "core_clk";
+		clock-names = "iface", "core";
 		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
 			 <&clock_gcc clk_gcc_blsp1_qup1_i2c_apps_clk>;
 
@@ -1040,7 +1108,7 @@
 
 	i2c_2: i2c@f9924000 {
 		cell-index = <2>;
-		compatible = "qcom,i2c-msm-v2";
+		compatible = "qcom,i2c-qup-v2.1.1";
 		reg = <0xf9924000 0x1000>;
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -1051,7 +1119,7 @@
 		// qcom,i2c-src-freq = <19200000>;
 		qcom,clk-freq-out = <384000>;
         qcom,clk-freq-in  = <19200000>;
-		clock-names = "iface_clk", "core_clk";
+		clock-names = "iface", "core";
 		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
 			 <&clock_gcc clk_gcc_blsp1_qup2_i2c_apps_clk>;
 
@@ -1838,7 +1906,7 @@
 		ranges;
 
 		interrupt-parent = <&usb3>;
-		interrupts = <0 1>;
+		interrupts = <0 1 0>;
 		#interrupt-cells = <1>;
 		interrupt-map-mask = <0x0 0xffffffff>;
 		interrupt-map = <0x0 0 &intc 0 133 0
@@ -1850,15 +1918,21 @@
 			 <&clock_gcc clk_gcc_usb30_mock_utmi_clk>,
 			 <&clock_gcc clk_usb30_mock_utmi_clk_src>,
 			 <&clock_gcc clk_gcc_usb30_sleep_clk>,
-			 <&clock_rpm clk_diff_clk>,
 			 <&clock_rpm clk_cxo_dwc3_clk>;
 		clock-names = "core_clk", "iface_clk", "utmi_clk",
 				"utmi_clk_src", "sleep_clk",
-				"ref_clk", "xo";
+				"xo";
 
 		vbus_dwc3-supply = <&pm8941_mvs1>;
+		USB3_GDSC-supply = <&gdsc_usb30>;
+
+		//are these used on 4.14?
 		vdda33-supply = <&pm8941_l24>;
 		vdda18-supply = <&pm8941_l6>;
+
+		resets = <&clock_gcc GCC_USB_30_BCR>;
+		reset-names = "core_reset";
+
 		qcom,misc-ref = <&pm8941_misc>;
 		dwc_usb3-adc_tm = <&pm8941_adc_tm>;
 		qcom,dwc-usb3-msm-tx-fifo-size = <29696>;
@@ -1872,11 +1946,16 @@
 				<61 512 0 0>,
 				<61 512 240000 960000>;
 		dwc3@f9200000 {
-			compatible = "synopsys,dwc3";
+			compatible = "snps,dwc3";
 			reg = <0xf9200000 0xfc000>;
 			interrupt-parent = <&intc>;
 			interrupts = <0 131 0>;
 			usb-phy = <&hsphy>, <&ssphy>;
+			linux,sysdev_is_parent;
+			snps,disable-clk-gating;
+			usb-core-id = <1>;
+			maximum-speed = "super-speed";
+			dr_mode = "peripheral";
 			tx-fifo-resize;
 		};
 	};
@@ -1902,6 +1981,8 @@
 		vdd-supply = <&pm8841_s2_corner>;
 		vdda18-supply = <&pm8941_l6>;
 		qcom,vdd-voltage-level = <1 5 7>;
+
+		//need ref_clk
 		clocks = <&clock_gcc clk_gcc_usb30_master_clk>;
 		clock-names = "core_clk";
 	};
@@ -2662,58 +2743,6 @@
 		qcom,ce-opp-freq = <100000000>;
 	};
 
-	qcom,usbbam@f9304000 {
-		compatible = "qcom,usb-bam-msm";
-		reg = <0xf9304000 0x5000>,
-		      <0xf9a44000 0x11000>,
-		      <0xf92f880c 0x4>;
-		reg-names = "ssusb", "hsusb", "qscratch_ram1_reg";
-		interrupts = <0 132 0 0 135 0>;
-		interrupt-names = "ssusb", "hsusb";
-		qcom,usb-bam-num-pipes = <16>;
-		qcom,usb-bam-fifo-baseaddr = <0xf9200000>;
-		qcom,ignore-core-reset-ack;
-		qcom,disable-clk-gating;
-		clocks = <&clock_gcc clk_gcc_usb30_master_clk>,
-			 <&clock_gcc clk_gcc_sys_noc_usb3_axi_clk>;
-		clock-names = "mem_clk", "mem_iface_clk";
-
-		qcom,pipe0 {
-			label = "ssusb-qdss-in-0";
-			qcom,usb-bam-mem-type = <1>;
-			qcom,bam-type = <0>;
-			qcom,dir = <1>;
-			qcom,pipe-num = <0>;
-			qcom,peer-bam = <1>;
-			qcom,src-bam-physical-address = <0xfc37C000>;
-			qcom,src-bam-pipe-index = <0>;
-			qcom,dst-bam-physical-address = <0xf9304000>;
-			qcom,dst-bam-pipe-index = <2>;
-			qcom,data-fifo-offset = <0xf0000>;
-			qcom,data-fifo-size = <0x1800>;
-			qcom,descriptor-fifo-offset = <0xf4000>;
-			qcom,descriptor-fifo-size = <0x1400>;
-			qcom,reset-bam-on-connect;
-		};
-
-		qcom,pipe1 {
-			label = "hsusb-qdss-in-0";
-			qcom,usb-bam-mem-type = <1>;
-			qcom,bam-type = <1>;
-			qcom,dir = <1>;
-			qcom,pipe-num = <0>;
-			qcom,peer-bam = <1>;
-			qcom,src-bam-physical-address = <0xfc37c000>;
-			qcom,src-bam-pipe-index = <0>;
-			qcom,dst-bam-physical-address = <0xf9a44000>;
-			qcom,dst-bam-pipe-index = <2>;
-			qcom,data-fifo-offset = <0xf4000>;
-			qcom,data-fifo-size = <0x1000>;
-			qcom,descriptor-fifo-offset = <0xf5000>;
-			qcom,descriptor-fifo-size = <0x400>;
-		};
-	};
-
 	qcom,msm-thermal {
 		compatible = "qcom,msm-thermal";
 		qcom,sensor-id = <5>;
@@ -2902,14 +2931,14 @@
 
 	i2c@f9928000 { /* BLSP-1 QUP-6 */
 		cell-index = <3>;
-		compatible = "qcom,i2c-msm-v2";
+		compatible = "qcom,i2c-qup-v2.1.1";
 		reg = <0xf9928000 0x1000>;
 		#address-cells = <1>;
 		#size-cells = <0>;
 		reg-names = "qup_phys_addr";
 		interrupts = <0 100 0>;
 		interrupt-names = "qup_err_intr";
-		clock-names = "iface_clk", "core_clk";
+		clock-names = "iface", "core";
 		clocks = <&clock_gcc clk_gcc_blsp1_ahb_clk>,
 			 <&clock_gcc clk_gcc_blsp1_qup6_i2c_apps_clk>;
 
@@ -3261,5 +3290,9 @@
 };
 
 &gdsc_usb_hsic {
+	status = "ok";
+};
+
+&gdsc_usb30 {
 	status = "ok";
 };
