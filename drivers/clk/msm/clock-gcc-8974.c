@@ -30,6 +30,7 @@
 #include <dt-bindings/clock/msm-clocks-8974.h>
 
 #include "clock.h"
+#include "reset.h"
 
 enum {
 	GCC_BASE,
@@ -338,6 +339,87 @@ static void __iomem *virt_bases[N_BASES];
 		[VDD_DIG_##l3] = (f3),		\
 	},					\
 	.num_fmax = VDD_DIG_NUM
+
+static const struct msm_reset_map gcc_msm8936_resets[] = {
+	[GCC_SYSTEM_NOC_BCR] = { 0x0100 },
+	[GCC_CONFIG_NOC_BCR] = { 0x0140 },
+	[GCC_PERIPH_NOC_BCR] = { 0x0180 },
+	[GCC_IMEM_BCR] = { 0x0200 },
+	[GCC_MMSS_BCR] = { 0x0240 },
+	[GCC_QDSS_BCR] = { 0x0300 },
+	[GCC_USB_30_BCR] = { 0x03c0 },
+	[GCC_USB3_PHY_BCR] = { 0x03fc },
+	[GCC_USB_HS_HSIC_BCR] = { 0x0400 },
+	[GCC_USB_HS_BCR] = { 0x0480 },
+	[GCC_USB2A_PHY_BCR] = { 0x04a8 },
+	[GCC_USB2B_PHY_BCR] = { 0x04b0 },
+	[GCC_SDCC1_BCR] = { 0x04c0 },
+	[GCC_SDCC2_BCR] = { 0x0500 },
+	[GCC_SDCC3_BCR] = { 0x0540 },
+	[GCC_SDCC4_BCR] = { 0x0580 },
+	[GCC_BLSP1_BCR] = { 0x05c0 },
+	[GCC_BLSP1_QUP1_BCR] = { 0x0640 },
+	[GCC_BLSP1_UART1_BCR] = { 0x0680 },
+	[GCC_BLSP1_QUP2_BCR] = { 0x06c0 },
+	[GCC_BLSP1_UART2_BCR] = { 0x0700 },
+	[GCC_BLSP1_QUP3_BCR] = { 0x0740 },
+	[GCC_BLSP1_UART3_BCR] = { 0x0780 },
+	[GCC_BLSP1_QUP4_BCR] = { 0x07c0 },
+	[GCC_BLSP1_UART4_BCR] = { 0x0800 },
+	[GCC_BLSP1_QUP5_BCR] = { 0x0840 },
+	[GCC_BLSP1_UART5_BCR] = { 0x0880 },
+	[GCC_BLSP1_QUP6_BCR] = { 0x08c0 },
+	[GCC_BLSP1_UART6_BCR] = { 0x0900 },
+	[GCC_BLSP2_BCR] = { 0x0940 },
+	[GCC_BLSP2_QUP1_BCR] = { 0x0980 },
+	[GCC_BLSP2_UART1_BCR] = { 0x09c0 },
+	[GCC_BLSP2_QUP2_BCR] = { 0x0a00 },
+	[GCC_BLSP2_UART2_BCR] = { 0x0a40 },
+	[GCC_BLSP2_QUP3_BCR] = { 0x0a80 },
+	[GCC_BLSP2_UART3_BCR] = { 0x0ac0 },
+	[GCC_BLSP2_QUP4_BCR] = { 0x0b00 },
+	[GCC_BLSP2_UART4_BCR] = { 0x0b40 },
+	[GCC_BLSP2_QUP5_BCR] = { 0x0b80 },
+	[GCC_BLSP2_UART5_BCR] = { 0x0bc0 },
+	[GCC_BLSP2_QUP6_BCR] = { 0x0c00 },
+	[GCC_BLSP2_UART6_BCR] = { 0x0c40 },
+	[GCC_PDM_BCR] = { 0x0cc0 },
+	[GCC_BAM_DMA_BCR] = { 0x0d40 },
+	[GCC_TSIF_BCR] = { 0x0d80 },
+	[GCC_TCSR_BCR] = { 0x0dc0 },
+	[GCC_BOOT_ROM_BCR] = { 0x0e00 },
+	[GCC_MSG_RAM_BCR] = { 0x0e40 },
+	[GCC_TLMM_BCR] = { 0x0e80 },
+	[GCC_MPM_BCR] = { 0x0ec0 },
+	[GCC_SEC_CTRL_BCR] = { 0x0f40 },
+	[GCC_SPMI_BCR] = { 0x0fc0 },
+	[GCC_SPDM_BCR] = { 0x1000 },
+	[GCC_CE1_BCR] = { 0x1040 },
+	[GCC_CE2_BCR] = { 0x1080 },
+	[GCC_BIMC_BCR] = { 0x1100 },
+	[GCC_MPM_NON_AHB_RESET] = { 0x0ec4, 2 },
+	[GCC_MPM_AHB_RESET] = {	0x0ec4, 1 },
+	[GCC_SNOC_BUS_TIMEOUT0_BCR] = { 0x1240 },
+	[GCC_SNOC_BUS_TIMEOUT2_BCR] = { 0x1248 },
+	[GCC_PNOC_BUS_TIMEOUT0_BCR] = { 0x1280 },
+	[GCC_PNOC_BUS_TIMEOUT1_BCR] = { 0x1288 },
+	[GCC_PNOC_BUS_TIMEOUT2_BCR] = { 0x1290 },
+	[GCC_PNOC_BUS_TIMEOUT3_BCR] = { 0x1298 },
+	[GCC_PNOC_BUS_TIMEOUT4_BCR] = { 0x12a0 },
+	[GCC_CNOC_BUS_TIMEOUT0_BCR] = { 0x12c0 },
+	[GCC_CNOC_BUS_TIMEOUT1_BCR] = { 0x12c8 },
+	[GCC_CNOC_BUS_TIMEOUT2_BCR] = { 0x12d0 },
+	[GCC_CNOC_BUS_TIMEOUT3_BCR] = { 0x12d8 },
+	[GCC_CNOC_BUS_TIMEOUT4_BCR] = { 0x12e0 },
+	[GCC_CNOC_BUS_TIMEOUT5_BCR] = { 0x12e8 },
+	[GCC_CNOC_BUS_TIMEOUT6_BCR] = { 0x12f0 },
+	[GCC_DEHR_BCR] = { 0x1300 },
+	[GCC_RBCPR_BCR] = { 0x1380 },
+	[GCC_MSS_RESTART] = { 0x1680 },
+	[GCC_LPASS_RESTART] = { 0x16c0 },
+	[GCC_WCSS_RESTART] = { 0x1700 },
+	[GCC_VENUS_RESTART] = { 0x1740 },
+};
 
 enum vdd_dig_levels {
 	VDD_DIG_NONE,
@@ -2701,6 +2783,9 @@ static int msm_gcc_8974_probe(struct platform_device *pdev)
 	clk_set_rate(&usb30_mock_utmi_clk_src.c,
 			usb30_mock_utmi_clk_src.freq_tbl[0].freq_hz);
 	clk_set_rate(&pdm2_clk_src.c, pdm2_clk_src.freq_tbl[0].freq_hz);
+
+	msm_reset_controller_register(pdev, gcc_msm8936_resets,
+			ARRAY_SIZE(gcc_msm8936_resets), virt_bases[GCC_BASE]);
 
 	dev_info(&pdev->dev, "Registered GCC clocks.\n");
 
