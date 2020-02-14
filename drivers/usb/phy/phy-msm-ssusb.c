@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014,2017-2019 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -17,92 +17,54 @@
 #include <linux/err.h>
 #include <linux/slab.h>
 #include <linux/clk.h>
+#include <linux/clk/msm-clk.h>
 #include <linux/delay.h>
 #include <linux/io.h>
 #include <linux/of.h>
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 #include <linux/usb/phy.h>
-#include <linux/reset.h>
-#include <linux/iopoll.h>
+#include <linux/usb/msm_hsusb.h>
 
-/* SSPHY control registers */
-#define SS_PHY_CTRL0			0x6C
-#define SS_PHY_CTRL1			0x70
-#define SS_PHY_CTRL2			0x74
-#define SS_PHY_CTRL4			0x7C
-#define PHY_CR_REG_CTRL1		0x60
-#define PHY_CR_REG_CTRL2		0x64
-#define PHY_CR_REG_CTRL3		0x68
-#define PHY_CR_DATA_STATUS0		0x30
-#define PHY_CR_DATA_STATUS1		0x34
-#define PHY_CR_DATA_STATUS2		0x38
+static int ss_phy_override_deemphasis;
+module_param(ss_phy_override_deemphasis, int, S_IRUGO|S_IWUSR);
+MODULE_PARM_DESC(ss_phy_override_deemphasis, "Override SSPHY demphasis value");
 
-#define PHY_HOST_MODE			BIT(2)
-#define PHY_VBUS_VALID_OVERRIDE		BIT(4)
+/* QSCRATCH SSPHY control registers */
+#define SS_PHY_CTRL_REG			0x30
+#define SS_PHY_PARAM_CTRL_1		0x34
+#define SS_PHY_PARAM_CTRL_2		0x38
+#define SS_CR_PROTOCOL_DATA_IN_REG	0x3C
+#define SS_CR_PROTOCOL_DATA_OUT_REG	0x40
+#define SS_CR_PROTOCOL_CAP_ADDR_REG	0x44
+#define SS_CR_PROTOCOL_CAP_DATA_REG	0x48
+#define SS_CR_PROTOCOL_READ_REG		0x4C
+#define SS_CR_PROTOCOL_WRITE_REG	0x50
 
 /* SS_PHY_CTRL_REG bits */
-#define REF_SS_PHY_EN			BIT(0)
-#define LANE0_PWR_PRESENT		BIT(2)
-#define SWI_PCS_CLK_SEL			BIT(4)
-#define TEST_POWERDOWN			BIT(4)
-#define REF_USE_PAD			BIT(6)
 #define SS_PHY_RESET			BIT(7)
+#define REF_SS_PHY_EN			BIT(8)
+#define LANE0_PWR_PRESENT		BIT(24)
+#define TEST_POWERDOWN			BIT(26)
+#define REF_USE_PAD			BIT(28)
 
 #define USB_SSPHY_1P8_VOL_MIN		1800000 /* uV */
 #define USB_SSPHY_1P8_VOL_MAX		1800000 /* uV */
 #define USB_SSPHY_1P8_HPM_LOAD		23000	/* uA */
 
-#define SS_OVRD_EN			0x0013
-#define SS_OVRD_VAL			0x0C00
 struct msm_ssphy {
 	struct usb_phy		phy;
 	void __iomem		*base;
-
-	struct clk		*ref_clk;
-	struct clk		*cfg_ahb_clk;
-	struct clk		*pipe_clk;
-	bool			clocks_enabled;
-
-	struct reset_control	*phy_com_reset;
-	struct reset_control	*phy_reset;
+	struct clk		*core_clk;	/* USB3 master clock */
+	struct clk		*com_reset_clk;	/* PHY common block reset */
+	struct clk		*reset_clk;	/* SS PHY reset */
 	struct regulator	*vdd;
 	struct regulator	*vdda18;
+	atomic_t		active_count;	/* num of active instances */
 	bool			suspended;
 	int			vdd_levels[3]; /* none, low, high */
-
-	int			power_enabled;
+	int			deemphasis_val;
 };
-
-static void msm_ssusb_enable_clocks(struct msm_ssphy *phy)
-{
-	dev_dbg(phy->phy.dev, "%s: clocks_enabled:%d\n",
-			__func__, phy->clocks_enabled);
-
-	if (phy->clocks_enabled)
-		return;
-
-	clk_prepare_enable(phy->cfg_ahb_clk);
-	clk_prepare_enable(phy->ref_clk);
-	clk_prepare_enable(phy->pipe_clk);
-
-	phy->clocks_enabled = true;
-}
-
-static void msm_ssusb_disable_clocks(struct msm_ssphy *phy)
-{
-	dev_dbg(phy->phy.dev, "%s: clocks_enabled:%d\n",
-			__func__, phy->clocks_enabled);
-
-	if (!phy->clocks_enabled)
-		return;
-
-	clk_disable_unprepare(phy->pipe_clk);
-	clk_disable_unprepare(phy->ref_clk);
-	clk_disable_unprepare(phy->cfg_ahb_clk);
-
-	phy->clocks_enabled = false;
-}
 
 static int msm_ssusb_config_vdd(struct msm_ssphy *phy, int high)
 {
@@ -127,59 +89,47 @@ static int msm_ssusb_ldo_enable(struct msm_ssphy *phy, int on)
 
 	dev_dbg(phy->phy.dev, "reg (%s)\n", on ? "HPM" : "LPM");
 
-	if (phy->power_enabled == on) {
-		dev_dbg(phy->phy.dev, "LDOs are already %s\n",
-							on ? "ON" : "OFF");
-		return 0;
-	}
-
 	if (!on)
 		goto disable_regulators;
 
+
 	rc = regulator_set_load(phy->vdda18, USB_SSPHY_1P8_HPM_LOAD);
 	if (rc < 0) {
-		dev_err(phy->phy.dev, "Unable to set HPM of vdda18: %d\n", rc);
+		dev_err(phy->phy.dev, "Unable to set HPM of vdda18\n");
 		return rc;
 	}
 
 	rc = regulator_set_voltage(phy->vdda18, USB_SSPHY_1P8_VOL_MIN,
 						USB_SSPHY_1P8_VOL_MAX);
 	if (rc) {
-		dev_err(phy->phy.dev, "unable to set voltage for vdda18: %d\n",
-									rc);
+		dev_err(phy->phy.dev, "unable to set voltage for vdda18\n");
 		goto put_vdda18_lpm;
 	}
 
 	rc = regulator_enable(phy->vdda18);
 	if (rc) {
-		dev_err(phy->phy.dev, "Unable to enable vdda18: %d\n", rc);
+		dev_err(phy->phy.dev, "Unable to enable vdda18\n");
 		goto unset_vdda18;
 	}
-
-	phy->power_enabled = 1;
 
 	return 0;
 
 disable_regulators:
 	rc = regulator_disable(phy->vdda18);
 	if (rc)
-		dev_err(phy->phy.dev, "Unable to disable vdda18: %d\n", rc);
+		dev_err(phy->phy.dev, "Unable to disable vdda18\n");
 
 unset_vdda18:
 	rc = regulator_set_voltage(phy->vdda18, 0, USB_SSPHY_1P8_VOL_MAX);
 	if (rc)
-		dev_err(phy->phy.dev, "unable to set min voltage for vdda18: %d\n",
-									rc);
+		dev_err(phy->phy.dev, "unable to set voltage for vdda18\n");
 
 put_vdda18_lpm:
 	rc = regulator_set_load(phy->vdda18, 0);
 	if (rc < 0)
-		dev_err(phy->phy.dev, "Unable to set LPM of vdda18: %d\n", rc);
+		dev_err(phy->phy.dev, "Unable to set LPM of vdda18\n");
 
-
-	phy->power_enabled = 0;
-
-	return rc;
+	return rc < 0 ? rc : 0;
 }
 
 static void msm_usb_write_readback(void *base, u32 offset,
@@ -201,91 +151,127 @@ static void msm_usb_write_readback(void *base, u32 offset,
 			__func__, val, offset);
 }
 
-static int __maybe_unused msm_ssphy_control_reg_read(struct usb_phy *uphy,
-								u16 address)
+/**
+ * Write SSPHY register with debug info.
+ *
+ * @base - base virtual address.
+ * @addr - SSPHY address to write.
+ * @val - value to write.
+ *
+ */
+static void msm_ssusb_write_phycreg(void *base, u32 addr, u32 val)
 {
-	struct msm_ssphy *phy = container_of(uphy, struct msm_ssphy, phy);
-	u16 val;
-	int ret;
+	writel_relaxed(addr, base + SS_CR_PROTOCOL_DATA_IN_REG);
+	writel_relaxed(0x1, base + SS_CR_PROTOCOL_CAP_ADDR_REG);
+	while (readl_relaxed(base + SS_CR_PROTOCOL_CAP_ADDR_REG))
+		cpu_relax();
 
-	/* Write address */
-	writeb_relaxed((address & 0xFF), phy->base + PHY_CR_REG_CTRL2);
-	writeb_relaxed(((address >> 0x8) & 0xFF), phy->base + PHY_CR_REG_CTRL3);
-	/* Set CR_ADDR */
-	writeb_relaxed(0x1, phy->base + PHY_CR_REG_CTRL1);
-	/* Do a polled read up to 1ms */
-	ret = readl_poll_timeout(phy->base + PHY_CR_DATA_STATUS2, val,
-							val, 1000, 0);
-	if (ret) {
-		dev_err(phy->phy.dev, "Write address failed:%d\n", ret);
-		return ret;
-	}
-	/* Clear CR_ADDR */
-	writeb_relaxed(0x0, phy->base + PHY_CR_REG_CTRL1);
+	writel_relaxed(val, base + SS_CR_PROTOCOL_DATA_IN_REG);
+	writel_relaxed(0x1, base + SS_CR_PROTOCOL_CAP_DATA_REG);
+	while (readl_relaxed(base + SS_CR_PROTOCOL_CAP_DATA_REG))
+		cpu_relax();
 
-	/* Set CR_READ */
-	writeb_relaxed(0x4, phy->base + PHY_CR_REG_CTRL1);
-	ret = readl_poll_timeout(phy->base + PHY_CR_DATA_STATUS2, val,
-							val, 1000, 0);
-	if (ret) {
-		dev_err(phy->phy.dev, "Read from address failed:%d\n", ret);
-		return ret;
-	}
-	/* Clear CR_READ */
-	writeb_relaxed(0x0, phy->base + PHY_CR_REG_CTRL1);
-
-	/* Read Data */
-	val = readb_relaxed(phy->base + PHY_CR_DATA_STATUS0);
-	val |= (readb_relaxed(phy->base + PHY_CR_DATA_STATUS1) << 0x8);
-
-	return val;
+	writel_relaxed(0x1, base + SS_CR_PROTOCOL_WRITE_REG);
+	while (readl_relaxed(base + SS_CR_PROTOCOL_WRITE_REG))
+		cpu_relax();
 }
 
-static int msm_ssphy_control_reg_write(struct usb_phy *uphy,
-						u16 address, u16 value)
+/**
+ * Read SSPHY register with debug info.
+ *
+ * @base - base virtual address.
+ * @addr - SSPHY address to read.
+ *
+ */
+static u32 msm_ssusb_read_phycreg(void *base, u32 addr)
+{
+	bool first_read = true;
+
+	writel_relaxed(addr, base + SS_CR_PROTOCOL_DATA_IN_REG);
+	writel_relaxed(0x1, base + SS_CR_PROTOCOL_CAP_ADDR_REG);
+	while (readl_relaxed(base + SS_CR_PROTOCOL_CAP_ADDR_REG))
+		cpu_relax();
+
+	/*
+	 * Due to hardware bug, first read of SSPHY register might be
+	 * incorrect. Hence as workaround, SW should perform SSPHY register
+	 * read twice, but use only second read and ignore first read.
+	 */
+retry:
+	writel_relaxed(0x1, base + SS_CR_PROTOCOL_READ_REG);
+	while (readl_relaxed(base + SS_CR_PROTOCOL_READ_REG))
+		cpu_relax();
+
+	if (first_read) {
+		readl_relaxed(base + SS_CR_PROTOCOL_DATA_OUT_REG);
+		first_read = false;
+		goto retry;
+	}
+
+	return readl_relaxed(base + SS_CR_PROTOCOL_DATA_OUT_REG);
+}
+
+static int msm_ssphy_set_params(struct usb_phy *uphy)
 {
 	struct msm_ssphy *phy = container_of(uphy, struct msm_ssphy, phy);
-	u16 val;
-	int ret;
+	u32 data = 0;
 
-	/* Write address */
-	writeb_relaxed((address & 0xFF), phy->base + PHY_CR_REG_CTRL2);
-	writeb_relaxed(((address >> 0x8) & 0xFF), phy->base + PHY_CR_REG_CTRL3);
-	/* Set CR_ADDR */
-	writeb_relaxed(0x1, phy->base + PHY_CR_REG_CTRL1);
-	ret = readl_poll_timeout(phy->base + PHY_CR_DATA_STATUS2, val,
-							val, 1000, 0);
-	if (ret) {
-		dev_err(phy->phy.dev, "Write address failed:%d\n", ret);
-		return ret;
-	}
-	/* Clear CR_ADDR */
-	writeb_relaxed(0x0, phy->base + PHY_CR_REG_CTRL1);
+	/*
+	 * WORKAROUND: There is SSPHY suspend bug due to which USB enumerates
+	 * in HS mode instead of SS mode. Workaround it by asserting
+	 * LANE0.TX_ALT_BLOCK.EN_ALT_BUS to enable TX to use alt bus mode
+	 */
+	data = msm_ssusb_read_phycreg(phy->base, 0x102D);
+	data |= (1 << 7);
+	msm_ssusb_write_phycreg(phy->base, 0x102D, data);
 
-	/* Write data */
-	writeb_relaxed((value & 0xFF), phy->base + PHY_CR_REG_CTRL2);
-	writeb_relaxed(((value >> 0x8) & 0xFF), phy->base + PHY_CR_REG_CTRL3);
-	/* Set CR_DATA */
-	writeb_relaxed(0x2, phy->base + PHY_CR_REG_CTRL1);
-	ret = readl_poll_timeout(phy->base + PHY_CR_DATA_STATUS2, val,
-							val, 1000, 0);
-	if (ret) {
-		dev_err(phy->phy.dev, "Write data failed:%d\n", ret);
-		return ret;
-	}
-	/* Clear CR_DATA */
-	writeb_relaxed(0x0, phy->base + PHY_CR_REG_CTRL1);
+	data = msm_ssusb_read_phycreg(phy->base, 0x1010);
+	data &= ~0xFF0;
+	data |= 0x20;
+	msm_ssusb_write_phycreg(phy->base, 0x1010, data);
 
-	/* Set CR_WRITE */
-	writeb_relaxed(0x8, phy->base + PHY_CR_REG_CTRL1);
-	ret = readl_poll_timeout(phy->base + PHY_CR_DATA_STATUS2, val,
-							val, 1000, 0);
-	if (ret) {
-		dev_err(phy->phy.dev, "Write data to address failed:%d\n", ret);
-		return ret;
-	}
-	/* Clear CR_WRITE */
-	writeb_relaxed(0x0, phy->base + PHY_CR_REG_CTRL1);
+	/*
+	 * Fix RX Equalization setting as follows
+	 * LANE0.RX_OVRD_IN_HI. RX_EQ_EN set to 0
+	 * LANE0.RX_OVRD_IN_HI.RX_EQ_EN_OVRD set to 1
+	 * LANE0.RX_OVRD_IN_HI.RX_EQ set to 3
+	 * LANE0.RX_OVRD_IN_HI.RX_EQ_OVRD set to 1
+	 */
+	data = msm_ssusb_read_phycreg(phy->base, 0x1006);
+	data &= ~(1 << 6);
+	data |= (1 << 7);
+	data &= ~(0x7 << 8);
+	data |= (0x3 << 8);
+	data |= (0x1 << 11);
+	msm_ssusb_write_phycreg(phy->base, 0x1006, data);
+
+	/*
+	 * Set EQ and TX launch amplitudes as follows
+	 * LANE0.TX_OVRD_DRV_LO.PREEMPH set to 22
+	 * LANE0.TX_OVRD_DRV_LO.AMPLITUDE set to 127
+	 * LANE0.TX_OVRD_DRV_LO.EN set to 1.
+	 */
+	data = msm_ssusb_read_phycreg(phy->base, 0x1002);
+	data &= ~0x3F80;
+	if (ss_phy_override_deemphasis)
+		phy->deemphasis_val = ss_phy_override_deemphasis;
+	if (phy->deemphasis_val)
+		data |= (phy->deemphasis_val << 7);
+	else
+		data |= (0x16 << 7);
+	data &= ~0x7F;
+	data |= (0x7F | (1 << 14));
+	msm_ssusb_write_phycreg(phy->base, 0x1002, data);
+
+	/*
+	 * Set the QSCRATCH SS_PHY_PARAM_CTRL1 parameters as follows
+	 * TX_FULL_SWING [26:20] amplitude to 127
+	 * TX_DEEMPH_3_5DB [13:8] to 22
+	 * LOS_BIAS [2:0] to 0x5
+	 */
+	msm_usb_write_readback(phy->base, SS_PHY_PARAM_CTRL_1,
+				0x07f03f07, 0x07f01605);
+
 	return 0;
 }
 
@@ -293,44 +279,44 @@ static int msm_ssphy_control_reg_write(struct usb_phy *uphy,
 static int msm_ssphy_init(struct usb_phy *uphy)
 {
 	struct msm_ssphy *phy = container_of(uphy, struct msm_ssphy, phy);
-	int rc;
+	u32 val;
 
-	rc = msm_ssusb_config_vdd(phy, 1);
-	if (rc) {
-		dev_err(phy->phy.dev, "Unable to config vdd: %d\n", rc);
-		return rc;
-	}
+	/* Ensure clock is on before accessing QSCRATCH registers */
+	clk_prepare_enable(phy->core_clk);
 
-	msm_ssusb_ldo_enable(phy, 1);
-
-	msm_ssusb_enable_clocks(phy);
+	/* read initial value */
+	val = readl_relaxed(phy->base + SS_PHY_CTRL_REG);
 
 	/* Use clk reset, if available; otherwise use SS_PHY_RESET bit */
-	if (phy->phy_com_reset) {
-		reset_control_assert(phy->phy_com_reset);
-		reset_control_assert(phy->phy_reset);
-		udelay(10);
-		reset_control_deassert(phy->phy_com_reset);
-		reset_control_deassert(phy->phy_reset);
-	} else {
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL1,
-						SS_PHY_RESET, SS_PHY_RESET);
+	if (phy->com_reset_clk) {
+		clk_reset(phy->com_reset_clk, CLK_RESET_ASSERT);
+		clk_reset(phy->reset_clk, CLK_RESET_ASSERT);
 		udelay(10); /* 10us required before de-asserting */
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL1,
-						SS_PHY_RESET, 0);
+		clk_reset(phy->com_reset_clk, CLK_RESET_DEASSERT);
+		clk_reset(phy->reset_clk, CLK_RESET_DEASSERT);
+	} else {
+		writel_relaxed(val | SS_PHY_RESET, phy->base + SS_PHY_CTRL_REG);
+		udelay(10); /* 10us required before de-asserting */
+		writel_relaxed(val, phy->base + SS_PHY_CTRL_REG);
 	}
 
-	writeb_relaxed(SWI_PCS_CLK_SEL, phy->base + SS_PHY_CTRL0);
+	/* Use ref_clk from pads and set its parameters */
+	val |= REF_USE_PAD;
+	writel_relaxed(val, phy->base + SS_PHY_CTRL_REG);
+	msleep(30);
 
-	msm_usb_write_readback(phy->base, SS_PHY_CTRL4,
-					LANE0_PWR_PRESENT, LANE0_PWR_PRESENT);
+	/* Ref clock must be stable now, enable ref clock for HS mode */
+	val |= LANE0_PWR_PRESENT | REF_SS_PHY_EN;
+	writel_relaxed(val, phy->base + SS_PHY_CTRL_REG);
+	usleep_range(2000, 2200);
 
-	writeb_relaxed(REF_SS_PHY_EN, phy->base + SS_PHY_CTRL2);
+	/*
+	 * Reinitialize SSPHY parameters as SS_PHY RESET will reset
+	 * the internal registers to default values.
+	 */
+	msm_ssphy_set_params(uphy);
 
-	/* Enable SSC override in SSC_OVRD_IN register */
-	rc = msm_ssphy_control_reg_write(uphy, SS_OVRD_EN, SS_OVRD_VAL);
-	if (rc)
-		dev_err(phy->phy.dev, "Write to PHY reg failed: %d\n", rc);
+	clk_disable_unprepare(phy->core_clk);
 
 	return 0;
 }
@@ -338,44 +324,87 @@ static int msm_ssphy_init(struct usb_phy *uphy)
 static int msm_ssphy_set_suspend(struct usb_phy *uphy, int suspend)
 {
 	struct msm_ssphy *phy = container_of(uphy, struct msm_ssphy, phy);
-	int rc;
+	void __iomem *base = phy->base;
+	int count;
 
-	dev_dbg(uphy->dev, "%s: phy->suspended:%d suspend:%d", __func__,
-					phy->suspended, suspend);
-
-	if (phy->suspended == suspend) {
-		dev_dbg(uphy->dev, "PHY is already %s\n",
-					suspend ? "suspended" : "resumed");
-		return 0;
-	}
+	/* Ensure clock is on before accessing QSCRATCH registers */
+	clk_prepare_enable(phy->core_clk);
 
 	if (suspend) {
+		count = atomic_dec_return(&phy->active_count);
+		if (count > 0 || phy->suspended) {
+			dev_dbg(uphy->dev, "Skipping suspend, active_count=%d phy->suspended=%d\n",
+					count, phy->suspended);
+			goto done;
+		}
 
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL2,
-					REF_SS_PHY_EN, 0);
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL4,
-					TEST_POWERDOWN, TEST_POWERDOWN);
+		if (count < 0) {
+			dev_WARN(uphy->dev, "Suspended too many times!  active_count=%d\n",
+					count);
+			atomic_set(&phy->active_count, 0);
+		}
 
-		msm_ssusb_disable_clocks(phy);
+		/* Clear REF_SS_PHY_EN */
+		msm_usb_write_readback(base, SS_PHY_CTRL_REG, REF_SS_PHY_EN, 0);
+		/* Clear REF_USE_PAD */
+		msm_usb_write_readback(base, SS_PHY_CTRL_REG, REF_USE_PAD, 0);
+		/* Set TEST_POWERDOWN (enables PHY retention) */
+		msm_usb_write_readback(base, SS_PHY_CTRL_REG, TEST_POWERDOWN,
+								TEST_POWERDOWN);
+		if (phy->com_reset_clk &&
+			!(phy->phy.flags & ENABLE_SECONDARY_PHY)) {
+			/* leave these asserted until resuming */
+			clk_reset(phy->com_reset_clk, CLK_RESET_ASSERT);
+			clk_reset(phy->reset_clk, CLK_RESET_ASSERT);
+		}
+
 		msm_ssusb_ldo_enable(phy, 0);
 		msm_ssusb_config_vdd(phy, 0);
 		phy->suspended = true;
 	} else {
-
-		rc = msm_ssusb_config_vdd(phy, 1);
-		if (rc)
-			return rc;
-		msm_ssusb_ldo_enable(phy, 1);
-		msm_ssusb_enable_clocks(phy);
-
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL2,
-					REF_SS_PHY_EN, REF_SS_PHY_EN);
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL4,
-					TEST_POWERDOWN, 0);
+		count = atomic_inc_return(&phy->active_count);
+		if (count > 1 || !phy->suspended) {
+			dev_dbg(uphy->dev, "Skipping resume, active_count=%d phy->suspended=%d\n",
+					count, phy->suspended);
+			goto done;
+		}
 
 		phy->suspended = false;
+		msm_ssusb_config_vdd(phy, 1);
+		msm_ssusb_ldo_enable(phy, 1);
+
+		if (phy->phy.flags & ENABLE_SECONDARY_PHY) {
+			dev_err(uphy->dev, "secondary PHY, skipping reset\n");
+			goto done;
+		}
+
+		if (phy->com_reset_clk) {
+			clk_reset(phy->com_reset_clk, CLK_RESET_DEASSERT);
+			clk_reset(phy->reset_clk, CLK_RESET_DEASSERT);
+		} else {
+			/* Assert SS PHY RESET */
+			msm_usb_write_readback(base, SS_PHY_CTRL_REG,
+						SS_PHY_RESET, SS_PHY_RESET);
+		}
+
+		/* Set REF_USE_PAD */
+		msm_usb_write_readback(base, SS_PHY_CTRL_REG, REF_USE_PAD,
+								REF_USE_PAD);
+		/* Set REF_SS_PHY_EN */
+		msm_usb_write_readback(base, SS_PHY_CTRL_REG, REF_SS_PHY_EN,
+								REF_SS_PHY_EN);
+		/* Clear TEST_POWERDOWN */
+		msm_usb_write_readback(base, SS_PHY_CTRL_REG, TEST_POWERDOWN,
+								0);
+		if (!phy->com_reset_clk) {
+			udelay(10); /* 10us required before de-asserting */
+			msm_usb_write_readback(base, SS_PHY_CTRL_REG,
+						SS_PHY_RESET, 0);
+		}
 	}
 
+done:
+	clk_disable_unprepare(phy->core_clk);
 	return 0;
 }
 
@@ -389,7 +418,7 @@ static int msm_ssphy_notify_connect(struct usb_phy *uphy,
 
 	if (uphy->flags & PHY_VBUS_VALID_OVERRIDE)
 		/* Indicate power present to SS phy */
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL4,
+		msm_usb_write_readback(phy->base, SS_PHY_CTRL_REG,
 					LANE0_PWR_PRESENT, LANE0_PWR_PRESENT);
 
 	return 0;
@@ -405,7 +434,7 @@ static int msm_ssphy_notify_disconnect(struct usb_phy *uphy,
 
 	if (uphy->flags & PHY_VBUS_VALID_OVERRIDE)
 		/* Clear power indication to SS phy */
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL4,
+		msm_usb_write_readback(phy->base, SS_PHY_CTRL_REG,
 					LANE0_PWR_PRESENT, 0);
 
 	return 0;
@@ -434,36 +463,27 @@ static int msm_ssphy_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	phy->ref_clk = devm_clk_get(dev, "ref_clk");
-	if (IS_ERR(phy->ref_clk)) {
-		dev_err(dev, "unable to get ref_clk\n");
-		return PTR_ERR(phy->ref_clk);
+	phy->core_clk = devm_clk_get(dev, "core_clk");
+	if (IS_ERR(phy->core_clk)) {
+		dev_err(dev, "unable to get core_clk\n");
+		return PTR_ERR(phy->core_clk);
 	}
 
-	phy->cfg_ahb_clk = devm_clk_get(dev, "cfg_ahb_clk");
-	if (IS_ERR(phy->cfg_ahb_clk)) {
-		dev_err(dev, "unable to get cfg_ahb_clk\n");
-		return PTR_ERR(phy->cfg_ahb_clk);
+	phy->com_reset_clk = devm_clk_get(dev, "com_reset_clk");
+	if (IS_ERR(phy->com_reset_clk)) {
+		dev_dbg(dev, "com_reset_clk unavailable\n");
+		phy->com_reset_clk = NULL;
 	}
 
-	phy->pipe_clk = devm_clk_get(dev, "pipe_clk");
-	if (IS_ERR(phy->pipe_clk)) {
-		dev_err(dev, "unable to get pipe_clk\n");
-		return PTR_ERR(phy->pipe_clk);
+	phy->reset_clk = devm_clk_get(dev, "reset_clk");
+	if (IS_ERR(phy->reset_clk)) {
+		dev_dbg(dev, "reset_clk unavailable\n");
+		phy->reset_clk = NULL;
 	}
 
-	phy->phy_com_reset = devm_reset_control_get(dev, "phy_com_reset");
-	if (IS_ERR(phy->phy_com_reset)) {
-		ret = PTR_ERR(phy->phy_com_reset);
-		dev_dbg(dev, "failed to get phy_com_reset\n");
-		phy->phy_com_reset = NULL;
-	}
-
-	phy->phy_reset = devm_reset_control_get(dev, "phy_reset");
-	if (IS_ERR(phy->phy_reset)) {
-		ret = PTR_ERR(phy->phy_reset);
-		dev_dbg(dev, "failed to get phy_reset\n");
-		phy->phy_reset = NULL;
+	if (of_get_property(dev->of_node, "qcom,primary-phy", NULL)) {
+		dev_dbg(dev, "secondary HSPHY\n");
+		phy->phy.flags |= ENABLE_SECONDARY_PHY;
 	}
 
 	ret = of_property_read_u32_array(dev->of_node, "qcom,vdd-voltage-level",
@@ -489,14 +509,20 @@ static int msm_ssphy_probe(struct platform_device *pdev)
 
 	ret = msm_ssusb_config_vdd(phy, 1);
 	if (ret) {
-		dev_err(phy->phy.dev, "Unable to config vdd: %d\n", ret);
+		dev_err(dev, "ssusb vdd_dig configuration failed\n");
 		return ret;
 	}
 
 	ret = regulator_enable(phy->vdd);
 	if (ret) {
-		dev_err(phy->phy.dev, "Unable to enable vdd: %d\n", ret);
-		goto unconfig_vdd;
+		dev_err(dev, "unable to enable the ssusb vdd_dig\n");
+		goto unconfig_ss_vdd;
+	}
+
+	ret = msm_ssusb_ldo_enable(phy, 1);
+	if (ret) {
+		dev_err(dev, "ssusb vreg enable failed\n");
+		goto disable_ss_vdd;
 	}
 
 	platform_set_drvdata(pdev, phy);
@@ -504,16 +530,9 @@ static int msm_ssphy_probe(struct platform_device *pdev)
 	if (of_property_read_bool(dev->of_node, "qcom,vbus-valid-override"))
 		phy->phy.flags |= PHY_VBUS_VALID_OVERRIDE;
 
-	/* Power down PHY to avoid leakage at 1.8V LDO */
-	if (of_property_read_bool(dev->of_node, "qcom,keep-powerdown")) {
-		msm_ssusb_ldo_enable(phy, 1);
-		msm_ssusb_enable_clocks(phy);
-		msm_usb_write_readback(phy->base, SS_PHY_CTRL4,
-					TEST_POWERDOWN, TEST_POWERDOWN);
-		msm_ssusb_disable_clocks(phy);
-		msm_ssusb_ldo_enable(phy, 0);
-		msm_ssusb_config_vdd(phy, 0);
-	}
+	if (of_property_read_u32(dev->of_node, "qcom,deemphasis-value",
+						&phy->deemphasis_val))
+		dev_dbg(dev, "unable to read ssphy deemphasis value\n");
 
 	phy->phy.init			= msm_ssphy_init;
 	phy->phy.set_suspend		= msm_ssphy_set_suspend;
@@ -523,13 +542,15 @@ static int msm_ssphy_probe(struct platform_device *pdev)
 
 	ret = usb_add_phy_dev(&phy->phy);
 	if (ret)
-		goto disable_vdd;
+		goto disable_ss_ldo;
 
 	return 0;
 
-disable_vdd:
+disable_ss_ldo:
+	msm_ssusb_ldo_enable(phy, 0);
+disable_ss_vdd:
 	regulator_disable(phy->vdd);
-unconfig_vdd:
+unconfig_ss_vdd:
 	msm_ssusb_config_vdd(phy, 0);
 
 	return ret;
@@ -542,10 +563,11 @@ static int msm_ssphy_remove(struct platform_device *pdev)
 	if (!phy)
 		return 0;
 
-	msm_ssphy_set_suspend(&phy->phy, 0);
 	usb_remove_phy(&phy->phy);
-	msm_ssphy_set_suspend(&phy->phy, 1);
+	msm_ssusb_ldo_enable(phy, 0);
 	regulator_disable(phy->vdd);
+	msm_ssusb_config_vdd(phy, 0);
+	kfree(phy);
 
 	return 0;
 }
