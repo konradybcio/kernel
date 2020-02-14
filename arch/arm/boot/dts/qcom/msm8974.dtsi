@@ -810,7 +810,7 @@
 	};
 
 	qcom,sps@f9980000 {
-		compatible = "qcom,msm_sps";
+		compatible = "qcom,msm-sps";
 		reg = <0xf9984000 0x15000>,
 		      <0xf9999000 0xb000>;
 		interrupts = <0 94 0>;
@@ -1898,7 +1898,8 @@
 	};
 
 	usb3: ssusb@f9200000 {
-		compatible = "qcom,dwc-usb3-msm";
+		//compatible = "qcom,dwc-usb3-msm";
+		compatible = "qcom,dwc3";
 		reg = <0xf9200000 0xfc000>,
 			  <0xfd4ab000 0x4>;
 		#address-cells = <1>;
@@ -1983,8 +1984,9 @@
 		qcom,vdd-voltage-level = <1 5 7>;
 
 		//need ref_clk
-		clocks = <&clock_gcc clk_gcc_usb30_master_clk>;
-		clock-names = "core_clk";
+		clocks = <&clock_gcc clk_gcc_usb30_master_clk>,
+						<&clock_rpm clk_diff_clk>;
+		clock-names = "core_clk", "ref_clk";
 	};
 
 	dbm_1p4: dbm@f92f8000 {
@@ -2671,17 +2673,20 @@
 				3200 3200>;
 	};
 
+	//missing driver
 	jtag_fuse: jtagfuse@fc4be024 {
 		compatible = "qcom,jtag-fuse";
 		reg = <0xfc4be024 0x8>;
 		reg-names = "fuse-base";
 	};
 
+	//missing driver
 	qcom,msm-rtb {
 		compatible = "qcom,msm-rtb";
 		qcom,rtb-size = <0x100000>; /* 1M EBI1 buffer */
 	};
 
+	//missing driver
 	qcom,msm-contig-mem {
 		compatible = "qcom,msm-contig-mem";
 		qcom,memory-reservation-type = "EBI1";
@@ -2794,6 +2799,9 @@
 		reg = <0xfc834000 0x7000>;
 		interrupts = <0 29 1>;
 		qcom,rx-ring-size = <64>;
+
+		//[    0.857432] bam_dmux_probe: bam dmux irq field missing
+
 	};
 
 	uart7: uart@f995d000 { /*BLSP #2, UART #7 */
@@ -2926,6 +2934,7 @@
 	};
 
 	qcom,bcl {
+		//missing for pm8941?
 		compatible = "qcom,bcl";
 	};
 
@@ -2951,6 +2960,7 @@
 		qcom,master-id = <86>;
 	};
 
+	//missing driver?
 	qcom,ssm {
 		compatible = "qcom,ssm";
 		qcom,channel-name = "SSM_RTR";
@@ -2973,12 +2983,14 @@
 		reg = <0xf9011000 0x1000>;
 	};
 
+	//uh its there in doc but not in drivers/
 	cpu-pmu {
 		compatible = "qcom,krait-pmu";
 		qcom,irq-is-percpu;
 		interrupts = <1 7 0xf00>;
 	};
 
+	//missing driver?
 	l2-pmu {
 		compatible = "qcom,l2-pmu";
 		interrupts = <0 1 0>;
@@ -2990,11 +3002,13 @@
 		reg-names = "bimc";
 	};
 
+	//missing driver?
 	qcom,perfmap@fc330000 {
 		compatible = "qcom,perfmap";
 		reg = <0xfc330000 0x3000>;
 	};
 
+	//it's there in docs but not in drivers/
 	qcom,smdtty {
 		compatible = "qcom,smdtty";
 
@@ -3239,6 +3253,7 @@
 		};
 	};
 
+	//it's there in docs but not in drivers/
 	qcom,avtimer {
 		compatible = "qcom,avtimer";
 		reg = <0xfe053008 0x4>,
