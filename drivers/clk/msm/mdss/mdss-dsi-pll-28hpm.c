@@ -19,7 +19,7 @@
 #include <linux/clk/msm-clk-provider.h>
 #include <linux/clk/msm-clk.h>
 #include <linux/clk/msm-clock-generic.h>
-#include <dt-bindings/clock/msm-clocks-8976.h>
+#include <dt-bindings/clock/msm-clocks-8974.h>
 
 #include "mdss-pll.h"
 #include "mdss-dsi-pll.h"

@@ -58,6 +58,7 @@
 #define DSI_PLL_POLL_DELAY_US			50
 #define DSI_PLL_POLL_TIMEOUT_US			500
 
+#if 0
 int set_byte_mux_sel(struct mux_clk *clk, int sel)
 {
 	struct mdss_pll_resources *dsi_pll_res = clk->priv;
@@ -91,6 +92,7 @@ int get_byte_mux_sel(struct mux_clk *clk)
 
 	return !!mux_mode;
 }
+#endif
 
 int dsi_pll_div_prepare(struct clk *c)
 {

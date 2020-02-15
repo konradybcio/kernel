@@ -365,5 +365,9 @@
 #define GCC_WCSS_RESTART			76
 #define GCC_VENUS_RESTART			77
 
+#define clk_dsi_pll0_byte_clk_src    0x44539836
+#define clk_dsi_pll0_pixel_clk_src    0x5767c287
+#define clk_dsi_pll1_byte_clk_src    0x73e88d02
+#define clk_dsi_pll1_pixel_clk_src    0xce233fcf
 
 #endif
