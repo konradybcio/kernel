@@ -340,7 +340,7 @@ static void __iomem *virt_bases[N_BASES];
 	},					\
 	.num_fmax = VDD_DIG_NUM
 
-static const struct msm_reset_map gcc_msm8936_resets[] = {
+static const struct msm_reset_map gcc_msm8974_resets[] = {
 	[GCC_SYSTEM_NOC_BCR] = { 0x0100 },
 	[GCC_CONFIG_NOC_BCR] = { 0x0140 },
 	[GCC_PERIPH_NOC_BCR] = { 0x0180 },
@@ -2784,8 +2784,8 @@ static int msm_gcc_8974_probe(struct platform_device *pdev)
 			usb30_mock_utmi_clk_src.freq_tbl[0].freq_hz);
 	clk_set_rate(&pdm2_clk_src.c, pdm2_clk_src.freq_tbl[0].freq_hz);
 
-	msm_reset_controller_register(pdev, gcc_msm8936_resets,
-			ARRAY_SIZE(gcc_msm8936_resets), virt_bases[GCC_BASE]);
+	msm_reset_controller_register(pdev, gcc_msm8974_resets,
+			ARRAY_SIZE(gcc_msm8974_resets), virt_bases[GCC_BASE]);
 
 	dev_info(&pdev->dev, "Registered GCC clocks.\n");
 
