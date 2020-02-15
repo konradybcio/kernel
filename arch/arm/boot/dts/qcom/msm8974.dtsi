@@ -312,6 +312,7 @@
 		clock-names = "xo";
 		clocks = <&clock_rpm clk_cxo_gcc>;
 		#clock-cells = <1>;
+		#reset-cells = <1>;
 	};
 
 	clock_mmss: qcom,mmsscc@fd8c0000 {
@@ -547,11 +548,19 @@
 		qcom,hsusb-otg-mpm-dmsehv-int = <58>;
 		qcom,hsusb-otg-disable-reset;
 		
-		resets = <&clock_gcc GCC_USB_30_BCR>;
+		resets = <&clock_gcc GCC_USB_HS_HSIC_BCR>;
 		reset-names = "core_reset";
 
+		/////
+		qcom,max-nominal-sysclk-rate = <133330000>;
+		//qcom,max-svs-sysclk-rate = <100000000>;
+
+		dr_mode = "peripheral";
+		qcom,pm-qos-latency = <59>;
+		////
+
 		qcom,hsusb-otg-phy-init-seq = <0x63 0x81 0xffffffff>;
-		qcom,hsusb-otg-phy-type = <2>; /* CHIPIDEA PHY*/
+		qcom,hsusb-otg-phy-type = <1>; /* CHIPIDEA PHY*/
 		
 		qcom,msm-bus,name = "usb2";
 		qcom,msm-bus,num-cases = <2>;
@@ -568,7 +577,7 @@
 
 		
 		qcom,usbbam@f9304000 {
-			compatible = "qcom,usb-bam-msm";
+			//compatible = "qcom,usb-bam-msm";
 			//are multiple regs allowed on 4.14?
 			reg = <0xf9304000 0x5000>,
 				<0xf9a44000 0x11000>,
@@ -1951,11 +1960,12 @@
 			reg = <0xf9200000 0xfc000>;
 			interrupt-parent = <&intc>;
 			interrupts = <0 131 0>;
-			usb-phy = <&hsphy>, <&ssphy>;
+			usb-phy = <&hsphy>;//, <&ssphy>;
 			linux,sysdev_is_parent;
 			snps,disable-clk-gating;
 			usb-core-id = <1>;
-			maximum-speed = "super-speed";
+			// maximum-speed = "super-speed";
+			maximum-speed = "high-speed";
 			dr_mode = "peripheral";
 			tx-fifo-resize;
 		};
@@ -1976,23 +1986,25 @@
 		clock-names = "core_clk", "phy_sleep_clk";
 	};
 
-	ssphy: ssphy@f92f8800 {
-		compatible = "qcom,usb-ssphy";
-		reg = <0xf92f8800 0x3ff>;
-		vdd-supply = <&pm8841_s2_corner>;
-		vdda18-supply = <&pm8941_l6>;
-		qcom,vdd-voltage-level = <1 5 7>;
+	// ssphy: ssphy@f92f8800 {
+	// 	compatible = "qcom,usb-ssphy";
+	// 	reg = <0xf92f8800 0x3ff>;
+	// 	vdd-supply = <&pm8841_s2_corner>;
+	// 	vdda18-supply = <&pm8941_l6>;
+	// 	qcom,vdd-voltage-level = <1 5 7>;
 
-		//need ref_clk
-		clocks = <&clock_gcc clk_gcc_usb30_master_clk>,
-						<&clock_rpm clk_diff_clk>;
-		clock-names = "core_clk", "ref_clk";
-	};
+	// 	//need ref_clk
+	// 	clocks = <&clock_gcc clk_gcc_usb30_master_clk>,
+	// 					<&clock_gcc USB_PHY_CFG_AHB_CLK>,
+	// 					<&clock_rpm clk_diff_clk>;
+	// 	clock-names = "core_clk", "cfg_ahb_clk", "ref_clk";
+	// };
 
 	dbm_1p4: dbm@f92f8000 {
 		compatible = "qcom,usb-dbm-1p4";
 		reg = <0xf92f8000 0x1000>;
 	};
+
 	ehci: qcom,ehci-host@f9a55000 {
 		compatible = "qcom,ehci-host";
 		status = "disabled";
@@ -2829,7 +2841,12 @@
 				<84 512 0 0>,
 				<84 512 500 800>;
 	};
-
+	
+	tcsr: syscon@fd4a0000 {
+			compatible = "syscon";
+			reg = <0xfd4a0000 0x10000>;
+	};
+	
 	tcsr_mutex_block: syscon@fd484000 {
 		compatible = "syscon";
 		reg = <0xfd484000 0x2000>;
