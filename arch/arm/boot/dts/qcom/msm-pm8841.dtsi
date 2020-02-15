@@ -12,15 +12,15 @@
 #include <dt-bindings/spmi/spmi.h>
 
 &spmi_bus {
-	#address-cells = <1>;
+	#address-cells = <2>;
 	#size-cells = <0>;
 	interrupt-controller;
-	#interrupt-cells = <3>;
+	#interrupt-cells = <4>;
 
 	qcom,pm8841@4 {
-		compatible = "qcom,spmi-pmic";
+		compatible = "qcom,pm8841", "qcom,spmi-pmic";
 		reg = <0x4 SPMI_USID>;
-		#address-cells = <2>;
+		#address-cells = <1>;
 		#size-cells = <0>;
 
 		qcom,qpnp-revid@100 {
@@ -37,14 +37,17 @@
 			qcom,default-temp = <37000>;
 		};
 
-		pm8841_mpps: mpps {
+		pm8841_mpps: mpps@a000 {
 			spmi-dev-container;
-			compatible = "qcom,qpnp-pin";
+			reg = <0xa000>;
+			compatible = "qcom,pm8841-mpp", "qcom,spmi-mpp";
 			gpio-controller;
 			#gpio-cells = <2>;
-			#address-cells = <1>;
-			#size-cells = <1>;
 			label = "pm8841-mpp";
+			interrupts = <4 0xa0 0 IRQ_TYPE_NONE>,
+				     <4 0xa1 0 IRQ_TYPE_NONE>,
+				     <4 0xa2 0 IRQ_TYPE_NONE>,
+				     <4 0xa3 0 IRQ_TYPE_NONE>;
 
 			mpp@a000 {
 				reg = <0xa000 0x100>;
@@ -69,9 +72,9 @@
 	};
 
 	qcom,pm8841@5 {
-		compatible = "qcom,spmi-pmic";
+		compatible = "qcom,pm8841", "qcom,spmi-pmic";
 		reg = <0x5 SPMI_USID>;
-		#address-cells = <2>;
+		#address-cells = <1>;
 		#size-cells = <0>;
 
 		regulator@1400 {

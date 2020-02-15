@@ -14,6 +14,7 @@
 #include <dt-bindings/clock/msm-clocks-8974.h>
 #include <dt-bindings/regulator/qcom,rpm-smd-regulator.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/gpio/gpio.h>
 
 / {
 	model = "Qualcomm Technologies, Inc. MSM 8974";
@@ -557,6 +558,7 @@
 
 		dr_mode = "peripheral";
 		qcom,pm-qos-latency = <59>;
+		extcon = <&pm8941_chg>;
 		////
 
 		qcom,hsusb-otg-phy-init-seq = <0x63 0x81 0xffffffff>;
@@ -2870,7 +2872,7 @@
 		hwlocks = <&tcsr_mutex 3>;
 		qcom,mpu-enabled;
 	};
-	qcom,smd {
+	smd: qcom,smd {
 		compatible = "qcom,smd";
 
 		modem {
@@ -2907,6 +2909,32 @@
 					rpm-channel-type = <15>; /* SMD_APPS_RPM */
 				};
 		};
+	};
+
+	vreg_boost: vreg-boost {
+		compatible = "regulator-fixed";
+
+		regulator-name = "vreg-boost";
+		regulator-min-microvolt = <3150000>;
+		regulator-max-microvolt = <3150000>;
+
+		regulator-always-on;
+		regulator-boot-on;
+
+		gpio = <&pm8941_gpios 21 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&boost_bypass_n_pin>;
+	};
+	vreg_vph_pwr: vreg-vph-pwr {
+		compatible = "regulator-fixed";
+		regulator-name = "vph-pwr";
+
+		regulator-min-microvolt = <3600000>;
+		regulator-max-microvolt = <3600000>;
+
+		regulator-always-on;
 	};
 
 	qcom,smsm {

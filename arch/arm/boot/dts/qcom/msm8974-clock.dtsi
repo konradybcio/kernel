@@ -10,7 +10,7 @@
  * GNU General Public License for more details.
  */
 
-&pm8941_lsid0 {
+&pm8941_0 {
 	pm8941_clkdiv1: clkdiv@5b00 {
 		qcom,cxo-div = <2>;
 	};

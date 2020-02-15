@@ -222,7 +222,7 @@
 	};
 };
 
-&pm8941_lsid1 {
+&pm8941_1 {
 	qcom,leds@d800 {
 		status = "okay";
 		qcom,wled_0 {

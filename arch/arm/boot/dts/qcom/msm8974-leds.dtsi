@@ -11,7 +11,7 @@
  * GNU General Public License for more details.
  */
 
-&pm8941_lsid1 {
+&pm8941_1 {
 	qcom,leds@d000 {
 		status = "okay";
 		qcom,rgb_0 {
