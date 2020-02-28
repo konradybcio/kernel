@@ -297,6 +297,9 @@ static struct msm_hs_port *msm_hs_get_hs_port(int port_index);
 static void msm_hs_queue_rx_desc(struct msm_hs_port *msm_uport);
 static int disconnect_rx_endpoint(struct msm_hs_port *msm_uport);
 static int msm_hs_pm_resume(struct device *dev);
+static void msm_hs_set_std_bps_locked(struct uart_port *uport, unsigned int bps);
+static void msm_hs_set_bps_locked(struct uart_port *uport, unsigned int bps);
+
 
 #define UARTDM_TO_MSM(uart_port) \
 	container_of((uart_port), struct msm_hs_port, uport)
@@ -311,7 +314,15 @@ static int msm_hs_ioctl(struct uart_port *uport, unsigned int cmd,
 		return -ENODEV;
 
 	if(!bcm43xx_may_use_bluesleep()) {
-		/* the device has been rfkill-ed */
+		/* Savely park the baudrate at 9600 when the
+		 * device has been turned off/rfkilled,
+		 * let userspace instead set a new baudrate later on */
+		uport->uartclk = clk_get_rate(msm_uport->clk);
+		if (!uport->uartclk)
+			msm_hs_set_std_bps_locked(uport, 9600);
+		else
+			msm_hs_set_bps_locked(uport, 9600);
+
 		return -ENODEV;
 	}
 
