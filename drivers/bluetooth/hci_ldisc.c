@@ -519,9 +519,7 @@ static void hci_uart_tty_close(struct tty_struct *tty)
 	struct hci_uart *hu = tty->disc_data;
 	struct hci_dev *hdev;
 
-	return;
-
-	BT_DBG("tty %pK", tty);
+	BT_DBG("tty %p", tty);
 
 	/* Detach from the tty */
 	tty->disc_data = NULL;
@@ -530,11 +528,8 @@ static void hci_uart_tty_close(struct tty_struct *tty)
 		return;
 
 	hdev = hu->hdev;
-	if (hdev) {
+	if (hdev)
 		hci_uart_close(hdev);
-		if (test_bit(HCI_UART_REGISTERED, &hu->flags))
-			hci_unregister_dev(hdev);
-	}
 
 	cancel_work_sync(&hu->write_work);
 
@@ -544,17 +539,10 @@ static void hci_uart_tty_close(struct tty_struct *tty)
 				hci_unregister_dev(hdev);
 			hci_free_dev(hdev);
 		}
-		hci_uart_proto_lock(hu);
 		hu->proto->close(hu);
-		hu->proto = NULL;
-		hci_uart_proto_unlock(hu);
 	}
+	clear_bit(HCI_UART_PROTO_SET, &hu->flags);
 
-	cancel_work_sync(&hu->write_work);
-
-	if (hdev)
-		hci_free_dev(hdev);
-	mutex_destroy(&hu->proto_lock);
 	kfree(hu);
 }
 
