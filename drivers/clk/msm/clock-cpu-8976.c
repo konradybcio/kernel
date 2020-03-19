@@ -355,6 +355,11 @@ static int cpu_clk_8976_set_rate(struct clk *c, unsigned long rate)
 	int ret = 0;
 	struct cpu_clk_8976 *cpuclk = to_cpu_clk_8976(c);
 	bool hw_low_power_ctrl = cpuclk->hw_low_power_ctrl;
+#ifdef CONFIG_ARCH_SONY_LOIRE
+	const bool skip_qos = true;
+#else
+	const bool skip_qos = false;
+#endif
 
 	/*
 	 * If hardware control of the clock tree is enabled during power
@@ -367,7 +372,8 @@ static int cpu_clk_8976_set_rate(struct clk *c, unsigned long rate)
 		cpumask_copy(&cpuclk->req.cpus_affine,
 				(const struct cpumask *)&cpuclk->cpumask);
 		cpuclk->req.type = PM_QOS_REQ_AFFINE_CORES;
-		pm_qos_add_request(&cpuclk->req, PM_QOS_CPU_DMA_LATENCY,
+		if (!skip_qos)
+			pm_qos_add_request(&cpuclk->req, PM_QOS_CPU_DMA_LATENCY,
 				CPU_LATENCY_NO_L2_PC_US);
 		smp_call_function_any(&cpuclk->cpumask, do_nothing,
 				NULL, 1);
@@ -376,7 +382,7 @@ static int cpu_clk_8976_set_rate(struct clk *c, unsigned long rate)
 	ret = clk_set_rate(c->parent, rate);
 
 	/* Remove PM QOS request */
-	if (hw_low_power_ctrl)
+	if (hw_low_power_ctrl && !skip_qos)
 		pm_qos_remove_request(&cpuclk->req);
 
 	return ret;
