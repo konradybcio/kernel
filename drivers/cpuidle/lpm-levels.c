@@ -1911,7 +1911,8 @@ static int lpm_probe(struct platform_device *pdev)
 	if (ret) {
 		pr_err("%s()Failed to register with cpuidle framework\n",
 				__func__);
-		goto failed;
+		lpm_root_node = NULL;
+		return ret;
 	}
 	register_hotcpu_notifier(&lpm_cpu_nblk);
 	module_kobj = kset_find_obj(module_kset, KBUILD_MODNAME);
