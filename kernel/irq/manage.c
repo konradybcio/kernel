@@ -1107,11 +1107,9 @@ setup_irq_thread(struct irqaction *new, unsigned int irq, bool secondary)
 	};
 
 	if (!secondary) {
-		t = kthread_create(irq_thread, new, "irq/%d-%s", irq,
-				   new->name);
+		t = kthread_create(irq_thread, new, "irq/%d", irq);
 	} else {
-		t = kthread_create(irq_thread, new, "irq/%d-s-%s", irq,
-				   new->name);
+		t = kthread_create(irq_thread, new, "irq/%d-s", irq);
 		param.sched_priority -= 1;
 	}
 
