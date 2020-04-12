@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2015-2017, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -188,8 +188,9 @@ extern void tasha_mbhc_hs_detect_exit(struct snd_soc_codec *codec);
 extern void tasha_mbhc_zdet_gpio_ctrl(
 		int (*zdet_gpio_cb)(struct snd_soc_codec *codec, bool high),
 		struct snd_soc_codec *codec);
-extern int tasha_codec_info_create_codec_entry(struct snd_info_entry *,
-					       struct snd_soc_codec *);
+extern int tasha_codec_info_create_codec_entry(
+		struct snd_info_entry *codec_root,
+		struct snd_soc_codec *codec);
 extern void tasha_event_register(
 	int (*machine_event_cb)(struct snd_soc_codec *codec,
 				enum wcd9335_codec_event),
@@ -200,4 +201,5 @@ extern int tasha_codec_enable_standalone_micbias(struct snd_soc_codec *codec,
 extern int tasha_set_spkr_mode(struct snd_soc_codec *codec, int mode);
 extern int tasha_set_spkr_gain_offset(struct snd_soc_codec *codec, int offset);
 extern enum codec_variant tasha_codec_ver(void);
+extern int tasha_set_spk_amp_gpio(struct snd_soc_codec *codec, int gpio);
 #endif
