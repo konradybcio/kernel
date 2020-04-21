@@ -39,6 +39,7 @@ struct msm_function {
  * @intr_target_reg:      Offset of the register specifying routing of the interrupts
  *                        from this group.
  * @reg_size_4k:          Size of the group register space in 4k granularity.
+ * @dir_conn_reg:         Offset of the register hmss setup in tile.
  * @mux_bit:              Offset in @ctl_reg for the pinmux function selection.
  * @pull_bit:             Offset in @ctl_reg for the bias configuration.
  * @drv_bit:              Offset in @ctl_reg for the drive strength configuration.
@@ -58,6 +59,7 @@ struct msm_function {
  * @intr_detection_width: Number of bits used for specifying interrupt type,
  *                        Should be 2 for SoCs that can detect both edges in hardware,
  *                        otherwise 1.
+ * @dir_conn_en_bit:      Offset in @intr_cfg_reg for direct connect enable bit
  * @wake_reg:             Offset of the WAKEUP_INT_EN register from base tile
  * @wake_bit:             Bit number for the corresponding gpio
  */
@@ -75,6 +77,7 @@ struct msm_pingroup {
 	u32 intr_status_reg;
 	u32 intr_target_reg;
 	unsigned int reg_size_4k:5;
+	u32 dir_conn_reg;
 
 	unsigned int tile:2;
 
@@ -100,9 +103,30 @@ struct msm_pingroup {
 	unsigned intr_polarity_bit:5;
 	unsigned intr_detection_bit:5;
 	unsigned intr_detection_width:5;
+	unsigned dir_conn_en_bit:8;
 
 	u32 wake_reg;
 	unsigned int wake_bit;
+};
+
+/**
+ * struct msm_dir_conn - TLMM Direct GPIO connect configuration
+ * @gpio:	GPIO pin number
+ * @irq:	The GIC interrupt that the pin is connected to
+ */
+struct msm_dir_conn {
+	int gpio;
+	int irq;
+};
+
+/*
+ * struct pinctrl_qup - Qup mode configuration
+ * @mode:	Qup i3c mode
+ * @offset:	Offset of the register
+ */
+struct pinctrl_qup {
+	u32 mode;
+	u32 offset;
 };
 
 /**
@@ -138,12 +162,12 @@ struct pinctrl_qup {
  * @wakeirq_map:    The map of wakeup capable GPIOs and the pin at PDC/MPM
  * @nwakeirq_map:   The number of entries in @wakeirq_map
  * @wakeirq_dual_edge_errata: If true then GPIOs using the wakeirq_map need
- *                            to be aware that their parent can't handle dual
  *                            edge interrupts.
  * @gpio_func: Which function number is GPIO (usually 0).
+ * @nwakeirq_map:   The number of entries in @hierarchy_map
+ * @dir_conn:       An array describing all the pins directly connected to GIC.
  */
 struct msm_pinctrl_soc_data {
-	const struct pinctrl_pin_desc *pins;
 	unsigned npins;
 	const struct msm_function *functions;
 	unsigned nfunctions;
@@ -160,6 +184,7 @@ struct msm_pinctrl_soc_data {
 	struct pinctrl_qup *qup_regs;
 	unsigned int nqup_regs;
 	unsigned int gpio_func;
+	struct msm_dir_conn *dir_conn;
 };
 
 extern const struct dev_pm_ops msm_pinctrl_dev_pm_ops;
