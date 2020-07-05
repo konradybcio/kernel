@@ -309,11 +309,12 @@ static int msm_hs_ioctl(struct uart_port *uport, unsigned int cmd,
 
 	if (!msm_uport)
 		return -ENODEV;
-
+#ifdef CONFIG_BT_BCM43XX
 	if(!bcm43xx_may_use_bluesleep()) {
 		/* the device has been rfkill-ed */
 		return -ENODEV;
 	}
+#endif
 
 	switch (cmd) {
 	case MSM_ENABLE_UART_CLOCK: {
@@ -349,8 +350,9 @@ static int msm_hs_ioctl(struct uart_port *uport, unsigned int cmd,
 	}
 	}
 
+#ifdef CONFIG_BT_BCM43XX
 	bcm43xx_done_accessing_bluesleep();
-
+#endif
 	return ret;
 }
 
@@ -1453,14 +1455,18 @@ static void msm_hs_submit_tx_locked(struct uart_port *uport)
 
 	/* Notify the bluesleep driver of outgoing data, if available. */
 #if defined(CONFIG_BT_MSM_SLEEP) && !defined(CONFIG_LINE_DISCIPLINE_DRIVER)
+#ifdef CONFIG_BT_BCM43XX
 	if(!bcm43xx_may_use_bluesleep()) {
 		/* device has been shutdown */
 		return;
 	}
+#endif
 
 	bluesleep_outgoing_data();
 
+#ifdef CONFIG_BT_BCM43XX
 	bcm43xx_done_accessing_bluesleep();
+#endif
 #endif
 
 	MSM_HS_DBG("%s:Enqueue Tx Cmd, ret %d\n", __func__, ret);
