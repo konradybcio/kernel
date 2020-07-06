@@ -3308,7 +3308,6 @@ static int msm_hs_pm_sys_resume_noirq(struct device *dev)
 }
 #endif
 
-#ifdef CONFIG_BT_BCM43XX
 static void  msm_serial_hs_rt_init(struct uart_port *uport)
 {
 	struct msm_hs_port *msm_uport = UARTDM_TO_MSM(uport);
@@ -3333,12 +3332,6 @@ static int msm_hs_runtime_resume(struct device *dev)
 {
 	return msm_hs_pm_resume(dev);
 }
-#else
-static void  msm_serial_hs_rt_init(struct uart_port *uport) {}
-static int msm_hs_runtime_suspend(struct device *dev) {}
-static int msm_hs_runtime_resume(struct device *dev) {}
-#endif
-
 
 static int msm_hs_probe(struct platform_device *pdev)
 {
