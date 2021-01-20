@@ -49,6 +49,7 @@
  * @irq:            parent irq for the TLMM irq_chip.
  * @intr_target_use_scm: route irq to application cpu using scm calls
  * @n_dir_conns:    The number of pins directly connected to GIC.
+ * @mpm_wake_ctl:   MPM wakeup capability control enable.
  * @lock:           Spinlock to protect register resources as well
  *                  as msm_pinctrl data structures.
  * @enabled_irqs:   Bitmap of currently enabled irqs.
@@ -70,6 +71,7 @@ struct msm_pinctrl {
 	struct irq_chip irq_chip;
 	int irq;
 	int n_dir_conns;
+	bool mpm_wake_ctl;
 
 	bool intr_target_use_scm;
 
@@ -1837,6 +1839,9 @@ int msm_pinctrl_probe(struct platform_device *pdev,
 
 		pctrl->phys_base[0] = res->start;
 	}
+
+	pctrl->mpm_wake_ctl = of_property_read_bool(pdev->dev.of_node,
+					"qcom,tlmm-mpm-wake-control");
 
 	msm_pinctrl_setup_pm_reset(pctrl);
 
