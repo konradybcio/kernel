@@ -165,6 +165,8 @@ struct pinctrl_qup {
  *                            edge interrupts.
  * @gpio_func: Which function number is GPIO (usually 0).
  * @nwakeirq_map:   The number of entries in @hierarchy_map
+ * @no_wake_gpios:  The list of non-wakeup capable GPIOs
+ * @n_no_wake_gpios:The number of entries in non-wakeup capable gpios
  * @dir_conn:       An array describing all the pins directly connected to GIC.
  */
 struct msm_pinctrl_soc_data {
@@ -181,6 +183,8 @@ struct msm_pinctrl_soc_data {
 	const struct msm_gpio_wakeirq_map *wakeirq_map;
 	unsigned int nwakeirq_map;
 	bool wakeirq_dual_edge_errata;
+	unsigned int *no_wake_gpios;
+	unsigned int n_no_wake_gpios;
 	struct pinctrl_qup *qup_regs;
 	unsigned int nqup_regs;
 	unsigned int gpio_func;
