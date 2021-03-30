@@ -107,6 +107,7 @@ obj-$(CONFIG_MSM_DISPCC_WAIPIO) += dispcc-waipio.o
 obj-$(CONFIG_MSM_DEBUGCC_WAIPIO) += debugcc-waipio.o
 obj-$(CONFIG_SM_GPUCC_8150) += gpucc-sm8150.o
 obj-$(CONFIG_SM_GPUCC_8250) += gpucc-sm8250.o
+obj-$(CONFIG_SM_GPUCC_BLAIR) += gpucc-blair.o
 obj-$(CONFIG_SM_VIDEOCC_8150) += videocc-sm8150.o
 obj-$(CONFIG_SM_VIDEOCC_8250) += videocc-sm8250.o
 obj-$(CONFIG_SM_GPUCC_DIWALI) += gpucc-diwali.o
