@@ -996,6 +996,11 @@ static void msm_gpio_irq_enable(struct irq_data *d)
 	struct irq_data *dir_conn_data;
 	irq_hw_number_t dir_conn_irq = 0;
 
+	if (test_bit(d->hwirq, pctrl->skip_wake_irqs)) {
+		if (pctrl->mpm_wake_ctl)
+			msm_gpio_mpm_wake_set(d->hwirq, true);
+	}
+
 	/*
 	 * Clear the interrupt that may be pending before we enable
 	 * the line.
@@ -1017,11 +1022,8 @@ static void msm_gpio_irq_enable(struct irq_data *d)
 		}
 		irq_chip_enable_parent(d);
 
-	if (test_bit(d->hwirq, pctrl->skip_wake_irqs)) {
-		if (pctrl->mpm_wake_ctl)
-			msm_gpio_mpm_wake_set(d->hwirq, true);
+	if (test_bit(d->hwirq, pctrl->skip_wake_irqs))
 		return;
-	}
 
 	msm_gpio_irq_unmask(d, true);
 }
