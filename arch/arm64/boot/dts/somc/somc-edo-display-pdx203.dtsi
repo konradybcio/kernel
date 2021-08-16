@@ -8,6 +8,8 @@
 	qcom,mdss-brightness-max-level = <4095>;
 	qcom,mdss-dsi-mode-sel-gpio-state = "single_port";
 
+	somc,dsi-panel-type = "oled";
+
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
 	somc,platform-touch-reset-gpio = <&tlmm 38 0>;
 	somc,disp-err-flag-gpio = <&tlmm 46 0>;
