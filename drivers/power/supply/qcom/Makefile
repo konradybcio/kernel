@@ -17,3 +17,4 @@ obj-$(CONFIG_QTI_QBG)	+= qti-qbg-main.o
 qti-qbg-main-y	+= qti-qbg.o qbg-sdam.o qbg-battery-profile.o battery-profile-loader.o
 obj-$(CONFIG_SMB358_CHARGER)    += smb358-charger.o
 obj-$(CONFIG_IDTP9382A)			+= idtp9382a.o
+obj-$(CONFIG_SOMC_BATTERY_CHARGER) += somc_battchg_ext.o pmic-voter.o
