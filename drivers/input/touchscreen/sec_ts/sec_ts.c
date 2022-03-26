@@ -2708,19 +2708,13 @@ static void sec_ts_shutdown(struct i2c_client *client)
 
 int sec_ts_stop_device(struct sec_ts_data *ts)
 {
-#ifndef TOUCH_DRIVER_NOT_SOD_PROXIMITY
-	int display_sod_mode;
-#endif
-
 	input_info(true, &ts->client->dev, "%s: start\n", __func__);
 
 #ifndef TOUCH_DRIVER_NOT_SOD_PROXIMITY
 	if (ts->plat_data->sod_mode.status) {
-		display_sod_mode = incell_get_display_sod_mode();
-		if ((!ts->cover_set && ts->flip_enable) || display_sod_mode) {
+		if (!ts->cover_set && ts->flip_enable) {
 			input_dbg(true, &ts->client->dev, "%s: sod skip - SEC_TS_STATE_POWER_OFF\n", __func__);
 			ts->power_status = SEC_TS_STATE_POWER_OFF;
-			incell_control_touch_power();
 		} else {
 			sec_ts_set_irq(ts, true);
 			sec_ts_set_lowpowermode(ts, TO_LOWPOWER_MODE);
