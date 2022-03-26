@@ -195,13 +195,6 @@
 
 #define PERF_CAPABILITY   (1 << 1)
 
-/*Max number of region supported  */
-#define MAX_UNIQUE_ID 5
-
-/*Unique index flag used for mini dump*/
-
-static int md_unique_index_flag[MAX_UNIQUE_ID] = { 0, 0, 0, 0, 0 };
-
 enum fastrpc_proc_attr {
 	/* Macro for Debug attr */
 	FASTRPC_MODE_DEBUG				= 1 << 0,
@@ -568,7 +561,6 @@ struct fastrpc_mmap {
 	int uncached;
 	int secure;
 	bool is_persistent;		/* Indicates whether map is persistent */
-	int frpc_md_index;		/* Minidump unique index */
 	uintptr_t attr;
 	bool in_use;			/* Indicates if persistent map is in use*/
 	struct timespec64 map_start_time;
@@ -875,31 +867,6 @@ static inline void fastrpc_update_rxmsg_buf(struct fastrpc_channel_ctx *chan,
 	spin_unlock_irqrestore(&chan->gmsg_log.lock, flags);
 }
 
-
-static inline int get_unique_index(void)
-{
-	int index = -1;
-
-	mutex_lock(&gfa.mut_uid);
-	for (index = 0; index < MAX_UNIQUE_ID; index++) {
-		if (md_unique_index_flag[index] == 0) {
-			md_unique_index_flag[index] = 1;
-			mutex_unlock(&gfa.mut_uid);
-			return index;
-		}
-	}
-	mutex_unlock(&gfa.mut_uid);
-	return index;
-}
-
-static inline void reset_unique_index(int index)
-{
-	mutex_lock(&gfa.mut_uid);
-	if (index > -1 && index < MAX_UNIQUE_ID)
-		md_unique_index_flag[index] = 0;
-	mutex_unlock(&gfa.mut_uid);
-}
-
 /**
  * fastrpc_elf_ramdump - Dump given ram dump entry
  * @rh_dump_dev       : Device handle for given channel
@@ -916,74 +883,6 @@ static int fastrpc_elf_ramdump(void *rh_dump_dev, struct ramdump_segment *ramdum
 
 	return err;
 }
-
-/**
- * fastrpc_minidump_add_region - Add mini dump region
- * @fastrpc_mmap       : Input structure mmap
- *
- * Returns int
- */
-static int fastrpc_minidump_add_region(struct fastrpc_mmap *map)
-{
-	int err = 0, ret_val = 0, md_index = 0;
-	struct md_region md_entry;
-
-	md_index = get_unique_index();
-	if (md_index > -1 && md_index < MAX_UNIQUE_ID) {
-		scnprintf(md_entry.name, MAX_NAME_LENGTH, "FRPC_%d", md_index);
-		md_entry.virt_addr = map->va;
-		md_entry.phys_addr = map->phys;
-		md_entry.size = map->size;
-		ret_val = msm_minidump_add_region(&md_entry);
-		if (ret_val < 0) {
-			ADSPRPC_ERR(
-			"Failed to add/update CMA to Minidump for phys: 0x%llx, size: %zu, md_index %d, md_entry.name %s\n",
-			map->phys,
-			map->size, md_index,
-			md_entry.name);
-			reset_unique_index(md_index);
-			err = ret_val;
-		} else {
-			map->frpc_md_index = md_index;
-		}
-	} else {
-		pr_warn("failed to generate valid unique id for mini dump : %d\n", md_index);
-	}
-	return err;
-}
-
-/**
- * fastrpc_minidump_remove_region - Remove mini dump region if added
- * @fastrpc_mmap       : Input structure mmap
- *
- * Returns int
- */
-static int fastrpc_minidump_remove_region(struct fastrpc_mmap *map)
-{
-	int err = -1;
-	struct md_region md_entry;
-
-	if (map->frpc_md_index > -1 && map->frpc_md_index < MAX_UNIQUE_ID) {
-		scnprintf(md_entry.name, MAX_NAME_LENGTH, "FRPC_%d",
-					map->frpc_md_index);
-		md_entry.virt_addr = map->va;
-		md_entry.phys_addr = map->phys;
-		md_entry.size = map->size;
-		err = msm_minidump_remove_region(&md_entry);
-		if (err < 0) {
-			ADSPRPC_ERR(
-				"Failed to remove CMA from Minidump for phys: 0x%llx, size: %zu index = %d\n",
-				 map->phys, map->size, map->frpc_md_index);
-		} else {
-			reset_unique_index(map->frpc_md_index);
-			map->frpc_md_index = -1;
-		}
-	} else {
-		ADSPRPC_WARN("mini-dump enabled with invalid unique id: %d\n", map->frpc_md_index);
-	}
-	return err;
-}
-
 
 static void fastrpc_buf_free(struct fastrpc_buf *buf, int cache)
 {
@@ -1237,6 +1136,7 @@ static void fastrpc_mmap_free(struct fastrpc_mmap *map, uint32_t flags)
 	struct fastrpc_file *fl;
 	int vmid, cid = -1, err = 0;
 	struct fastrpc_session_ctx *sess;
+	struct md_region md_entry;
 
 	if (!map)
 		return;
@@ -1287,7 +1187,15 @@ static void fastrpc_mmap_free(struct fastrpc_mmap *map, uint32_t flags)
 		}
 
 		if (msm_minidump_enabled() && !map->is_persistent)
-			err = fastrpc_minidump_remove_region(map);
+			scnprintf(md_entry.name, sizeof(md_entry.name), "CMA_%d", current->tgid);
+			md_entry.virt_addr = map->va;
+			md_entry.phys_addr = map->phys;
+			md_entry.size = map->size;
+			if (msm_minidump_remove_region(&md_entry) < 0) {
+				ADSPRPC_ERR(
+					"Failed to remove CMA from Minidump for tgid: %d, phys: 0x%llx, size: %zu\n",
+					current->tgid, map->phys, map->size);
+			}
 
 		if (map->phys && !map->is_persistent) {
 			trace_fastrpc_dma_free(-1, map->phys, map->size);
@@ -1379,6 +1287,7 @@ static int fastrpc_mmap_create(struct fastrpc_file *fl, int fd,
 	unsigned long flags;
 	int err = 0, vmid, sgl_index = 0;
 	struct scatterlist *sgl = NULL;
+	struct md_region md_entry;
 
 	VERIFY(err, cid >= ADSP_DOMAIN_ID && cid < NUM_CHANNELS);
 	if (err) {
@@ -1401,7 +1310,6 @@ static int fastrpc_mmap_create(struct fastrpc_file *fl, int fd,
 	map->fl = fl;
 	map->fd = fd;
 	map->attr = attr;
-	map->frpc_md_index = -1;
 	map->is_filemap = false;
 	ktime_get_real_ts64(&map->map_start_time);
 	if (mflags == ADSP_MMAP_HEAP_ADDR ||
@@ -1420,9 +1328,15 @@ static int fastrpc_mmap_create(struct fastrpc_file *fl, int fd,
 		map->va = (uintptr_t)region_vaddr;
 
 		if (msm_minidump_enabled()) {
-			err = fastrpc_minidump_add_region(map);
-			if (err)
-				goto bail;
+			scnprintf(md_entry.name, sizeof(md_entry.name), "CMA_%d", fl->tgid);
+			md_entry.virt_addr = map->va;
+			md_entry.phys_addr = map->phys;
+			md_entry.size = map->size;
+			if (msm_minidump_add_region(&md_entry) >= 0) {
+				ADSPRPC_ERR(
+					"Failed to add CMA to Minidump for tgid: %d, phys: 0x%llx, size: %zu\n",
+					fl->tgid, map->phys, map->size);
+			}
 		}
 	} else if (mflags == FASTRPC_DMAHANDLE_NOMAP) {
 		VERIFY(err, !IS_ERR_OR_NULL(map->buf = dma_buf_get(fd)));
@@ -2979,8 +2893,8 @@ static void fastrpc_init(struct fastrpc_apps *me)
 	INIT_HLIST_HEAD(&me->drivers);
 	INIT_HLIST_HEAD(&me->maps);
 	spin_lock_init(&me->hlock);
-	me->channel = &gcinfo[0];
 	mutex_init(&me->mut_uid);
+	me->channel = &gcinfo[0];
 	for (i = 0; i < NUM_CHANNELS; i++) {
 		init_completion(&me->channel[i].work);
 		init_completion(&me->channel[i].workport);
