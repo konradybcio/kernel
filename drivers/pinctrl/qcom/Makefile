@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Qualcomm pin control drivers
 obj-$(CONFIG_PINCTRL_MSM)	+= pinctrl-msm.o
+obj-$(CONFIG_PINCTRL_BLAIR) += pinctrl-blair.o
 obj-$(CONFIG_PINCTRL_LAHAINA) += pinctrl-lahaina.o
 obj-$(CONFIG_PINCTRL_SHIMA) += pinctrl-shima.o
 obj-$(CONFIG_PINCTRL_HOLI) += pinctrl-holi.o
