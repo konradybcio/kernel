@@ -2426,7 +2426,7 @@ ufs_qcom_query_ioctl(struct ufs_hba *hba, u8 lun, void __user *buffer)
 #ifdef UFS_TARGET_SONY_PLATFORM
 		case QUERY_ATTR_IDN_PURGE_STATUS:
 			index = 0;
-			if (hba->dev_info.quirks & UFS_DEVICE_QUIRK_NO_PURGE) {
+			if (hba->dev_quirks & UFS_DEVICE_QUIRK_NO_PURGE) {
 				err = -EPERM;
 				goto out_release_mem;
 			}
@@ -2496,7 +2496,7 @@ ufs_qcom_query_ioctl(struct ufs_hba *hba, u8 lun, void __user *buffer)
 		switch (ioctl_data->idn) {
 #ifdef UFS_TARGET_SONY_PLATFORM
 		case QUERY_FLAG_IDN_PURGE_ENABLE:
-			if (hba->dev_info.quirks & UFS_DEVICE_QUIRK_NO_PURGE) {
+			if (hba->dev_quirks & UFS_DEVICE_QUIRK_NO_PURGE) {
 				err = -EPERM;
 				goto out_release_mem;
 			}
@@ -2522,7 +2522,7 @@ ufs_qcom_query_ioctl(struct ufs_hba *hba, u8 lun, void __user *buffer)
 		switch (ioctl_data->idn) {
 		case QUERY_FLAG_IDN_PURGE_ENABLE:
 #ifdef UFS_TARGET_SONY_PLATFORM
-			if (hba->dev_info.quirks & UFS_DEVICE_QUIRK_NO_PURGE) {
+			if (hba->dev_quirks & UFS_DEVICE_QUIRK_NO_PURGE) {
 				err = -EPERM;
 				goto out_release_mem;
 			}
