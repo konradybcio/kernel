@@ -1025,7 +1025,7 @@ static void msm_gpio_irq_enable(struct irq_data *d)
 	if (test_bit(d->hwirq, pctrl->skip_wake_irqs))
 		return;
 
-	msm_gpio_irq_unmask(d, true);
+	msm_gpio_irq_unmask(d);
 }
 
 static void msm_gpio_irq_disable(struct irq_data *d)
