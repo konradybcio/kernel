@@ -82,4 +82,9 @@
 #define QMI_SLPI_INST_ID	0x53
 #define QMI_MODEM_NR_INST_ID	0x64
 
+/* Legacy bindings */
+#define QMI_BEAMER_N_THERM      31
+#define QMI_BEAMER_E_THERM      32
+#define QMI_BEAMER_W_THERM      33
+
 #endif
