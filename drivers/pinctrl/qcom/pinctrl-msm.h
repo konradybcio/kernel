@@ -170,6 +170,7 @@ struct pinctrl_qup {
  * @dir_conn:       An array describing all the pins directly connected to GIC.
  */
 struct msm_pinctrl_soc_data {
+	const struct pinctrl_pin_desc *pins;
 	unsigned npins;
 	const struct msm_function *functions;
 	unsigned nfunctions;
