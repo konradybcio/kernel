@@ -265,6 +265,7 @@ struct msm_geni_serial_port {
 	atomic_t is_clock_off;
 	enum uart_error_code uart_error;
 	unsigned long ser_clk_cfg;
+	bool gpio_suspend_state;
 };
 
 static const struct uart_ops msm_geni_serial_pops;
@@ -2986,6 +2987,9 @@ static int msm_geni_console_setup(struct console *co, char *options)
 
 	uport = &dev_port->uport;
 
+	if (dev_port->gpio_suspend_state)
+		return -ENXIO;
+
 	if (unlikely(!uport->membase))
 		return -ENXIO;
 
@@ -3122,6 +3126,9 @@ static void msm_geni_serial_cons_pm(struct uart_port *uport,
 	if (unlikely(!uart_console(uport)))
 		return;
 
+	if (msm_port->gpio_suspend_state)
+		return;
+
 	if (new_state == UART_PM_STATE_ON && old_state == UART_PM_STATE_OFF) {
 		se_geni_resources_on(&msm_port->serial_rsc);
 		msm_geni_enable_disable_se_clk(uport, true);
@@ -3233,6 +3240,69 @@ exit_ver_info:
 	return ret;
 }
 
+int msm_geni_serial_gpio_suspend(bool state)
+{
+	int ret = 0;
+	struct msm_geni_serial_port *port = NULL;
+
+	port = get_port_from_line(0, true);
+	if (IS_ERR_OR_NULL(port))
+		return -EINVAL;
+
+	if (IS_ERR_OR_NULL(port->serial_rsc.geni_gpio_active) ||
+		IS_ERR_OR_NULL(port->serial_rsc.geni_gpio_suspend)) {
+		return -EINVAL;
+	}
+	pr_err("%s-%d: gpio_suspend_state=%d, state=%d", __func__, __LINE__, port->gpio_suspend_state, state);
+
+	if (port->gpio_suspend_state^state) {
+		port->gpio_suspend_state = state;
+
+		if (state) {
+			ret = pinctrl_select_state(port->serial_rsc.geni_pinctrl, port->serial_rsc.geni_gpio_suspend);
+			if (ret < 0) {
+				pr_err("Set Suspend pin state error:%d", ret);
+			}
+		} else {
+			ret = pinctrl_select_state(port->serial_rsc.geni_pinctrl, port->serial_rsc.geni_gpio_active);
+			if (ret < 0) {
+				pr_err("Set Active pin state error:%d", ret);
+			}
+		}
+
+	}
+
+	return ret;
+}
+EXPORT_SYMBOL(msm_geni_serial_gpio_suspend);
+
+static ssize_t geni_gpio_suspend_show(struct device *dev,
+		struct device_attribute *attr, char *buf)
+{
+	struct platform_device *pdev = to_platform_device(dev);
+	struct msm_geni_serial_port *port = platform_get_drvdata(pdev);
+	ssize_t ret = 0;
+
+	if (port->gpio_suspend_state == true)
+		ret = snprintf(buf, sizeof("1\n"), "1\n");
+	else
+		ret = snprintf(buf, sizeof("0\n"), "0\n");
+	return ret;
+}
+
+static ssize_t geni_gpio_suspend_store(struct device *dev,
+	struct device_attribute *attr, const char *buf, size_t size)
+{
+	pr_err("%s-%d: buf=%s", __func__, __LINE__, buf);
+
+	if (strnstr(buf, "1", strlen("1")))
+		msm_geni_serial_gpio_suspend(true);
+	else
+		msm_geni_serial_gpio_suspend(false);
+	return size;
+}
+static DEVICE_ATTR_RW(geni_gpio_suspend);
+
 static int msm_geni_serial_get_irq_pinctrl(struct platform_device *pdev,
 					struct msm_geni_serial_port *dev_port)
 {
@@ -3285,6 +3355,14 @@ static int msm_geni_serial_get_irq_pinctrl(struct platform_device *pdev,
 	if (IS_ERR_OR_NULL(dev_port->serial_rsc.geni_gpio_sleep)) {
 		dev_err(&pdev->dev, "No sleep config specified!\n");
 		return PTR_ERR(dev_port->serial_rsc.geni_gpio_sleep);
+	}
+
+	dev_port->serial_rsc.geni_gpio_suspend=
+		pinctrl_lookup_state(dev_port->serial_rsc.geni_pinctrl,
+						PINCTRL_SLEEP);
+	if (IS_ERR_OR_NULL(dev_port->serial_rsc.geni_gpio_suspend)) {
+		dev_err(&pdev->dev, "No suspend config specified!\n");
+		return PTR_ERR(dev_port->serial_rsc.geni_gpio_suspend);
 	}
 
 	uport->irq = platform_get_irq(pdev, 0);
@@ -3543,6 +3621,7 @@ static int msm_geni_serial_probe(struct platform_device *pdev)
 	device_create_file(uport->dev, &dev_attr_loopback);
 	device_create_file(uport->dev, &dev_attr_xfer_mode);
 	device_create_file(uport->dev, &dev_attr_ver_info);
+	device_create_file(uport->dev, &dev_attr_geni_gpio_suspend);
 	msm_geni_serial_debug_init(uport, is_console);
 	dev_port->port_setup = false;
 
@@ -3694,6 +3773,10 @@ static int msm_geni_serial_runtime_resume(struct device *dev)
 	int ret = 0;
 
 	UART_LOG_DBG(port->ipc_log_pwr, dev, "%s: Start\n", __func__);
+
+	if (port->gpio_suspend_state)
+		return ret;
+
 	/*
 	 * Do an unconditional relax followed by a stay awake in case the
 	 * wake source is activated by the wakeup isr.
