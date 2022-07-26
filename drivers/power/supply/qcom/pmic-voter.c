@@ -45,11 +45,8 @@ struct votable {
 	char			*client_strs[NUM_MAX_CLIENTS];
 	bool			voted_on;
 	struct dentry		*root;
-	struct dentry		*status_ent;
 	u32			force_val;
-	struct dentry		*force_val_ent;
 	bool			force_active;
-	struct dentry		*force_active_ent;
 };
 
 /**
@@ -771,42 +768,19 @@ struct votable *create_votable(const char *name,
 		return ERR_PTR(-ENOMEM);
 	}
 
-	votable->status_ent = debugfs_create_file("status", S_IFREG | 0444,
+	debugfs_create_file("status", S_IFREG | 0444,
 				  votable->root, votable,
 				  &votable_status_ops);
-	if (!votable->status_ent) {
-		pr_err("Couldn't create status dbg file for %s\n", name);
-		debugfs_remove_recursive(votable->root);
-		kfree(votable->name);
-		kfree(votable);
-		return ERR_PTR(-EEXIST);
-	}
 
-	votable->force_val_ent = debugfs_create_u32("force_val",
+	debugfs_create_u32("force_val",
 					S_IFREG | 0644,
 					votable->root,
 					&(votable->force_val));
 
-	if (!votable->force_val_ent) {
-		pr_err("Couldn't create force_val dbg file for %s\n", name);
-		debugfs_remove_recursive(votable->root);
-		kfree(votable->name);
-		kfree(votable);
-		return ERR_PTR(-EEXIST);
-	}
-
-	votable->force_active_ent = debugfs_create_file("force_active",
+	debugfs_create_file("force_active",
 					S_IFREG | 0444,
 					votable->root, votable,
 					&votable_force_ops);
-	if (!votable->force_active_ent) {
-		pr_err("Couldn't create force_active dbg file for %s\n", name);
-		debugfs_remove_recursive(votable->root);
-		kfree(votable->name);
-		kfree(votable);
-		return ERR_PTR(-EEXIST);
-	}
-
 	return votable;
 }
 

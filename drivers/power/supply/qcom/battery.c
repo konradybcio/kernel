@@ -2053,11 +2053,7 @@ static void qcom_batt_create_debugfs(struct pl_data *chip)
 		return;
 	}
 
-	entry = debugfs_create_u32("debug_mask", 0600, chip->dfs_root,
-			&debug_mask);
-	if (IS_ERR_OR_NULL(entry))
-		pr_err("Couldn't create force_dc_psy_update file rc=%ld\n",
-			(long)entry);
+	debugfs_create_u32("debug_mask", 0600, chip->dfs_root, debug_mask);
 }
 
 #define DEFAULT_RESTRICTED_CURRENT_UA	1000000
