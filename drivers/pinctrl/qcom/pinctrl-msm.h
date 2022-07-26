@@ -120,16 +120,6 @@ struct msm_dir_conn {
 };
 
 /*
- * struct pinctrl_qup - Qup mode configuration
- * @mode:	Qup i3c mode
- * @offset:	Offset of the register
- */
-struct pinctrl_qup {
-	u32 mode;
-	u32 offset;
-};
-
-/*
  * struct msm_spare_tlmm - TLMM spare registers config
  * @spare_reg:	spare register number
  * @offset:	Offset of spare register
