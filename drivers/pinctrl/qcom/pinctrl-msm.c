@@ -1021,6 +1021,7 @@ static void msm_gpio_irq_enable(struct irq_data *d)
 			dir_conn_data->chip->irq_unmask(dir_conn_data);
 		}
 		irq_chip_enable_parent(d);
+	}
 
 	if (test_bit(d->hwirq, pctrl->skip_wake_irqs))
 		return;
