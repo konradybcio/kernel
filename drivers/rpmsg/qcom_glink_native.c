@@ -56,7 +56,8 @@ do {									     \
 #define RPM_GLINK_CID_MAX	65536
 
 static int should_wake;
-static int glink_resume_pkt;
+int glink_resume_pkt;
+EXPORT_SYMBOL(glink_resume_pkt);
 
 struct glink_msg {
 	__le16 cmd;
