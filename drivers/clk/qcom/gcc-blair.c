@@ -4385,7 +4385,7 @@ static int __init gcc_blair_init(void)
 {
 	return platform_driver_register(&gcc_blair_driver);
 }
-subsys_initcall(gcc_blair_init);
+core_initcall(gcc_blair_init);
 
 static void __exit gcc_blair_exit(void)
 {
