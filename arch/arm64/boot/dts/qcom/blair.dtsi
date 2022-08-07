@@ -24,7 +24,7 @@
 	#size-cells = <2>;
 
 	chosen {
-		bootargs = "log_buf_len=256K rcupdate.rcu_expedited=1 rcu_nocbs=0-7 kpti=off";
+		bootargs = "earlycon=simplefb,0x85200000,1080,2520 log_buf_len=256K";
 	};
 
 	memory {
