@@ -1322,8 +1322,8 @@ static void cnss_recovery_work_handler(struct work_struct *work)
 	struct cnss_plat_data *plat_priv =
 		container_of(work, struct cnss_plat_data, recovery_work);
 
-	if (!plat_priv->recovery_enabled)
-		panic("subsys-restart: Resetting the SoC wlan crashed\n");
+//	if (!plat_priv->recovery_enabled)
+//		panic("subsys-restart: Resetting the SoC wlan crashed\n");
 
 	cnss_bus_dev_shutdown(plat_priv);
 	cnss_bus_dev_ramdump(plat_priv);
