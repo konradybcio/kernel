@@ -2211,7 +2211,7 @@ static void glink_slatecom_release(struct device *dev)
 	kfree(glink);
 }
 
-int glink_slatecom_probe(struct platform_device *pdev)
+static int glink_slatecom_probe(struct platform_device *pdev)
 {
 	struct glink_slatecom *glink;
 	struct device *dev;
@@ -2283,7 +2283,7 @@ err_put_dev:
 }
 EXPORT_SYMBOL(glink_slatecom_probe);
 
-int glink_slatecom_remove(struct platform_device *pdev)
+static int glink_slatecom_remove(struct platform_device *pdev)
 {
 	struct glink_slatecom *glink = platform_get_drvdata(pdev);
 	int ret;
