@@ -318,6 +318,7 @@ config ARCH_HOLI
 config ARCH_SONY_MURRAY
 	bool "Sony Mobile Murray platform"
 	depends on ARCH_BLAIR
+	depends on ARCH_HOLI
 	help
 	  Support for the SONY Mobile Murray platform
 	  which is based on QCOM HOLI chipset.
