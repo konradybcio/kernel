@@ -1,5 +1,5 @@
 &qupv3_se10_i2c {
-	status = "ok";
+	status = "disabled";
 	ti_haptic@5A{
 		compatible = "ti,haptic";
 		reg = < 0x5A >;
@@ -10,6 +10,6 @@
 		ti,rated-voltage = <280>;
 		ti,odclamp-voltage = <320>;
 		ti,lra-frequency = <235>; /* DON'T Care if ERM */
-		status = "okay";
+		status = "disabled";
 	};
 };

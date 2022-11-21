@@ -190,7 +190,7 @@
 	};
 
 	sde_dsi: qcom,dsi-display-primary {
-		compatible = "qcom,dsi-display";
+		compatible = "somc,dsi-display";
 		label = "primary";
 
 		qcom,dsi-ctrl = <&mdss_dsi0>;

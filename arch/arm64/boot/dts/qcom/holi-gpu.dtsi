@@ -3,14 +3,14 @@
 #define MHZ_TO_KBPS(mhz, w) ((mhz * 1000000 * w) / (1024))
 &soc {
 	pil_gpu: qcom,kgsl-hyp {
-		compatible = "qcom,pil-tz-generic";
+		//compatible = "qcom,pil-tz-generic";
 		qcom,pas-id = <13>;
 		qcom,firmware-name = "a615_zap";
 		memory-region = <&pil_gpu_micro_code_mem>;
 	};
 
 msm_gpu: qcom,kgsl-3d0@5900000 {
-		compatible = "qcom,kgsl-3d0", "qcom,adreno-gpu-a619-holi";
+		//compatible = "qcom,kgsl-3d0", "qcom,adreno-gpu-a619-holi";
 		status = "ok";
 		reg = <0x5900000 0x40000>,
 		    <0x5961000 0x800>,
@@ -68,7 +68,7 @@ msm_gpu: qcom,kgsl-3d0@5900000 {
 		qcom,gpu-mempools {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			compatible = "qcom,gpu-mempools";
+			//compatible = "qcom,gpu-mempools";
 
 			/* 4K Page Pool configuration */
 			qcom,gpu-mempool@0 {
@@ -106,7 +106,7 @@ msm_gpu: qcom,kgsl-3d0@5900000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
 
-			compatible = "qcom,gpu-pwrlevel-bins";
+			//compatible = "qcom,gpu-pwrlevel-bins";
 
 			qcom,gpu-pwrlevels-0 {
 				#address-cells = <1>;
@@ -313,19 +313,19 @@ msm_gpu: qcom,kgsl-3d0@5900000 {
 	 };
 
 	kgsl_msm_iommu: qcom,kgsl-iommu@5940000 {
-		compatible = "qcom,kgsl-smmu-v2";
+		//compatible = "qcom,kgsl-smmu-v2";
 		reg = <0x5940000 0x10000>;
 
 		vddcx-supply = <&gpu_cx_gdsc>;
 
 		gfx3d_user: gfx3d_user {
-			compatible = "qcom,smmu-kgsl-cb";
+			//compatible = "qcom,smmu-kgsl-cb";
 			iommus = <&kgsl_smmu 0x0>;
 			qcom,iommu-dma = "disabled";
 		};
 
 		gfx3d_secure: gfx3d_secure {
-		      compatible = "qcom,smmu-kgsl-cb";
+		      //compatible = "qcom,smmu-kgsl-cb";
 		      iommus = <&kgsl_smmu 0x2>;
 		      qcom,iommu-dma = "disabled";
 		};

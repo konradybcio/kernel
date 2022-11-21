@@ -112,7 +112,7 @@ static void simplefb_earlycon_write_char(u32 *dst, unsigned char c, unsigned int
 	int m, n, bytes;
 	u8 x;
 
-	bytes = BITS_TO_BYTES(font->width);
+	bytes = __KERNEL_DIV_ROUND_UP(font->width, BITS_PER_TYPE(char));
 	src = font->data + c * font->height * bytes + h * bytes;
 
 	for (m = 0; m < font->width; m++) {
