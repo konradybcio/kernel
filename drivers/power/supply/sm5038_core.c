@@ -200,7 +200,7 @@ static int of_sm5038_dt(struct device *dev, struct sm5038_platform_data *pdata)
 	return 0;
 }
 
-static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *dev_id)
+static int sm5038_i2c_probe(struct i2c_client *i2c)
 {
 	struct sm5038_dev *sm5038;
 	struct sm5038_platform_data *pdata = i2c->dev.platform_data;
@@ -281,24 +281,24 @@ pr_err("got here 10\n");
 	
 	pr_info("%s: %s : sm5038->dev=%p, sm5038->irq=%d\n", SM5038_DEV_NAME, __func__, sm5038->dev, sm5038->irq);
 
-    /* Get Device ID & Check Charger I2C transmission */
-    ret = sm5038_read_reg(i2c, SM5038_CHG_REG_DEVICEID, &temp);
+	/* Get Device ID & Check Charger I2C transmission */
+	ret = sm5038_read_reg(i2c, SM5038_CHG_REG_DEVICEID, &temp);
 	if (ret < 0 || (temp & 0x7) != 0x1) {
 		pr_err("%s:%s device not found on this channel (reg_data=0x%x)\n", SM5038_DEV_NAME, __func__, temp);
 		ret = -ENODEV;
 		goto err_w_lock;
 	}
-    sm5038->vender_id = (temp & 0x7);
-    sm5038->pmic_rev = ((temp >> 3) & 0x1F);
+	sm5038->vender_id = (temp & 0x7);
+	sm5038->pmic_rev = ((temp >> 3) & 0x1F);
 
     pr_info("%s:%s v_id=0x%x, rev=0x%x\n",
 		SM5038_DEV_NAME, __func__, sm5038->vender_id, sm5038->pmic_rev);
 
 	sm5038->fuelgauge_i2c = i2c_new_dummy(i2c->adapter, SM5038_I2C_SADR_FG);
 	//i2c_set_clientdata(sm5038->fuelgauge_i2c, sm5038);
-    /* Check FG I2C transmission */
-    ret = sm5038_read_word(sm5038->fuelgauge_i2c, SM5038_FG_REG_DEVICE_ID);
-    if ((unsigned int)ret > 0xFF) {
+	/* Check FG I2C transmission */
+	ret = sm5038_read_word(sm5038->fuelgauge_i2c, SM5038_FG_REG_DEVICE_ID);
+	if ((unsigned int)ret > 0xFF) {
 		pr_err("%s:%s fail to setup FG I2C transmission (ret=0x%x)\n", SM5038_DEV_NAME, __func__, ret);
 		ret = -ENODEV;
 		goto err_w_lock;
@@ -306,8 +306,8 @@ pr_err("got here 10\n");
 pr_err("got here 11\n");
 	sm5038->muic_i2c = i2c_new_dummy(i2c->adapter, SM5038_I2C_SADR_MUIC);
 	//i2c_set_clientdata(sm5038->muic_i2c, sm5038);
-    /* Check MUIC I2C transmission */
-    ret = sm5038_read_reg(sm5038->muic_i2c, SM5038_MUIC_REG_DEVICEID, &temp);
+	/* Check MUIC I2C transmission */
+	ret = sm5038_read_reg(sm5038->muic_i2c, SM5038_MUIC_REG_DEVICEID, &temp);
 	if (ret < 0 || temp != 0x1) {
 		pr_err("%s:%s fail to setup MUIC I2C transmission (reg_data=0x%x)\n", SM5038_DEV_NAME, __func__, temp);
 		ret = -ENODEV;
@@ -410,15 +410,15 @@ static int sm5038_i2c_remove(struct i2c_client *i2c)
 
 
 	//mfd_remove_devices(sm5038->dev);
-    sm5038_irq_exit(sm5038);
+	sm5038_irq_exit(sm5038);
 
 	i2c_unregister_device(sm5038->muic_i2c);
-    i2c_unregister_device(sm5038->fuelgauge_i2c);
+	i2c_unregister_device(sm5038->fuelgauge_i2c);
 
-    mutex_destroy(&sm5038->i2c_lock);
+	mutex_destroy(&sm5038->i2c_lock);
 	mutex_destroy(&sm5038->irq_thread_lock);
 
-    kfree(sm5038);
+	kfree(sm5038);
 
 	return 0;
 }
@@ -505,25 +505,13 @@ static struct i2c_driver sm5038_i2c_driver = {
 		.pm	    = &sm5038_pm,
 		.of_match_table	= sm5038_i2c_dt_ids,
 	},
-	.probe		= sm5038_i2c_probe,
+	.probe_new	= sm5038_i2c_probe,
 	.remove		= sm5038_i2c_remove,
 	.shutdown	= sm5038_i2c_shutdown,
 	.id_table	= sm5038_i2c_id,
 };
 
-static int __init sm5038_i2c_init(void)
-{
-	pr_info("%s:%s\n", SM5038_DEV_NAME, __func__);
-	return i2c_add_driver(&sm5038_i2c_driver);
-}
-module_init(sm5038_i2c_init);
-
-static void __exit sm5038_i2c_exit(void)
-{
-	i2c_del_driver(&sm5038_i2c_driver);
-}
-module_exit(sm5038_i2c_exit);
+module_i2c_driver(sm5038_i2c_driver);
 
 MODULE_DESCRIPTION("SM5038 multi-function core driver");
 MODULE_LICENSE("GPL");
-MODULE_IMPORT_NS(VFS_internal_I_am_really_a_filesystem_and_am_NOT_a_driver);
