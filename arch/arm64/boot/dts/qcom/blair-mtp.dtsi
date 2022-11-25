@@ -187,11 +187,11 @@
 	};
 };*/
 &qupv3_se8_i2c {
-	status = "okay";
+	//status = "okay";
 	qcom,i2c-touch-active="sec,sec_ts";
 
 	sec_ts@48 {
-		compatible = "sec,sec_ts";
+		//compatible = "sec,sec_ts";
 		reg = <0x48>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <22 0x2008>;

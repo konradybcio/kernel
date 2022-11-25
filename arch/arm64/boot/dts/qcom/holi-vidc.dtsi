@@ -1,6 +1,6 @@
 &soc {
 	msm_vidc: qcom,vidc@5a00000 {
-		compatible = "qcom,msm-vidc", "qcom,holi-vidc";
+		//compatible = "qcom,msm-vidc", "qcom,holi-vidc";
 		status = "ok";
 		reg = <0x5a00000 0x200000>;
 		interrupts = <GIC_SPI 225 IRQ_TYPE_LEVEL_HIGH>;

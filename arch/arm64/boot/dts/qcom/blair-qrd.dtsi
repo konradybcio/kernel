@@ -203,7 +203,7 @@
 		};
 	};
 	sony_ext_uim_ctrl {
-		compatible = "sony,ext-uim-ctrl";
+//		compatible = "sony,ext-uim-ctrl";
 		uim2_detect_en_gpio = <&tlmm 85 GPIO_ACTIVE_HIGH>;
 	};
     bu520x1nvx {
@@ -269,11 +269,11 @@
 	};
 };*/
 &qupv3_se8_i2c {
-	status = "okay";
+	//status = "okay";
 	qcom,i2c-touch-active="sec,sec_ts";
 
 	sec_ts@48 {
-		compatible = "sec,sec_ts";
+		//compatible = "sec,sec_ts";
 		reg = <0x48>;
 		interrupt-parent = <&tlmm>;
 		interrupts = <22 0x2008>;

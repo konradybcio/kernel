@@ -2892,6 +2892,7 @@ EXPORT_SYMBOL(register_console);
 
 int unregister_console(struct console *console)
 {
+return 0;
         struct console *a, *b;
 	int res;
 
