@@ -516,8 +516,7 @@ static int __init sm5038_i2c_init(void)
 	pr_info("%s:%s\n", SM5038_DEV_NAME, __func__);
 	return i2c_add_driver(&sm5038_i2c_driver);
 }
-/* init early so consumer devices can complete system boot */
-subsys_initcall(sm5038_i2c_init);
+module_init(sm5038_i2c_init);
 
 static void __exit sm5038_i2c_exit(void)
 {
