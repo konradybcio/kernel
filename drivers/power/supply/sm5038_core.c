@@ -216,15 +216,16 @@ static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 		ret = -EIO;
 		goto err;
 	}
-
+pr_err("got here 1\n");
 	sm5038 = kzalloc(sizeof(struct sm5038_dev), GFP_KERNEL);
 	if (!sm5038) {
 		pr_err("%s: Failed to alloc mem for sm5038\n",
 								__func__);
 		return -ENOMEM;
 	}
-
+pr_err("got here 2\n");
 	if (i2c->dev.of_node) {
+pr_err("got here 3\n");
 		pdata = devm_kzalloc(&i2c->dev, sizeof(struct sm5038_platform_data), GFP_KERNEL);
 		if (!pdata) {
 			pr_err("Failed to allocate memory\n");
@@ -232,23 +233,25 @@ static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 			goto err;
 
 		}
-
+pr_err("got here 4\n");
 		ret = of_sm5038_dt(&i2c->dev, pdata);
 		if (ret < 0) {
 			pr_err("Failed to get device of_node\n");
 			goto err;
 		}
-
+pr_err("got here 5\n");
 		i2c->dev.platform_data = pdata;
 	} else {
+		pr_err("got here 2b\n");
 		pdata = i2c->dev.platform_data;
 	}
-
+pr_err("got here 6\n");
 	sm5038->dev = &i2c->dev;
 	sm5038->charger_i2c = i2c;
 	sm5038->irq = i2c->irq;
-
+pr_err("got here 7\n");
 	if (pdata) {
+		pr_err("got here 8\n");
 		sm5038->pdata = pdata;
 
 		pdata->irq_base = irq_alloc_descs(-1, 0, SM5038_IRQ_NR, -1);
@@ -268,12 +271,12 @@ static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 		pr_err("%s:%s pdata error\n", SM5038_DEV_NAME, __func__);
 		goto err;
 	}
-
+pr_err("got here 9\n");
 	mutex_init(&sm5038->i2c_lock);
 	mutex_init(&sm5038->irq_thread_lock);
 
 	static_sm5038_data = sm5038;
-
+pr_err("got here 10\n");
 	//i2c_set_clientdata(i2c, sm5038);
 	
 	pr_info("%s: %s : sm5038->dev=%p, sm5038->irq=%d\n", SM5038_DEV_NAME, __func__, sm5038->dev, sm5038->irq);
@@ -300,7 +303,7 @@ static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 		ret = -ENODEV;
 		goto err_w_lock;
     }
-
+pr_err("got here 11\n");
 	sm5038->muic_i2c = i2c_new_dummy(i2c->adapter, SM5038_I2C_SADR_MUIC);
 	//i2c_set_clientdata(sm5038->muic_i2c, sm5038);
     /* Check MUIC I2C transmission */
@@ -310,13 +313,13 @@ static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 		ret = -ENODEV;
 		goto err_w_lock;
 	}
-
+pr_err("got here 12\n");
 	ret = sm5038_irq_init(sm5038);
 	if (ret < 0) {
 		pr_err("%s:%s irq init error\n", SM5038_DEV_NAME, __func__);
 		goto err_irq_init;
 	}
-
+pr_err("got here 13\n");
 	//ret = mfd_add_devices(sm5038->dev, -1, sm5038_devs, ARRAY_SIZE(sm5038_devs), NULL, 0, NULL);
 	//if (ret < 0) {
 	//	pr_err("%s:%s mfd_add_devices error\n", SM5038_DEV_NAME, __func__);
@@ -333,7 +336,7 @@ static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 		pr_err("%s:%s sm5038_muic_probe error\n", SM5038_DEV_NAME, __func__);
 		goto err;
 	}
-
+pr_err("got here 14\n");
 	//////////////////////
 	// fg
 	//////////////////////
@@ -342,7 +345,7 @@ static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 		pr_err("%s:%s sm5038_fuelgauge_probe error\n", SM5038_DEV_NAME, __func__);
 		goto err;
 	}
-
+pr_err("got here 15\n");
 	//////////////////////
 	// charger
 	//////////////////////
@@ -350,7 +353,8 @@ static int sm5038_i2c_probe(struct i2c_client *i2c, const struct i2c_device_id *
 	if (ret < 0) {
 		pr_err("%s:%s sm5038_charger_probe error\n", SM5038_DEV_NAME, __func__);
 		goto err;
-	}	
+	}
+pr_err("got here 16\n");
 	//////////////////////
 	// fled
 	//////////////////////
