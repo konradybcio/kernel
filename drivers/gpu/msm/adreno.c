@@ -2096,10 +2096,10 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 	if (device->pwrctrl.bus_control) {
 		/* VBIF waiting for RAM */
 		if (adreno_dev->starved_ram_lo == 0) {
-			ret = adreno_perfcounter_get(adreno_dev,
-				KGSL_PERFCOUNTER_GROUP_VBIF_PWR, 0,
-				&adreno_dev->starved_ram_lo, NULL,
-				PERFCOUNTER_FLAG_KERNEL);
+		//	ret = adreno_perfcounter_get(adreno_dev,
+		//		KGSL_PERFCOUNTER_GROUP_VBIF_PWR, 0,
+		//		&adreno_dev->starved_ram_lo, NULL,
+		//		PERFCOUNTER_FLAG_KERNEL);
 
 			if (ret) {
 				dev_err(device->dev,
@@ -2110,10 +2110,10 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 
 		if (adreno_has_gbif(adreno_dev)) {
 			if (adreno_dev->starved_ram_lo_ch1 == 0) {
-				ret = adreno_perfcounter_get(adreno_dev,
-					KGSL_PERFCOUNTER_GROUP_VBIF_PWR, 1,
-					&adreno_dev->starved_ram_lo_ch1, NULL,
-					PERFCOUNTER_FLAG_KERNEL);
+		//		ret = adreno_perfcounter_get(adreno_dev,
+		//			KGSL_PERFCOUNTER_GROUP_VBIF_PWR, 1,
+		//			&adreno_dev->starved_ram_lo_ch1, NULL,
+		//			PERFCOUNTER_FLAG_KERNEL);
 
 				if (ret) {
 					dev_err(device->dev,
@@ -2123,11 +2123,11 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 			}
 
 			if (adreno_dev->ram_cycles_lo == 0) {
-				ret = adreno_perfcounter_get(adreno_dev,
-					KGSL_PERFCOUNTER_GROUP_VBIF,
-					GBIF_AXI0_READ_DATA_TOTAL_BEATS,
-					&adreno_dev->ram_cycles_lo, NULL,
-					PERFCOUNTER_FLAG_KERNEL);
+		//		ret = adreno_perfcounter_get(adreno_dev,
+		//			KGSL_PERFCOUNTER_GROUP_VBIF,
+		//			GBIF_AXI0_READ_DATA_TOTAL_BEATS,
+		//			&adreno_dev->ram_cycles_lo, NULL,
+		//			PERFCOUNTER_FLAG_KERNEL);
 
 				if (ret) {
 					dev_err(device->dev,
@@ -2137,12 +2137,12 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 			}
 
 			if (adreno_dev->ram_cycles_lo_ch1_read == 0) {
-				ret = adreno_perfcounter_get(adreno_dev,
-					KGSL_PERFCOUNTER_GROUP_VBIF,
-					GBIF_AXI1_READ_DATA_TOTAL_BEATS,
-					&adreno_dev->ram_cycles_lo_ch1_read,
-					NULL,
-					PERFCOUNTER_FLAG_KERNEL);
+		//		ret = adreno_perfcounter_get(adreno_dev,
+		//			KGSL_PERFCOUNTER_GROUP_VBIF,
+		//			GBIF_AXI1_READ_DATA_TOTAL_BEATS,
+		//			&adreno_dev->ram_cycles_lo_ch1_read,
+		//			NULL,
+		//			PERFCOUNTER_FLAG_KERNEL);
 
 				if (ret) {
 					dev_err(device->dev,
@@ -2152,12 +2152,12 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 			}
 
 			if (adreno_dev->ram_cycles_lo_ch0_write == 0) {
-				ret = adreno_perfcounter_get(adreno_dev,
-					KGSL_PERFCOUNTER_GROUP_VBIF,
-					GBIF_AXI0_WRITE_DATA_TOTAL_BEATS,
-					&adreno_dev->ram_cycles_lo_ch0_write,
-					NULL,
-					PERFCOUNTER_FLAG_KERNEL);
+		//		ret = adreno_perfcounter_get(adreno_dev,
+		//			KGSL_PERFCOUNTER_GROUP_VBIF,
+		//			GBIF_AXI0_WRITE_DATA_TOTAL_BEATS,
+		//			&adreno_dev->ram_cycles_lo_ch0_write,
+		//			NULL,
+		//			PERFCOUNTER_FLAG_KERNEL);
 
 				if (ret) {
 					dev_err(device->dev,
@@ -2167,12 +2167,12 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 			}
 
 			if (adreno_dev->ram_cycles_lo_ch1_write == 0) {
-				ret = adreno_perfcounter_get(adreno_dev,
-					KGSL_PERFCOUNTER_GROUP_VBIF,
-					GBIF_AXI1_WRITE_DATA_TOTAL_BEATS,
-					&adreno_dev->ram_cycles_lo_ch1_write,
-					NULL,
-					PERFCOUNTER_FLAG_KERNEL);
+		//		ret = adreno_perfcounter_get(adreno_dev,
+		//			KGSL_PERFCOUNTER_GROUP_VBIF,
+		//			GBIF_AXI1_WRITE_DATA_TOTAL_BEATS,
+		//			&adreno_dev->ram_cycles_lo_ch1_write,
+		//			NULL,
+		//			PERFCOUNTER_FLAG_KERNEL);
 
 				if (ret) {
 					dev_err(device->dev,
@@ -2209,7 +2209,7 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 	adreno_dev->busy_data.num_ifpc = 0;
 
 	/* Restore performance counter registers with saved values */
-	adreno_perfcounter_restore(adreno_dev);
+	//adreno_perfcounter_restore(adreno_dev);
 
 	/* Start the GPU */
 	gpudev->start(adreno_dev);
@@ -2227,7 +2227,7 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 
 	adreno_irqctrl(adreno_dev, 1);
 
-	adreno_perfcounter_start(adreno_dev);
+	//adreno_perfcounter_start(adreno_dev);
 
 	/* Clear FSR here in case it is set from a previous pagefault */
 	kgsl_mmu_clear_fsr(&device->mmu);
