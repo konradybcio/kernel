@@ -2040,13 +2040,6 @@ static int _adreno_start(struct adreno_device *adreno_dev)
 	if (regulator_left_on)
 		_soft_reset(adreno_dev);
 
-	void __iomem *gpucc = ioremap(0x05990000, 0x9000);
-	pr_err("GPU GDSC CX state 0x%x", readl(0x106c + gpucc));
-	pr_err("GPU GDSC GX state 0x%x", readl(0x100c + gpucc));
-
-	pr_err("GPU CX_GFX3D state 0x%x", readl(0x10a4 + gpucc));
-	pr_err("GPU GX_GFX3D state 0x%x", readl(0x1054 + gpucc));
-
 	/*
 	 * During adreno_stop, GBIF halt is asserted to ensure
 	 * no further transaction can go through GPU before GPU
