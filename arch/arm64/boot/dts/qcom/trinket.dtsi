@@ -1113,7 +1113,7 @@
 	};
 
 	pil_modem: qcom,mss@6080000 {
-		compatible = "qcom,pil-tz-generic";
+		compatible = "asdfqcom,pil-tz-generic";
 		reg = <0x6080000 0x100>;
 
 		clocks = <&clock_rpmcc CXO_SMD_PIL_MSS_CLK>;
@@ -1291,7 +1291,7 @@
 	};
 
 	qcom,turing@b300000 {
-		compatible = "qcom,pil-tz-generic";
+		compatible = "asdfqcom,pil-tz-generic";
 		reg = <0xb300000 0x100000>;
 
 		vdd_cx-supply = <&VDD_CX_LEVEL>;
@@ -2304,7 +2304,7 @@
 	};
 
 	ipa_hw: qcom,ipa@5800000 {
-		compatible = "qcom,ipa";
+		//compatible = "qcom,ipa";
 		reg = <0x5800000 0x34000>,
 		      <0x5804000 0x2c000>;
 		reg-names = "ipa-base", "gsi-base";
@@ -2393,7 +2393,7 @@
 	};
 
 	qcom,ipa_fws {
-		compatible = "qcom,pil-tz-generic";
+		compatible = "asdfqcom,pil-tz-generic";
 		qcom,pas-id = <0xf>;
 		qcom,firmware-name = "ipa_fws";
 		qcom,pil-force-shutdown;
@@ -2401,7 +2401,7 @@
 	};
 
 	qcom,venus@5ae0000 {
-		compatible = "qcom,pil-tz-generic";
+		compatible = "asdfqcom,pil-tz-generic";
 		reg = <0x5ae0000 0x4000>;
 
 		vdd-supply = <&venus_gdsc>;
@@ -2929,7 +2929,7 @@
 
 &soc {
 	icnss: qcom,icnss@C800000 {
-		compatible = "qcom,icnss";
+		//compatible = "qcom,icnss";
 		reg = <0xC800000 0x800000>,
 		      <0xb0000000 0x10000>;
 		reg-names = "membase", "smmu_iova_ipa";
