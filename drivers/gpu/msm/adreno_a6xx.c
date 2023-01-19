@@ -614,7 +614,7 @@ static void a6xx_start(struct adreno_device *adreno_dev)
 		a6xx_patch_pwrup_reglist(adreno_dev);
 		patch_reglist = true;
 	}
-	pr_err("[FOOFOO] gpuaddr=0x%llx", adreno_dev->pwrup_reglist.gpuaddr);
+
 	a6xx_preemption_start(adreno_dev);
 
 	/*
@@ -857,23 +857,6 @@ static int a6xx_post_start(struct adreno_device *adreno_dev)
  * a6xx_rb_start() - Start the ringbuffer
  * @adreno_dev: Pointer to adreno device
  */
-static const unsigned int a6xx_gmu_wrapper_registers[] = {
-        /* GMU CX */
-        0x1f840, 0x1f840, 0x1f844, 0x1f845, 0x1f887, 0x1f889,
-        /* GMU AO*/
-        0x23b0C, 0x23b0E, 0x23b15, 0x23b15,
-        // /* GPU CC */
-        // 0x24000, 0x24012, 0x24040, 0x24052, 0x24400, 0x24404, 0x24407, 0x2440B,
-        // 0x24415, 0x2441C, 0x2441E, 0x2442D, 0x2443C, 0x2443D, 0x2443F, 0x24440,
-        // 0x24442, 0x24449, 0x24458, 0x2445A, 0x24540, 0x2455E, 0x24800, 0x24802,
-        // 0x24C00, 0x24C02, 0x25400, 0x25402, 0x25800, 0x25802, 0x25C00, 0x25C02,
-        // 0x26000, 0x26002,
-};
-
-static const unsigned int gpucc_dump[] = {
-	0x0, 0x48, 0x100, 0x148, 0x1000, 0x1010, 0x101c, 0x102c, 0x1054, 0x1070, 0x1078, 0x10b4, 0x10f0, 0x10f4, 0x10fc, 0x1100, 0x1108, 0x1124, 0x1160, 0x1168, 0x1500, 0x1578, 0x2000, 0x2008, 0x3000, 0x3008, 0x5000, 0x5008, 0x6000, 0x6008, 0x7000, 0x7008, 0x8000, 0x8008
-};
-
 static int a6xx_rb_start(struct adreno_device *adreno_dev)
 {
 	struct adreno_gpudev *gpudev = ADRENO_GPU_DEVICE(adreno_dev);
@@ -911,9 +894,6 @@ static int a6xx_rb_start(struct adreno_device *adreno_dev)
 	/* Clear the SQE_HALT to start the CP engine */
 	kgsl_regwrite(device, A6XX_CP_SQE_CNTL, 1);
 
-	void __iomem *gpucc = ioremap(0x05990000, 0x9000);
-	pr_err("AFTER SQE UNHALT");
-
 	ret = a6xx_send_cp_init(adreno_dev, rb);
 	if (ret)
 		return ret;
@@ -926,20 +906,6 @@ static int a6xx_rb_start(struct adreno_device *adreno_dev)
 	ret = adreno_set_unsecured_mode(adreno_dev, rb);
 	if (ret)
 		return ret;
-
-
-	unsigned int v;
-	int i;
-	pr_err("--------\n");
-	for (i = 0; i < ARRAY_SIZE(a6xx_gmu_wrapper_registers); i++ ) {
-		kgsl_regread_nolog(device, a6xx_gmu_wrapper_registers[i], &v);
-		pr_err("0x%x = 0x%x\n", a6xx_gmu_wrapper_registers[i], v);
-	}
-	pr_err("--- GPUCC ---\n");
-	for (i = 0; i < ARRAY_SIZE(gpucc_dump); i++) {
-		pr_err("0x%x = 0x%x\n", gpucc_dump[i], readl(gpucc + gpucc_dump[i]));
-	}
-	pr_err("--------\n");
 
 	return a6xx_post_start(adreno_dev);
 }
