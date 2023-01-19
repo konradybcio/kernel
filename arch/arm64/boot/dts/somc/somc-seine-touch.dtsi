@@ -7,10 +7,10 @@
 	#address-cells = <1>;
 	#size-cells = <0>;
 	status = "ok";
-	qcom,i2c-touch-active = "sec,sec_ts";
+	//qcom,i2c-touch-active = "sec,sec_ts";
 
 	touchscreen@48 {
-		compatible = "sec,sec_ts";
+		//compatible = "sec,sec_ts";
 		reg = <0x48>;
 		sec,irq_gpio = <&tlmm 88 0x2008>;
 		sec,irq_type = <8200>;
