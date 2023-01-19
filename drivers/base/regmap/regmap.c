@@ -34,10 +34,7 @@
  * sort of problem defining LOG_DEVICE will add printks for basic
  * register I/O on a specific device.
  */
-//#undef LOG_DEVICE
-#define LOG_DEVICE "13375990000.qcom,gpupcc"
-#define LOG_DEVICE2 "1400000.qcom,gcc"
-//#define LOG_DEVICE "1400000.qcom,gcc"
+#undef LOG_DEVICE
 
 static int _regmap_update_bits(struct regmap *map, unsigned int reg,
 			       unsigned int mask, unsigned int val,
@@ -1753,8 +1750,8 @@ int _regmap_write(struct regmap *map, unsigned int reg,
 		}
 	}
 
-#ifdef LOG_DEVICE || LOG_DEVICE2
-	if (map->dev && (!strcmp(dev_name(map->dev), LOG_DEVICE) || !strcmp(dev_name(map->dev), LOG_DEVICE2)))
+#ifdef LOG_DEVICE
+	if (map->dev && strcmp(dev_name(map->dev), LOG_DEVICE) == 0)
 		dev_info(map->dev, "%x <= %x\n", reg, val);
 #endif
 
@@ -2448,8 +2445,8 @@ static int _regmap_read(struct regmap *map, unsigned int reg,
 
 	ret = map->reg_read(context, reg, val);
 	if (ret == 0) {
-#ifdef LOG_DEVICE || LOG_DEVICE2
-		if (map->dev && (!strcmp(dev_name(map->dev), LOG_DEVICE) || !strcmp(dev_name(map->dev), LOG_DEVICE2)))
+#ifdef LOG_DEVICE
+		if (map->dev && strcmp(dev_name(map->dev), LOG_DEVICE) == 0)
 			dev_info(map->dev, "%x => %x\n", reg, *val);
 #endif
 
