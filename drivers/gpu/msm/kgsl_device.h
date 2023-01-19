@@ -608,6 +608,20 @@ static inline bool kgsl_is_register_offset(struct kgsl_device *device,
 	return ((offsetwords * sizeof(uint32_t)) < device->reg_len);
 }
 
+static inline void kgsl_regread_nolog(struct kgsl_device *device,
+                                unsigned int offsetwords,
+                                unsigned int *value)
+{
+        if (kgsl_is_register_offset(device, offsetwords))
+                device->ftbl->regread(device, offsetwords, value);
+        else if (gmu_core_is_register_offset(device, offsetwords))
+                gmu_core_regread(device, offsetwords, value);
+        else {
+                WARN(1, "Out of bounds register read: 0x%x\n", offsetwords);
+                *value = 0;
+        }
+}
+
 static inline void kgsl_regread(struct kgsl_device *device,
 				unsigned int offsetwords,
 				unsigned int *value)
@@ -620,12 +634,14 @@ static inline void kgsl_regread(struct kgsl_device *device,
 		WARN(1, "Out of bounds register read: 0x%x\n", offsetwords);
 		*value = 0;
 	}
+	pr_err("[kgsl_regread] off=0x%x -> 0x%x\n", offsetwords, *value);
 }
 
 static inline void kgsl_regwrite(struct kgsl_device *device,
 				 unsigned int offsetwords,
 				 unsigned int value)
 {
+	pr_err("[kgsl_regwrite] off=0x%x <- 0x%x\n", offsetwords, value);
 	if (kgsl_is_register_offset(device, offsetwords))
 		device->ftbl->regwrite(device, offsetwords, value);
 	else if (gmu_core_is_register_offset(device, offsetwords))

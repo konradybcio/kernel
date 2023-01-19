@@ -237,6 +237,7 @@ void gmu_core_regwrite(struct kgsl_device *device, unsigned int offsetwords,
 	 * i.e. act like normal writel()
 	 */
 	wmb();
+	pr_err("[gmu_regwrite] off=0x%x <- 0x%x\n", offsetwords, value);
 	__raw_writel(value, reg);
 }
 
