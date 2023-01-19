@@ -34,7 +34,7 @@
 	gpubw: qcom,gpubw {
 		compatible = "qcom,devbw";
 		governor = "bw_vbif";
-		qcom,src-dst-ports = <26 512>;
+		qcom,src-dst-ports = <90 512>;
 		operating-points-v2 = <&gpu_bw_tbl>;
 	};
 
@@ -91,18 +91,18 @@
 		qcom,msm-bus,num-cases = <12>;
 		qcom,msm-bus,num-paths = <1>;
 		qcom,msm-bus,vectors-KBps =
-			<26 512 0 0>,
-			<26 512 0 800000>,    /*  1 bus=100  (LOW SVS) */
-			<26 512 0 1600000>,   /*  2 bus=200  (LOW SVS) */
-			<26 512 0 2400000>,   /*  3 bus=300  (LOW SVS) */
-			<26 512 0 3608000>,   /*  4 bus=451  (LOW SVS) */
-			<26 512 0 4376000>,   /*  5 bus=547  (LOW SVS) */
-			<26 512 0 5448000>,   /*  6 bus=681  (SVS)     */
-			<26 512 0 6144000>,   /*  7 bus=768  (SVS)     */
-			<26 512 0 8136000>,   /*  8 bus=1017 (SVS_L1)  */
-			<26 512 0 10824000>,  /*  9 bus=1353 (NOM)     */
-			<26 512 0 12440000>,  /* 10 bus=1555 (NOM)     */
-			<26 512 0 14432000>;  /* 11 bus=1804 (TURBO)   */
+			<90 512 0 0>,
+			<90 512 0 800000>,    /*  1 bus=100  (LOW SVS) */
+			<90 512 0 1600000>,   /*  2 bus=200  (LOW SVS) */
+			<90 512 0 2400000>,   /*  3 bus=300  (LOW SVS) */
+			<90 512 0 3608000>,   /*  4 bus=451  (LOW SVS) */
+			<90 512 0 4376000>,   /*  5 bus=547  (LOW SVS) */
+			<90 512 0 5448000>,   /*  6 bus=681  (SVS)     */
+			<90 512 0 6144000>,   /*  7 bus=768  (SVS)     */
+			<90 512 0 8136000>,   /*  8 bus=1017 (SVS_L1)  */
+			<90 512 0 10824000>,  /*  9 bus=1353 (NOM)     */
+			<90 512 0 12440000>,  /* 10 bus=1555 (NOM)     */
+			<90 512 0 14432000>;  /* 11 bus=1804 (TURBO)   */
 
 		/* GDSC regulator names */
 		regulator-names = "vddcx", "vdd";
