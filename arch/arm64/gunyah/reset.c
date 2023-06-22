@@ -29,11 +29,12 @@ int gh_arch_validate_vm_exited_notif(size_t buff_size, size_t hdr_size,
 				MAX_EXIT_REASON_SIZE) ||
 				(buff_size != min_buf_sz +
 			sizeof(struct gh_vm_exit_reason_psci_sys_reset2))) {
-			pr_err("%s: Invalid size for type PSCI_SYSTEM_RESET2: %u\n",
+			pr_err("%s: Invalid size for type PSCI_SYSTEM_RESET2: %lu\n",
 			__func__, buff_size - hdr_size);
 			return -EINVAL;
 		}
 		vm_exited_payload->exit_type = GH_RM_VM_EXIT_TYPE_SYSTEM_RESET;
+		break;
 	case GH_RM_VM_EXIT_TYPE_PSCI_SYSTEM_RESET:
 		vm_exited_payload->exit_type = GH_RM_VM_EXIT_TYPE_SYSTEM_RESET;
 		break;
